@@ -142,5 +142,94 @@ final notASchema = 42;
 
       expect(output, contains('// No valid schema definition found'));
     });
+
+    test('a root-level function schema annotated directly generates its data class', () async {
+      final output = await _generate('''
+import 'package:keyed_schema/keyed_schema.dart';
+
+@keyedSchema
+KSObject loginSchema() => ks.object({
+  'username': ks.string(),
+});
+''', 'loginSchema');
+
+      expect(output, contains('class LoginSchema'));
+    });
+
+    test(
+      '@keyedSchema library; also picks up function-declared schemas',
+      () async {
+        final inputId = AssetId.parse(
+          'keyed_form_gen|lib/generator_test_input.dart',
+        );
+        await resolveSource(
+          '''
+@keyedSchema
+library;
+
+import 'package:keyed_schema/keyed_schema.dart';
+
+final widgetSchema = ks.object({
+  'name': ks.string(),
+});
+
+KSObject loginSchema() => ks.object({
+  'username': ks.string(),
+});
+''',
+          (resolver) async {
+            final libraryElement = await resolver.libraryFor(inputId);
+            final annotation = ConstantReader(
+              libraryElement.metadata.annotations.first.computeConstantValue(),
+            );
+            final buildStep = _FakeBuildStep(resolver, inputId);
+            final output = await const KeyedFormGenerator()
+                .generateForAnnotatedElement(
+                  libraryElement,
+                  annotation,
+                  buildStep,
+                );
+
+            expect(output, contains('class WidgetSchema'));
+            expect(output, contains('class LoginSchema'));
+          },
+          inputId: inputId,
+        );
+      },
+    );
+
+    test('annotating a declaration that is neither a library nor a top-level schema throws', () async {
+      final inputId = AssetId.parse(
+        'keyed_form_gen|lib/generator_test_input.dart',
+      );
+      await resolveSource(
+        '''
+import 'package:keyed_schema/keyed_schema.dart';
+
+@keyedSchema
+class NotASchemaDeclaration {}
+''',
+        (resolver) async {
+          final lib = await resolver.libraryFor(inputId);
+          final element = lib.classes.firstWhere(
+            (c) => c.name == 'NotASchemaDeclaration',
+          );
+          final annotation = ConstantReader(
+            element.metadata.annotations.first.computeConstantValue(),
+          );
+          final buildStep = _FakeBuildStep(resolver, inputId);
+
+          await expectLater(
+            () => const KeyedFormGenerator().generateForAnnotatedElement(
+              element,
+              annotation,
+              buildStep,
+            ),
+            throwsA(isA<InvalidGenerationSourceError>()),
+          );
+        },
+        inputId: inputId,
+      );
+    });
   });
 }
