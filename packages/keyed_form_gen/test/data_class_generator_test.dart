@@ -214,5 +214,263 @@ void main() {
         expect(code, contains('_mapHash(dayNotes)'));
       },
     );
+
+    test('a root non-list nested-object field gets its own FieldRefs wrapper (toMap + Fields)', () {
+      final infoClass = ParsedClass(
+        name: 'TourInfoSchema',
+        schemaName: 'tourInfoSchema',
+        fields: [
+          ParsedField(name: 'name', dartType: 'String', defaultValue: "''"),
+        ],
+      );
+      final rootClass = ParsedClass(
+        name: 'TourSchema',
+        schemaName: 'tourSchema',
+        fields: [
+          ParsedField(
+            name: 'info',
+            dartType: 'TourInfoSchema',
+            isNestedObject: true,
+            nestedClass: infoClass,
+          ),
+          ParsedField(
+            name: 'altInfo',
+            dartType: 'TourInfoSchema?',
+            isNestedObject: true,
+            isNullable: true,
+            nestedClass: infoClass,
+          ),
+        ],
+      );
+
+      final code = generator.generate(rootClass);
+
+      // toMap: a nested-object field maps through its own toMap().
+      expect(code, contains("'info': info?.toMap(),"));
+
+      // Fields: a non-nullable nested field is a plain lens; a nullable one
+      // refines through .whenPresent(). The wrapper name derives from the
+      // *field* name ('info'), not the nested class's own name.
+      expect(code, contains('static InfoFieldRefs get info => InfoFieldRefs('));
+      expect(code, contains("key: FieldKey.name('info'),"));
+      expect(
+        code,
+        contains('static AltInfoFieldRefs get altInfo => AltInfoFieldRefs('),
+      );
+      expect(code, contains(').whenPresent(),'));
+
+      // The nested wrapper class itself, with a leaf getter for `name`.
+      expect(
+        code,
+        contains(
+          'final class InfoFieldRefs extends AffineLens<TourSchema, TourInfoSchema> {',
+        ),
+      );
+      expect(
+        code,
+        contains(
+          'FieldRef<TourSchema, String> get name =>\n'
+          '      _self.then(TourInfoFields.name);',
+        ),
+      );
+    });
+
+    test(
+      'a field name colliding with the FieldRef API throws a clear StateError',
+      () {
+        final rootClass = ParsedClass(
+          name: 'BadSchema',
+          schemaName: 'badSchema',
+          fields: [
+            ParsedField(
+              name: 'inner',
+              dartType: 'InnerSchema',
+              isNestedObject: true,
+              nestedClass: ParsedClass(
+                name: 'InnerSchema',
+                schemaName: 'innerSchema',
+                fields: [ParsedField(name: 'hashCode', dartType: 'int')],
+              ),
+            ),
+          ],
+        );
+
+        expect(
+          () => generator.generate(rootClass),
+          throwsA(
+            isA<StateError>().having(
+              (e) => e.message,
+              'message',
+              contains("field 'hashCode'"),
+            ),
+          ),
+        );
+      },
+    );
+
+    test('_singularizeField: "ies" and the (ss|x|z|ch|sh)es regex branches, via list navigators', () {
+      final categoryClass = ParsedClass(
+        name: 'CategorySchema',
+        schemaName: 'categorySchema',
+        isListItem: true,
+        fields: [
+          ParsedField(name: 'label', dartType: 'String', defaultValue: "''"),
+        ],
+      );
+      final boxClass = ParsedClass(
+        name: 'BoxSchema',
+        schemaName: 'boxSchema',
+        isListItem: true,
+        fields: [
+          ParsedField(name: 'weight', dartType: 'int', defaultValue: '0'),
+        ],
+      );
+      final rootClass = ParsedClass(
+        name: 'CatalogSchema',
+        schemaName: 'catalogSchema',
+        fields: [
+          ParsedField(
+            name: 'categories',
+            dartType: 'List<CategorySchema>',
+            isList: true,
+            nestedClass: categoryClass,
+          ),
+          ParsedField(
+            name: 'boxes',
+            dartType: 'List<BoxSchema>',
+            isList: true,
+            nestedClass: boxClass,
+          ),
+        ],
+      );
+
+      final code = generator.generate(rootClass);
+
+      // 'categories' ('ies' branch) -> navigator 'category'.
+      expect(
+        code,
+        contains('static CategoryFieldRefs category(CategoryRef at) =>'),
+      );
+      // 'boxes' (regex '(ss|x|z|ch|sh)es$' branch) -> navigator 'box'.
+      expect(code, contains('static BoxFieldRefs box(BoxRef at) =>'));
+    });
+
+    test('a two-level-deep non-list nested-object chain recurses to emit both wrappers', () {
+      final detailClass = ParsedClass(
+        name: 'DetailSchema',
+        schemaName: 'detailSchema',
+        fields: [
+          ParsedField(name: 'note', dartType: 'String', defaultValue: "''"),
+        ],
+      );
+      final infoClass = ParsedClass(
+        name: 'InfoSchema',
+        schemaName: 'infoSchema',
+        fields: [
+          ParsedField(
+            name: 'detail',
+            dartType: 'DetailSchema',
+            isNestedObject: true,
+            nestedClass: detailClass,
+          ),
+        ],
+      );
+      final rootClass = ParsedClass(
+        name: 'RootSchema',
+        schemaName: 'rootSchema',
+        fields: [
+          ParsedField(
+            name: 'info',
+            dartType: 'InfoSchema',
+            isNestedObject: true,
+            nestedClass: infoClass,
+          ),
+        ],
+      );
+
+      final code = generator.generate(rootClass);
+
+      expect(
+        code,
+        contains(
+          'final class InfoFieldRefs extends AffineLens<RootSchema, InfoSchema> {',
+        ),
+      );
+      expect(
+        code,
+        contains(
+          'final class DetailFieldRefs extends AffineLens<RootSchema, DetailSchema> {',
+        ),
+      );
+      expect(
+        code,
+        contains(
+          'FieldRef<RootSchema, String> get note =>\n'
+          '      _self.then(DetailFields.note);',
+        ),
+      );
+    });
+
+    test('a class name ending in literal "Schema" under a custom suffix falls back correctly', () {
+      // DataClassGenerator's naming helpers accept `name`/`suffix`
+      // independently of SchemaParser — this exercises the '...Schema'
+      // fallback a caller hits when the class name doesn't end with the
+      // active suffix (SchemaParser's own pipeline always keeps them in
+      // sync, but DataClassGenerator's public API does not assume that).
+      final parsedClass = ParsedClass(
+        name: 'LegacyThingSchema',
+        schemaName: 'legacyThingSchema',
+        fields: [
+          ParsedField(name: 'label', dartType: 'String', defaultValue: "''"),
+        ],
+      );
+
+      final code = generator.generate(parsedClass, suffix: 'Model');
+
+      expect(code, contains('abstract final class LegacyThingFields {'));
+    });
+
+    test(
+      'hashCode: zero fields, a single Map field, and more than 20 fields',
+      () {
+        final empty = generator.generate(
+          ParsedClass(
+            name: 'EmptySchema',
+            schemaName: 'emptySchema',
+            fields: [],
+          ),
+        );
+        expect(empty, contains('int get hashCode => 0;'));
+
+        final singleMap = generator.generate(
+          ParsedClass(
+            name: 'TagsSchema',
+            schemaName: 'tagsSchema',
+            fields: [
+              ParsedField(
+                name: 'tags',
+                dartType: 'Map<String, int>',
+                defaultValue: 'const {}',
+              ),
+            ],
+          ),
+        );
+        expect(singleMap, contains('int get hashCode => _mapHash(tags);'));
+
+        final manyFields = generator.generate(
+          ParsedClass(
+            name: 'WideSchema',
+            schemaName: 'wideSchema',
+            fields: [
+              for (var i = 0; i < 21; i++)
+                ParsedField(name: 'f$i', dartType: 'int', defaultValue: '0'),
+            ],
+          ),
+        );
+        expect(manyFields, contains('int get hashCode => Object.hashAll(['));
+        expect(manyFields, contains('    f0,'));
+        expect(manyFields, contains('    f20,'));
+      },
+    );
   });
 }
