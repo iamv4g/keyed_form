@@ -1,8 +1,9 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
 
+import 'expression_type_resolver.dart';
 import 'models/schema_model.dart';
+import 'naming.dart';
 
 class SchemaParser {
   const SchemaParser();
@@ -82,7 +83,7 @@ class SchemaParser {
     CompilationUnit? compilationUnit,
   }) {
     // Unroll method chains like ks.object({...}).refine(...)
-    final unrolled = _unrollExpression(expr);
+    final unrolled = unrollExpression(expr);
     final baseExpr = unrolled.base;
     final chainMethods = unrolled.methodCalls;
 
@@ -291,7 +292,7 @@ class SchemaParser {
     String suffix = 'Schema',
     CompilationUnit? compilationUnit,
   }) {
-    final unrolled = _unrollExpression(expr);
+    final unrolled = unrollExpression(expr);
     final baseExpr = unrolled.base;
     final chainMethods = unrolled.methodCalls;
 
@@ -422,8 +423,8 @@ class SchemaParser {
         } else {
           final args = baseExpr.argumentList.arguments;
           if (args.length >= 2) {
-            keyType = _resolveDartType(args[0]) ?? 'Object';
-            valType = _resolveDartType(args[1]) ?? 'Object';
+            keyType = resolveDartType(args[0]) ?? 'Object';
+            valType = resolveDartType(args[1]) ?? 'Object';
           }
         }
       }
@@ -444,7 +445,7 @@ class SchemaParser {
       if (listArgs.isEmpty) return null;
       final itemArg = listArgs.first;
 
-      String singular = _capitalize(fieldName);
+      String singular = capitalize(fieldName);
       if (singular.endsWith('ies')) {
         singular = '${singular.substring(0, singular.length - 3)}y';
       } else if (singular.endsWith('ses') ||
@@ -461,8 +462,8 @@ class SchemaParser {
       if (itemArg is SimpleIdentifier) {
         nestedSchemaName = itemArg.name;
       } else if (compilationUnit != null) {
-        final cand1 = '${_uncapitalize(singular)}$suffix';
-        final cand2 = '${_uncapitalize(singular)}Schema';
+        final cand1 = '${uncapitalize(singular)}$suffix';
+        final cand2 = '${uncapitalize(singular)}Schema';
         for (final d in compilationUnit.declarations) {
           if (d is TopLevelVariableDeclaration) {
             for (final v in d.variables.variables) {
@@ -493,7 +494,7 @@ class SchemaParser {
       if (nestedClass != null) {
         itemType = nestedClass.name;
       } else {
-        itemType = _resolveDartType(itemArg) ?? 'Object';
+        itemType = resolveDartType(itemArg) ?? 'Object';
       }
       final type = 'List<$itemType>';
 
@@ -521,7 +522,7 @@ class SchemaParser {
               'list',
               'map',
             ].contains(methodName))) {
-      final nestedClassName = '${_capitalize(fieldName)}$suffix';
+      final nestedClassName = '${capitalize(fieldName)}$suffix';
       final nestedClass = _parseObjectExpression(
         expr,
         nestedClassName,
@@ -549,119 +550,6 @@ class SchemaParser {
       }
     }
 
-    return null;
-  }
-
-  ({Expression base, List<MethodInvocation> methodCalls}) _unrollExpression(
-    Expression expr,
-  ) {
-    final methodCalls = <MethodInvocation>[];
-    Expression curr = expr;
-
-    while (curr is MethodInvocation) {
-      final target = curr.target;
-      if (target != null && target is! SimpleIdentifier) {
-        methodCalls.insert(0, curr);
-        curr = target;
-      } else {
-        break;
-      }
-    }
-
-    return (base: curr, methodCalls: methodCalls);
-  }
-
-  /// Resolves the Dart type representation of a validator expression.
-  ///
-  /// Priority:
-  /// 1. Resolved static type via Dart Analyzer if available (`KSValidator<T>`).
-  /// 2. AST-based recursive extraction for unresolved AST execution (e.g. unit tests).
-  String? _resolveDartType(Expression expr) {
-    // 1. Check resolved analyzer type if available
-    final staticType = expr.staticType;
-    if (staticType != null && staticType is InterfaceType) {
-      InterfaceType? validatorType;
-      if (staticType.element.name == 'KSValidator') {
-        validatorType = staticType;
-      } else {
-        for (final supertype in staticType.allSupertypes) {
-          if (supertype.element.name == 'KSValidator') {
-            validatorType = supertype;
-            break;
-          }
-        }
-      }
-      if (validatorType != null && validatorType.typeArguments.isNotEmpty) {
-        var display = validatorType.typeArguments.first.getDisplayString();
-        if (display.endsWith('?')) {
-          display = display.substring(0, display.length - 1);
-        }
-        return display;
-      }
-    }
-
-    // 2. Recursive AST fallback (unresolved AST)
-    final unrolled = _unrollExpression(expr);
-    final base = unrolled.base;
-
-    if (base is MethodInvocation) {
-      final name = base.methodName.name;
-      if (name == 'int') return 'int';
-      if (name == 'string') return 'String';
-      if (name == 'double') return 'double';
-      if (name == 'number' || name == 'num') return 'num';
-      if (name == 'boolean') return 'bool';
-      if (name == 'enums') {
-        final typeArgs = base.typeArguments?.arguments;
-        if (typeArgs != null && typeArgs.isNotEmpty) {
-          return typeArgs.first.toSource();
-        }
-        final args = base.argumentList.arguments;
-        if (args.isNotEmpty) {
-          final first = args.first;
-          if (first is PrefixedIdentifier &&
-              first.identifier.name == 'values') {
-            return first.prefix.name;
-          } else if (first is PropertyAccess &&
-              first.propertyName.name == 'values') {
-            return first.target?.toSource() ?? 'Enum';
-          }
-        }
-        return 'Enum';
-      }
-      if (name == 'list') {
-        final args = base.argumentList.arguments;
-        if (args.isNotEmpty) {
-          final innerType = _resolveDartType(args.first) ?? 'Object';
-          return 'List<$innerType>';
-        }
-        return 'List<Object>';
-      }
-      if (name == 'map') {
-        final typeArgs = base.typeArguments?.arguments;
-        if (typeArgs != null && typeArgs.length >= 2) {
-          return 'Map<${typeArgs[0].toSource()}, ${typeArgs[1].toSource()}>';
-        }
-        final args = base.argumentList.arguments;
-        if (args.length >= 2) {
-          final k = _resolveDartType(args[0]) ?? 'Object';
-          final v = _resolveDartType(args[1]) ?? 'Object';
-          return 'Map<$k, $v>';
-        }
-        return 'Map<Object, Object>';
-      }
-      if (name == 'object' || name == 'discriminatedUnion') {
-        for (final arg in base.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'className') {
-            if (arg.expression is SimpleStringLiteral) {
-              return (arg.expression as SimpleStringLiteral).value;
-            }
-          }
-        }
-      }
-    } else if (base is SimpleIdentifier) {
-      return _capitalize(base.name);
-    }
     return null;
   }
 
@@ -750,7 +638,7 @@ class SchemaParser {
         }
 
         final variantDefaultName =
-            '${_capitalize(variantKey)}${_getSingularName(finalClassName, suffix)}$suffix';
+            '${capitalize(variantKey)}${getSingularName(finalClassName, suffix)}$suffix';
 
         final variantClass = _parseObjectExpression(
           valExpr,
@@ -813,16 +701,6 @@ class SchemaParser {
     return unionClass;
   }
 
-  String _getSingularName(String name, String suffix) {
-    if (name.length > suffix.length && name.endsWith(suffix)) {
-      return name.substring(0, name.length - suffix.length);
-    }
-    if (name.length > 'Schema'.length && name.endsWith('Schema')) {
-      return name.substring(0, name.length - 'Schema'.length);
-    }
-    return name;
-  }
-
   String _inferClassName(String schemaName, String suffix) {
     var name = schemaName;
     if (name.startsWith('_')) {
@@ -831,14 +709,8 @@ class SchemaParser {
     if (name.endsWith('Schema')) {
       name = name.substring(0, name.length - 'Schema'.length);
     }
-    return '${_capitalize(name)}$suffix';
+    return '${capitalize(name)}$suffix';
   }
-
-  String _capitalize(String s) =>
-      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
-
-  String _uncapitalize(String s) =>
-      s.isEmpty ? s : s[0].toLowerCase() + s.substring(1);
 
   void _updateDescendantAncestors(
     ParsedClass cls,
