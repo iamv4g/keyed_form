@@ -25,23 +25,23 @@ jobs:
           set -e
           for pkg in keyed_lens keyed_schema keyed_form_gen keyed_form; do
             echo "::group::dart analyze $pkg"
-            (cd "$pkg" && dart analyze)
+            (cd "packages/$pkg" && dart analyze)
             echo "::endgroup::"
           done
 
       - name: Analyze (keyed_form_flutter)
         run: flutter analyze
-        working-directory: keyed_form_flutter
+        working-directory: packages/keyed_form_flutter
 
       - name: Test (pure Dart packages)
         run: |
           set -e
           for pkg in keyed_lens keyed_schema keyed_form_gen keyed_form; do
             echo "::group::dart test $pkg"
-            (cd "$pkg" && dart test)
+            (cd "packages/$pkg" && dart test)
             echo "::endgroup::"
           done
 
       - name: Test (keyed_form_flutter)
         run: flutter test
-        working-directory: keyed_form_flutter
+        working-directory: packages/keyed_form_flutter

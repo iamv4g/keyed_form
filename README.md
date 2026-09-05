@@ -14,11 +14,11 @@ keyed_lens          (pure Dart, no deps on the others)
 
 | Package | Role |
 |---|---|
-| [`keyed_lens`](keyed_lens) | Keyed optics (`Lens`/`AffineLens`/`FieldKey`) — the foundation |
-| [`keyed_schema`](keyed_schema) | Declarative schema/validation DSL built on `keyed_lens` |
-| [`keyed_form_gen`](keyed_form_gen) | `build_runner` codegen: schema → data class + lenses + validation |
-| [`keyed_form`](keyed_form) | Pure-Dart form controller (`KeyedFormController`, react-hook-form analogue) |
-| [`keyed_form_flutter`](keyed_form_flutter) | Flutter binding (`KeyedFormScope`, `KeyedFormField`, `KeyedFieldList`) |
+| [`keyed_lens`](packages/keyed_lens) | Keyed optics (`Lens`/`AffineLens`/`FieldKey`) — the foundation |
+| [`keyed_schema`](packages/keyed_schema) | Declarative schema/validation DSL built on `keyed_lens` |
+| [`keyed_form_gen`](packages/keyed_form_gen) | `build_runner` codegen: schema → data class + lenses + validation |
+| [`keyed_form`](packages/keyed_form) | Pure-Dart form controller (`KeyedFormController`, react-hook-form analogue) |
+| [`keyed_form_flutter`](packages/keyed_form_flutter) | Flutter binding (`KeyedFormScope`, `KeyedFormField`, `KeyedFieldList`) |
 
 ## Development
 
