@@ -1,0 +1,23 @@
+name: keyed_schema
+description: >-
+  Schema-driven declarative validation and type-safe form definitions for
+  keyed_lens. Pure Dart, no Flutter dependency.
+version: 0.1.0
+publish_to: "none"
+
+homepage: https://github.com/iamv4g/keyed_form
+repository: https://github.com/iamv4g/keyed_form/tree/main/keyed_schema
+issue_tracker: https://github.com/iamv4g/keyed_form/issues
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+
+dependencies:
+  keyed_lens: ^0.1.0
+  uuid: ^4.6.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

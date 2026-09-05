@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      # keyed_form_flutter needs the Flutter SDK; `flutter pub get` resolves
+      # the whole workspace (pure-Dart packages included) in one pass.
+      - name: Resolve workspace dependencies
+        run: flutter pub get
+
+      - name: Analyze (pure Dart packages)
+        run: |
+          set -e
+          for pkg in keyed_lens keyed_schema keyed_form_gen keyed_form; do
+            echo "::group::dart analyze $pkg"
+            (cd "$pkg" && dart analyze)
+            echo "::endgroup::"
+          done
+
+      - name: Analyze (keyed_form_flutter)
+        run: flutter analyze
+        working-directory: keyed_form_flutter
+
+      - name: Test (pure Dart packages)
+        run: |
+          set -e
+          for pkg in keyed_lens keyed_schema keyed_form_gen keyed_form; do
+            echo "::group::dart test $pkg"
+            (cd "$pkg" && dart test)
+            echo "::endgroup::"
+          done
+
+      - name: Test (keyed_form_flutter)
+        run: flutter test
+        working-directory: keyed_form_flutter

@@ -1,0 +1,19 @@
+targets:
+  $default:
+    builders:
+      keyed_form_gen:
+        enabled: true
+
+builders:
+  keyed_form_gen:
+    import: "package:keyed_form_gen/builder.dart"
+    builder_factories: ["keyedFormBuilder"]
+    build_extensions: { ".dart": [".kfg.dart"] }
+    auto_apply: dependents
+    build_to: source
+    # Run before the shared-part generators so a @riverpod / dart_mappable
+    # signature can name a generated schema class.
+    runs_before:
+      - "riverpod_generator|riverpod_generator"
+      - "dart_mappable_builder|dart_mappable_builder"
+      - "source_gen|combining_builder"

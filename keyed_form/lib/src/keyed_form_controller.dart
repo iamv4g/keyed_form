@@ -1,0 +1,347 @@
+import 'package:keyed_lens/keyed_lens.dart';
+import 'package:listen/listen.dart';
+
+import 'keyed_form_list.dart';
+import 'keyed_form_mode.dart';
+import 'keyed_form_resolver.dart';
+import 'keyed_form_snapshot.dart';
+
+/// Owns one editable draft of [Root] and everything that hangs off it:
+/// validation errors keyed by [FieldKey], which fields have been touched,
+/// which subtrees have been force-revealed, and whether a submit has been
+/// attempted.
+///
+/// It is a `ChangeNotifier` (`package:listen`) — every state change fires
+/// [notifyListeners]. Reads, writes, validation lookups and dirty checks all
+/// speak the `FieldRef` (lens) vocabulary, so UI code addresses a field the
+/// same way whether it is reading it, writing it, or asking for its error.
+///
+/// ```dart
+/// final form = KeyedFormController<InvoiceForm>(
+///   initialValue: const InvoiceForm(),
+///   mode: KeyedFormMode.onChange,
+///   resolver: (draft, _) => InvoiceForm.validateData(draft),
+/// );
+/// form.setField(InvoiceFields.customerEmail, 'ada@example.com');
+/// form.visibleError(InvoiceFields.customerEmail.key); // null until touched / submitted
+/// ```
+///
+/// [initialValue] doubles as the baseline for [isDirty] / [differs] / [reset];
+/// [seed] re-baselines once the real saved value is known.
+class KeyedFormController<Root> extends ChangeNotifier {
+  KeyedFormController({
+    required Root initialValue,
+    required this.resolver,
+    this.mode = KeyedFormMode.onTouched,
+    this.scopeOf,
+  }) : _value = initialValue,
+       _original = initialValue;
+
+  /// Validates a draft (or one subtree of it) — see [KeyedFormResolver].
+  final KeyedFormResolver<Root> resolver;
+
+  /// When a field's error becomes visible — see [KeyedFormMode].
+  final KeyedFormMode mode;
+
+  /// Maps a written field to the subtree to re-validate; `null` for
+  /// whole-draft validation on every write.
+  final KeyedFormScopeOf? scopeOf;
+
+  Root _value;
+  Root _original;
+  FieldErrors<String> _errors = const FieldErrors.empty();
+  final Set<FieldKey> _touched = {};
+  final Set<FieldKey> _revealed = {};
+  bool _submitted = false;
+  bool _submitting = false;
+
+  // --- reads -----------------------------------------------------------------
+
+  /// The current draft.
+  Root get value => _value;
+
+  /// The baseline the draft is diffed against — [initialValue], or the last
+  /// value passed to [seed] / [reset].
+  Root get original => _original;
+
+  /// The full error map, ungated by visibility. Insertion order is the
+  /// validation walk's document order.
+  FieldErrors<String> get errors => _errors;
+
+  bool get submitted => _submitted;
+
+  bool get submitting => _submitting;
+
+  /// The fields the user has interacted with (write in [KeyedFormMode.onChange],
+  /// blur elsewhere). Unmodifiable.
+  Set<FieldKey> get touched => Set.unmodifiable(_touched);
+
+  /// The subtrees whose errors are force-shown regardless of touched state —
+  /// populated by [validateScopes] and [reveal], cleared by [seed] / [reset]
+  /// and when a row is removed. A stale entry is harmless: a reverted subtree
+  /// has no errors to show.
+  Set<FieldKey> get revealed => Set.unmodifiable(_revealed);
+
+  /// Whole-draft dirty: the draft differs from [original].
+  bool get isDirty => _value != _original;
+
+  /// Reads one field of the draft; `null` when its path no longer resolves.
+  V? read<V>(FieldRef<Root, V> field) => field.getOrNull(_value);
+
+  /// Per-field dirty check against [original] (missing-vs-present counts as
+  /// different; equal or both-missing counts as clean).
+  bool differs(FieldRef<Root, Object?> field) =>
+      field.differs(_original, _value);
+
+  /// The row keys of [listField] whose row differs from its [original]
+  /// counterpart (matched by [KeyedRow.clientId]). Rows absent from the
+  /// baseline count as dirty.
+  Iterable<FieldKey> dirtyRows<Item extends KeyedRow>(
+    FieldRef<Root, List<Item>> listField,
+  ) sync* {
+    final current = listField.getOrNull(_value) ?? const [];
+    final originalRows = listField.getOrNull(_original) ?? const [];
+    final byId = {for (final row in originalRows) row.clientId: row};
+    for (final row in current) {
+      if (byId[row.clientId] != row) {
+        yield listField.key + FieldKey.id(row.clientId);
+      }
+    }
+  }
+
+  /// An immutable copy of the coarse state — see [KeyedFormSnapshot].
+  KeyedFormSnapshot<Root> get snapshot => KeyedFormSnapshot(
+    value: _value,
+    original: _original,
+    errors: _errors,
+    isDirty: isDirty,
+    submitted: _submitted,
+    submitting: _submitting,
+  );
+
+  // --- error visibility ----------------------------------------------------
+
+  /// The error on [key], or `null` when there is none or it is not visible yet
+  /// under the current [mode]. This is what a field widget renders.
+  String? visibleError(FieldKey key) {
+    final error = _errors.byKey(key);
+    if (error == null) return null;
+    return _isVisible(key) ? error : null;
+  }
+
+  /// [visibleError] addressed by lens.
+  String? visibleErrorFor(FieldRef<Root, Object?> field) =>
+      visibleError(field.key);
+
+  /// The visible error keys, in document order — feed straight to a
+  /// scroll-to-first-error routine.
+  Iterable<FieldKey> get visibleErrorKeys =>
+      _errors.keys.where(_isVisible);
+
+  /// Whether any *visible* error sits at or under [root] — for a day/section
+  /// header badge.
+  bool visibleErrorUnder(FieldKey root) =>
+      _errors.keys.any((key) => root.contains(key) && _isVisible(key));
+
+  bool _isVisible(FieldKey key) => switch (mode) {
+    KeyedFormMode.all => true,
+    KeyedFormMode.onSubmit => _submitted || _revealedCovers(key),
+    KeyedFormMode.onChange ||
+    KeyedFormMode.onBlur ||
+    KeyedFormMode.onTouched => _touched.contains(key) ||
+        _submitted ||
+        _revealedCovers(key),
+  };
+
+  bool _revealedCovers(FieldKey key) =>
+      _revealed.any((scope) => scope.contains(key));
+
+  // --- writes ------------------------------------------------------------
+
+  /// Writes [value] to [field] (no-op if the path no longer resolves or the
+  /// draft is unchanged).
+  void setField<V>(FieldRef<Root, V> field, V value) =>
+      _commit(field.key, field.set(_value, value));
+
+  /// Reads [field], applies [transform], writes it back — one revalidation,
+  /// one notification. Use for a bundle of related changes to a subtree.
+  void updateField<V>(
+    FieldRef<Root, V> field,
+    V Function(V current) transform,
+  ) => _commit(field.key, field.update(_value, transform));
+
+  /// A by-id list editor over [field] — append/insert/remove/move/update,
+  /// each funnelled through [updateField].
+  KeyedFormList<Root, Item> list<Item extends KeyedRow>(
+    FieldRef<Root, List<Item>> field,
+  ) => KeyedFormList.forController(this, field);
+
+  void _commit(FieldKey writtenKey, Root next) {
+    if (next == _value) return;
+    _value = next;
+    if (mode == KeyedFormMode.onChange) _touched.add(writtenKey);
+    _revalidateForWrite(writtenKey);
+    notifyListeners();
+  }
+
+  /// Applies [transform] to one list field and, for every row that the
+  /// transform dropped, forgets that row's errors and reveal state before
+  /// re-validating — so a removed row's error never outlives it even when the
+  /// list's own key falls outside any validation scope. Used by [KeyedFormList].
+  void mutateList<Item extends KeyedRow>(
+    FieldRef<Root, List<Item>> field,
+    List<Item> Function(List<Item> current) transform,
+  ) {
+    final before = field.getOrNull(_value) ?? const [];
+    final after = transform(List<Item>.of(before));
+    final next = field.set(_value, after);
+    if (next == _value) return;
+    _value = next;
+
+    final survivingIds = {for (final row in after) row.clientId};
+    for (final row in before) {
+      if (!survivingIds.contains(row.clientId)) {
+        final rowKey = field.key + FieldKey.id(row.clientId);
+        _errors = _errors.removeSubtree(rowKey);
+        _revealed.removeWhere(rowKey.contains);
+      }
+    }
+
+    if (mode == KeyedFormMode.onChange) _touched.add(field.key);
+    _revalidateForWrite(field.key);
+    notifyListeners();
+  }
+
+  // --- validation / touch / reveal --------------------------------------
+
+  /// Marks [key] touched and re-validates the subtree it belongs to (the whole
+  /// draft for an unscoped controller).
+  void touch(FieldKey key) {
+    _touched.add(key);
+    _revalidateScopeOf(key);
+    notifyListeners();
+  }
+
+  /// Whole-draft validation. Sets [submitted] so every error becomes visible.
+  /// Returns whether the draft is valid.
+  bool validate() {
+    _errors = resolver(_value, null);
+    _submitted = true;
+    notifyListeners();
+    return _errors.isEmpty;
+  }
+
+  /// Re-validates each subtree in [scopes], force-reveals all of them, and
+  /// returns the ones that still carry an error — the "validate my dirty days
+  /// before saving" operation. Only meaningful on a scoped controller.
+  List<FieldKey> validateScopes(Iterable<FieldKey> scopes) {
+    final failing = <FieldKey>[];
+    for (final scope in scopes) {
+      _errors = _spliceScope(scope, resolver(_value, scope));
+      _revealed.add(scope);
+      if (_errors.keys.any(scope.contains)) failing.add(scope);
+    }
+    notifyListeners();
+    return failing;
+  }
+
+  /// Force every error under each of [scopes] visible, without re-validating.
+  void reveal(Iterable<FieldKey> scopes) {
+    _revealed.addAll(scopes);
+    notifyListeners();
+  }
+
+  void _revalidateForWrite(FieldKey writtenKey) => _revalidateScopeOf(writtenKey);
+
+  void _revalidateScopeOf(FieldKey key) {
+    final scopeOf = this.scopeOf;
+    if (scopeOf == null) {
+      _errors = resolver(_value, null);
+      return;
+    }
+    final scope = scopeOf(key);
+    if (scope == null) return; // scoped controller, key outside any subtree
+    _errors = _spliceScope(scope, resolver(_value, scope));
+  }
+
+  /// Drops the existing errors under [scope] and appends [replacement],
+  /// keeping the surviving entries in their original order. Mirrors the
+  /// hand-rolled `replace<X>DayErrors` the app editors used to carry.
+  FieldErrors<String> _spliceScope(
+    FieldKey scope,
+    FieldErrors<String> replacement,
+  ) {
+    final kept = _errors.removeSubtree(scope);
+    final merged = <FieldKey, String>{
+      for (final key in kept.keys) key: kept.byKey(key)!,
+    };
+    for (final key in replacement.keys) {
+      assert(
+        scope.contains(key),
+        'resolver returned $key outside its scope $scope',
+      );
+      merged[key] = replacement.byKey(key)!;
+    }
+    return FieldErrors(merged);
+  }
+
+  // --- seed / reset / server errors ------------------------------------
+
+  /// Re-baselines the form to [value] (both draft and [original]) and clears
+  /// all bookkeeping — unless the draft is dirty and [force] is false, so a
+  /// background refresh cannot clobber in-progress edits.
+  void seed(Root value, {bool force = false}) {
+    if (isDirty && !force) return;
+    _value = value;
+    _original = value;
+    _resetBookkeeping();
+    notifyListeners();
+  }
+
+  /// Discards edits back to [original] and clears all bookkeeping.
+  void reset() {
+    _value = _original;
+    _resetBookkeeping();
+    notifyListeners();
+  }
+
+  void _resetBookkeeping() {
+    _errors = const FieldErrors.empty();
+    _touched.clear();
+    _revealed.clear();
+    _submitted = false;
+    _submitting = false;
+  }
+
+  /// Merges server-reported errors into the map and force-reveals them (they
+  /// come back from a submit, so the user must see them regardless of touched
+  /// state). Also sets [submitted].
+  void setServerErrors(Map<FieldKey, String> errors) {
+    if (errors.isEmpty) return;
+    final merged = <FieldKey, String>{
+      for (final key in _errors.keys) key: _errors.byKey(key)!,
+    };
+    errors.forEach((key, message) {
+      merged[key] = message;
+      _revealed.add(key);
+    });
+    _errors = FieldErrors(merged);
+    _submitted = true;
+    notifyListeners();
+  }
+
+  /// [setServerErrors] keyed by the [FieldKey.toPath] wire format — the shape
+  /// a JSON error body usually arrives in. Throws [FormatException] on a path
+  /// that is not valid wire format.
+  void setServerErrorPaths(Map<String, String> pathErrors) => setServerErrors({
+    for (final entry in pathErrors.entries)
+      FieldKey.parse(entry.key): entry.value,
+  });
+
+  /// Toggles the [submitting] flag (drives a disabled Save button / spinner).
+  void setSubmitting(bool value) {
+    if (_submitting == value) return;
+    _submitting = value;
+    notifyListeners();
+  }
+}

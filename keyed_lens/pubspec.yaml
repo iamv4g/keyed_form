@@ -1,0 +1,21 @@
+name: keyed_lens
+description: >-
+  Keyed optics for immutable aggregates: composable total/affine lenses that
+  each carry a stable, serializable FieldKey identity — the foundation for
+  editors, field-keyed validation, dirty tracking, and server patches.
+  Pure Dart, no Flutter dependency.
+version: 0.1.0
+publish_to: 'none'
+
+homepage: https://github.com/iamv4g/keyed_form
+repository: https://github.com/iamv4g/keyed_form/tree/main/keyed_lens
+issue_tracker: https://github.com/iamv4g/keyed_form/issues
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

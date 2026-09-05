@@ -1,0 +1,12 @@
+name: keyed_form_workspace
+publish_to: 'none'
+
+environment:
+  sdk: ^3.13.0
+
+workspace:
+  - keyed_lens
+  - keyed_schema
+  - keyed_form_gen
+  - keyed_form
+  - keyed_form_flutter
