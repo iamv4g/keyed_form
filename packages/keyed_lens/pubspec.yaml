@@ -1,8 +1,8 @@
 name: keyed_lens
 description: >-
   Composable total and affine lenses for immutable aggregates, each carrying a
-  stable, serializable FieldKey identity for addressing fields across errors,
-  focus and patches.
+  stable, serializable FieldKey identity that addresses a field for reads,
+  writes, diffs and patches.
 version: 0.1.0
 
 homepage: https://github.com/iamv4g/keyed_form
