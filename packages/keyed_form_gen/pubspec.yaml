@@ -1,7 +1,7 @@
 name: keyed_form_gen
 description: >-
-  Code generator for keyed_schema: generates primary constructor data models,
-  keyed lenses, and type-safe validation functions.
+  build_runner code generator for keyed_schema: turns a schema into immutable
+  data models, keyed_lens optics and type-safe validation functions.
 version: 0.1.0
 publish_to: "none"
 

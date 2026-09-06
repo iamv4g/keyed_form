@@ -1,9 +1,8 @@
 name: keyed_lens
 description: >-
-  Keyed optics for immutable aggregates: composable total/affine lenses that
-  each carry a stable, serializable FieldKey identity — the foundation for
-  editors, field-keyed validation, dirty tracking, and server patches.
-  Pure Dart, no Flutter dependency.
+  Composable total and affine lenses for immutable aggregates, each carrying a
+  stable, serializable FieldKey identity for addressing fields across errors,
+  focus and patches.
 version: 0.1.0
 publish_to: 'none'
 

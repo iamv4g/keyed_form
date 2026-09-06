@@ -1,7 +1,8 @@
 name: keyed_schema
 description: >-
-  Schema-driven declarative validation and type-safe form definitions for
-  keyed_lens. Pure Dart, no Flutter dependency.
+  Declarative, schema-driven validation for immutable aggregates: compose field
+  validators into object schemas that yield keyed_lens FieldKey-addressed errors.
+  Pure Dart.
 version: 0.1.0
 publish_to: "none"
 

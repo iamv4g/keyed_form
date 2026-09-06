@@ -1,9 +1,7 @@
 name: keyed_form_flutter
 description: >-
-  The Flutter binding for keyed_form: a FormScope that publishes a
-  FormController down the tree, KeyedFormField / KeyedFieldList widgets with
-  selective rebuilds, a caret-safe text binding, and a FieldKey-addressed
-  anchor registry for scroll-to-first-error.
+  Flutter bindings for keyed_form: a scope, field and list widgets with selective
+  rebuilds, caret-safe text editing, and scroll-to-first-error anchors.
 version: 0.1.0
 publish_to: 'none'
 
