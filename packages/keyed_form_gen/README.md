@@ -61,14 +61,18 @@ dev_dependencies:
 
 ### 1. Declare Schema
 
-You can declare schemas as top-level variables or top-level functions (e.g. for dynamic i18n):
+`@keyedSchema` is a **file-level** annotation: it goes on the `library`
+directive, and the generator picks up every schema declared in that file —
+whether a top-level variable or a top-level function (e.g. for dynamic i18n).
 
 ```dart
+@keyedSchema
+library;
+
 import 'package:keyed_schema/keyed_schema.dart';
 
-part 'invoice_schema.g.dart';
+part 'invoice_schema.kfg.dart';
 
-@keyedSchema
 final invoiceSchema = ks.object({
   'title': ks.string().min(3, error: .text('Invoice title must be at least 3 characters')),
   'lineItems': ks.list(
@@ -132,10 +136,14 @@ the `<Root>Fields` namespace drops it (`InvoiceSchema` → `InvoiceFields`):
 - `'itinerary'` $\rightarrow$ **`ItinerarySchema`** (with `ItineraryRef`, `ItineraryFieldRefs`)
 
 ### Custom Suffix (`Model`, `Entity`, `Dto`)
-You can configure a custom suffix for your project's architectural convention using `@KeyedSchema(suffix: '...')`:
+You can configure a custom suffix for your project's architectural convention using `@KeyedSchema(suffix: '...')` on the library directive:
 
 ```dart
 @KeyedSchema(suffix: 'Model')
+library;
+
+// ...
+
 final invoiceSchema = ks.object({
   'lineItems': ks.list(
     ks.object({
@@ -167,6 +175,10 @@ For dynamic translation resolution with packages like `slang`:
 
 ```dart
 @keyedSchema
+library;
+
+// ...
+
 KSObject loginSchema() {
   return ks.object({
     'username': ks.string().required(t.errors.auth.username),
@@ -178,6 +190,10 @@ KSObject loginSchema() {
 Or with lazy callbacks in variable schemas:
 ```dart
 @keyedSchema
+library;
+
+// ...
+
 final loginSchema = ks.object({
   'username': ks.string().required(() => t.errors.auth.username),
 });

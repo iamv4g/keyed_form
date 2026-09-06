@@ -13,11 +13,13 @@ Schema-driven declarative validation and type-safe form definitions for `keyed_l
 ## Usage
 
 ```dart
+@keyedSchema
+library;
+
 import 'package:keyed_schema/keyed_schema.dart';
 
-part 'invoice_schema.g.dart';
+part 'invoice_schema.kfg.dart';
 
-@keyedSchema
 final invoiceSchema = ks.object({
   'title': ks.string().min(3, error: .text('Invoice title must be at least 3 characters')),
   'lineItems': ks.list(
