@@ -6,7 +6,8 @@ import 'keyed_field_registry.dart';
 /// Turns a stored error string into display text for the given context — the
 /// app's i18n switch. Return the input unchanged for schemas that already
 /// store localized messages.
-typedef KeyedErrorTranslator = String Function(BuildContext context, String error);
+typedef KeyedErrorTranslator =
+    String Function(BuildContext context, String error);
 
 String _identity(BuildContext _, String error) => error;
 
