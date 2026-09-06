@@ -31,10 +31,7 @@ void main() {
           TourFields.hotel(hotel1Ref).hotelName.getOrNull(tour),
           'Kyoto Grand Hotel',
         );
-        expect(
-          TourFields.hotel(hotel1Ref).hotelPrice.getOrNull(tour),
-          '20000',
-        );
+        expect(TourFields.hotel(hotel1Ref).hotelPrice.getOrNull(tour), '20000');
         expect(HotelFields.hotelName.get(hotel1), 'Kyoto Grand Hotel');
 
         final hotel2Ref = (hotel: hotel2.clientId);
@@ -91,15 +88,12 @@ void main() {
       expect(next.dayNotes, isEmpty);
     });
 
-    test(
-      'bare [] literal for a List<Item> (nested data class) field '
-      'does not throw',
-      () {
-        final next = base.copyWith(hotels: []);
-        expect(next.hotels, isA<List<HotelSchema>>());
-        expect(next.hotels, isEmpty);
-      },
-    );
+    test('bare [] literal for a List<Item> (nested data class) field '
+        'does not throw', () {
+      final next = base.copyWith(hotels: []);
+      expect(next.hotels, isA<List<HotelSchema>>());
+      expect(next.hotels, isEmpty);
+    });
 
     test('a correctly-typed non-empty value still round-trips', () {
       final next = base.copyWith(
@@ -128,14 +122,8 @@ void main() {
 
   group('Map field equality/hashCode (deep, order-independent)', () {
     test('two maps with the same entries in different order are ==', () {
-      final a = TourSchema.create(
-        title: 'Tour',
-        dayNotes: {'d1': 1, 'd2': 2},
-      );
-      final b = TourSchema.create(
-        title: 'Tour',
-        dayNotes: {'d2': 2, 'd1': 1},
-      );
+      final a = TourSchema.create(title: 'Tour', dayNotes: {'d1': 1, 'd2': 2});
+      final b = TourSchema.create(title: 'Tour', dayNotes: {'d2': 2, 'd1': 1});
       expect(a, equals(b));
       expect(a.hashCode, b.hashCode);
     });

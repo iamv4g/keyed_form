@@ -148,23 +148,26 @@ KSObject loginSchema() {
   group('explicit className override', () {
     const parser = SchemaParser();
 
-    test('ks.object(className: ...) sets the class name, appending the suffix if missing', () {
-      const source = '''
+    test(
+      'ks.object(className: ...) sets the class name, appending the suffix if missing',
+      () {
+        const source = '''
 final testSchema = ks.object(className: 'CustomThing', {
   'foo': ks.string(),
 });
 ''';
-      final unit = parseString(content: source).unit;
-      final decl = unit.declarations.first as TopLevelVariableDeclaration;
-      final classes = parser.parseElement(
-        _FakeElement('testSchema'),
-        decl,
-        compilationUnit: unit,
-      );
+        final unit = parseString(content: source).unit;
+        final decl = unit.declarations.first as TopLevelVariableDeclaration;
+        final classes = parser.parseElement(
+          _FakeElement('testSchema'),
+          decl,
+          compilationUnit: unit,
+        );
 
-      expect(classes, hasLength(1));
-      expect(classes.first.name, 'CustomThingSchema');
-    });
+        expect(classes, hasLength(1));
+        expect(classes.first.name, 'CustomThingSchema');
+      },
+    );
 
     test(
       'an explicit className already ending in the suffix is not doubled',
@@ -238,8 +241,10 @@ final testSchema = ks.object({
   group('discriminatedUnion parsing', () {
     const parser = SchemaParser();
 
-    test('parses the discriminator, both variants, and promotes shared fields to the base class', () {
-      const source = '''
+    test(
+      'parses the discriminator, both variants, and promotes shared fields to the base class',
+      () {
+        const source = '''
 final testSchema = ks.discriminatedUnion('category', {
   'admission': ks.object({
     'sortIndex': ks.int().defaultTo(0),
@@ -251,37 +256,44 @@ final testSchema = ks.discriminatedUnion('category', {
   }),
 }, className: 'SectionSchema');
 ''';
-      final unit = parseString(content: source).unit;
-      final decl = unit.declarations.first as TopLevelVariableDeclaration;
-      final classes = parser.parseElement(
-        _FakeElement('testSchema'),
-        decl,
-        compilationUnit: unit,
-      );
+        final unit = parseString(content: source).unit;
+        final decl = unit.declarations.first as TopLevelVariableDeclaration;
+        final classes = parser.parseElement(
+          _FakeElement('testSchema'),
+          decl,
+          compilationUnit: unit,
+        );
 
-      // The union base class + both variants.
-      expect(classes, hasLength(3));
-      final union = classes.firstWhere((c) => c.name == 'SectionSchema');
-      expect(union.isUnion, isTrue);
-      expect(union.unionDiscriminator, 'category');
-      expect(union.unionVariants!.keys, containsAll(['admission', 'transfer']));
-      // 'sortIndex' is common to every variant, so it's promoted to the base.
-      expect(union.fields.map((f) => f.name), contains('sortIndex'));
+        // The union base class + both variants.
+        expect(classes, hasLength(3));
+        final union = classes.firstWhere((c) => c.name == 'SectionSchema');
+        expect(union.isUnion, isTrue);
+        expect(union.unionDiscriminator, 'category');
+        expect(
+          union.unionVariants!.keys,
+          containsAll(['admission', 'transfer']),
+        );
+        // 'sortIndex' is common to every variant, so it's promoted to the base.
+        expect(union.fields.map((f) => f.name), contains('sortIndex'));
 
-      final admission = union.unionVariants!['admission']!;
-      expect(admission.unionBaseClass, same(union));
-      expect(admission.unionDiscriminatorValue, 'admission');
-      expect(admission.fields.map((f) => f.name), contains('targetId'));
+        final admission = union.unionVariants!['admission']!;
+        expect(admission.unionBaseClass, same(union));
+        expect(admission.unionDiscriminatorValue, 'admission');
+        expect(admission.fields.map((f) => f.name), contains('targetId'));
 
-      final transfer = union.unionVariants!['transfer']!;
-      expect(transfer.unionDiscriminatorValue, 'transfer');
-      expect(transfer.fields.map((f) => f.name), contains('transferTargetId'));
-      // A field unique to one variant is not promoted to the base.
-      expect(
-        union.fields.map((f) => f.name),
-        isNot(contains('transferTargetId')),
-      );
-    });
+        final transfer = union.unionVariants!['transfer']!;
+        expect(transfer.unionDiscriminatorValue, 'transfer');
+        expect(
+          transfer.fields.map((f) => f.name),
+          contains('transferTargetId'),
+        );
+        // A field unique to one variant is not promoted to the base.
+        expect(
+          union.fields.map((f) => f.name),
+          isNot(contains('transferTargetId')),
+        );
+      },
+    );
 
     test(
       'a discriminator argument default of "category" is used when omitted',
@@ -427,8 +439,10 @@ final testSchema = ks.object({
       },
     );
 
-    test('a field value calling a sibling block-bodied function schema resolves through it', () {
-      const source = '''
+    test(
+      'a field value calling a sibling block-bodied function schema resolves through it',
+      () {
+        const source = '''
 KSObject partSchema() {
   return ks.object({'code': ks.string()});
 }
@@ -437,17 +451,18 @@ final testSchema = ks.object({
   'part': partSchema(),
 });
 ''';
-      final unit = parseString(content: source).unit;
-      final decl = unit.declarations.last as TopLevelVariableDeclaration;
-      final classes = parser.parseElement(
-        _FakeElement('testSchema'),
-        decl,
-        compilationUnit: unit,
-      );
+        final unit = parseString(content: source).unit;
+        final decl = unit.declarations.last as TopLevelVariableDeclaration;
+        final classes = parser.parseElement(
+          _FakeElement('testSchema'),
+          decl,
+          compilationUnit: unit,
+        );
 
-      final partField = classes.first.fields.single;
-      expect(partField.nestedClass!.fields.single.name, 'code');
-    });
+        final partField = classes.first.fields.single;
+        expect(partField.nestedClass!.fields.single.name, 'code');
+      },
+    );
 
     test('an inline list item borrows schemaName from a same-named sibling '
         'function declaration', () {
@@ -577,62 +592,70 @@ final testSchema = ks.object({
       },
     );
 
-    test('a namespaced (3-segment) Foo.Bar.values access resolves via the target property access', () {
-      const source = '''
+    test(
+      'a namespaced (3-segment) Foo.Bar.values access resolves via the target property access',
+      () {
+        const source = '''
 final testSchema = ks.object({
   'level': ks.enums(prefix.Priority.values),
 });
 ''';
-      final unit = parseString(content: source).unit;
-      final decl = unit.declarations.first as TopLevelVariableDeclaration;
-      final classes = parser.parseElement(
-        _FakeElement('testSchema'),
-        decl,
-        compilationUnit: unit,
-      );
+        final unit = parseString(content: source).unit;
+        final decl = unit.declarations.first as TopLevelVariableDeclaration;
+        final classes = parser.parseElement(
+          _FakeElement('testSchema'),
+          decl,
+          compilationUnit: unit,
+        );
 
-      expect(classes.first.fields.single.dartType, 'prefix.Priority?');
-    });
+        expect(classes.first.fields.single.dartType, 'prefix.Priority?');
+      },
+    );
   });
 
   group('object-level dedup by explicit className', () {
     const parser = SchemaParser();
 
-    test('two fields with the same explicit className resolve to a single cached class', () {
-      const source = '''
+    test(
+      'two fields with the same explicit className resolve to a single cached class',
+      () {
+        const source = '''
 final testSchema = ks.object({
   'primary': ks.object(className: 'AddressSchema', {'city': ks.string()}),
   'secondary': ks.object(className: 'AddressSchema', {'zip': ks.string()}),
 });
 ''';
-      final unit = parseString(content: source).unit;
-      final decl = unit.declarations.first as TopLevelVariableDeclaration;
-      final classes = parser.parseElement(
-        _FakeElement('testSchema'),
-        decl,
-        compilationUnit: unit,
-      );
+        final unit = parseString(content: source).unit;
+        final decl = unit.declarations.first as TopLevelVariableDeclaration;
+        final classes = parser.parseElement(
+          _FakeElement('testSchema'),
+          decl,
+          compilationUnit: unit,
+        );
 
-      // Deduped: only one AddressSchema, not two.
-      expect(classes.where((c) => c.name == 'AddressSchema'), hasLength(1));
-      final address = classes.firstWhere((c) => c.name == 'AddressSchema');
-      // The first definition wins; the second field's own fields never
-      // reach outClasses.
-      expect(address.fields.map((f) => f.name), contains('city'));
-      expect(address.fields.map((f) => f.name), isNot(contains('zip')));
+        // Deduped: only one AddressSchema, not two.
+        expect(classes.where((c) => c.name == 'AddressSchema'), hasLength(1));
+        final address = classes.firstWhere((c) => c.name == 'AddressSchema');
+        // The first definition wins; the second field's own fields never
+        // reach outClasses.
+        expect(address.fields.map((f) => f.name), contains('city'));
+        expect(address.fields.map((f) => f.name), isNot(contains('zip')));
 
-      final secondaryField = classes.first.fields.firstWhere(
-        (f) => f.name == 'secondary',
-      );
-      expect(secondaryField.nestedClass, same(address));
-    });
+        final secondaryField = classes.first.fields.firstWhere(
+          (f) => f.name == 'secondary',
+        );
+        expect(secondaryField.nestedClass, same(address));
+      },
+    );
   });
 
   group('nested object field ancestor tracking', () {
     const parser = SchemaParser();
 
-    test('a nested object field inside a list item records that list item as an ancestor', () {
-      const source = '''
+    test(
+      'a nested object field inside a list item records that list item as an ancestor',
+      () {
+        const source = '''
 final testSchema = ks.object({
   'sections': ks.list(ks.object({
     'title': ks.string(),
@@ -642,32 +665,35 @@ final testSchema = ks.object({
   })),
 });
 ''';
-      final unit = parseString(content: source).unit;
-      final decl = unit.declarations.first as TopLevelVariableDeclaration;
-      final classes = parser.parseElement(
-        _FakeElement('testSchema'),
-        decl,
-        compilationUnit: unit,
-      );
+        final unit = parseString(content: source).unit;
+        final decl = unit.declarations.first as TopLevelVariableDeclaration;
+        final classes = parser.parseElement(
+          _FakeElement('testSchema'),
+          decl,
+          compilationUnit: unit,
+        );
 
-      final sectionClass = classes.first.fields.single.nestedClass!;
-      final detailField = sectionClass.fields.firstWhere(
-        (f) => f.name == 'detail',
-      );
-      final detailClass = detailField.nestedClass!;
-      expect(
-        detailClass.ancestorListItems.map((c) => c.name),
-        contains('SectionSchema'),
-      );
-    });
+        final sectionClass = classes.first.fields.single.nestedClass!;
+        final detailField = sectionClass.fields.firstWhere(
+          (f) => f.name == 'detail',
+        );
+        final detailClass = detailField.nestedClass!;
+        expect(
+          detailClass.ancestorListItems.map((c) => c.name),
+          contains('SectionSchema'),
+        );
+      },
+    );
   });
 
   group('discriminatedUnion edge cases', () {
     const parser = SchemaParser();
 
-    test('appends the suffix to a bare explicit className, dedupes two fields '
-        'sharing a finalClassName, and tracks a list-item ancestor two levels deep', () {
-      const source = '''
+    test(
+      'appends the suffix to a bare explicit className, dedupes two fields '
+      'sharing a finalClassName, and tracks a list-item ancestor two levels deep',
+      () {
+        const source = '''
 final testSchema = ks.object({
   'primaryPayment': ks.discriminatedUnion('kind', {
     'cash': ks.object({'amount': ks.int()}),
@@ -681,29 +707,30 @@ final testSchema = ks.object({
   })),
 });
 ''';
-      final unit = parseString(content: source).unit;
-      final decl = unit.declarations.first as TopLevelVariableDeclaration;
-      final classes = parser.parseElement(
-        _FakeElement('testSchema'),
-        decl,
-        compilationUnit: unit,
-      );
+        final unit = parseString(content: source).unit;
+        final decl = unit.declarations.first as TopLevelVariableDeclaration;
+        final classes = parser.parseElement(
+          _FakeElement('testSchema'),
+          decl,
+          compilationUnit: unit,
+        );
 
-      // 'Method' (no suffix) becomes 'MethodSchema' — the same
-      // finalClassName as 'backupPayment''s explicit 'MethodSchema', so
-      // the two dedupe to one union class carrying the first's variants.
-      expect(classes.where((c) => c.name == 'MethodSchema'), hasLength(1));
-      final method = classes.firstWhere((c) => c.name == 'MethodSchema');
-      expect(method.unionVariants!.keys, contains('cash'));
+        // 'Method' (no suffix) becomes 'MethodSchema' — the same
+        // finalClassName as 'backupPayment''s explicit 'MethodSchema', so
+        // the two dedupe to one union class carrying the first's variants.
+        expect(classes.where((c) => c.name == 'MethodSchema'), hasLength(1));
+        final method = classes.firstWhere((c) => c.name == 'MethodSchema');
+        expect(method.unionVariants!.keys, contains('cash'));
 
-      // Nested two levels deep (days -> DaySchema -> sections -> union),
-      // the union tracks its enclosing list item as an ancestor.
-      final section = classes.firstWhere((c) => c.name == 'SectionSchema');
-      expect(
-        section.ancestorListItems.map((c) => c.name),
-        contains('DaySchema'),
-      );
-    });
+        // Nested two levels deep (days -> DaySchema -> sections -> union),
+        // the union tracks its enclosing list item as an ancestor.
+        final section = classes.firstWhere((c) => c.name == 'SectionSchema');
+        expect(
+          section.ancestorListItems.map((c) => c.name),
+          contains('DaySchema'),
+        );
+      },
+    );
   });
 
   group('boolean scalar field', () {
@@ -754,83 +781,83 @@ final _internalSchema = ks.object({'name': ks.string()});
     });
   });
 
-  group(
-    '_resolveDartType fallback branches, reached only through a scalar list '
-    'item that _parseObjectExpression could not resolve to a class',
-    () {
-      const parser = SchemaParser();
+  group('_resolveDartType fallback branches, reached only through a scalar list '
+      'item that _parseObjectExpression could not resolve to a class', () {
+    const parser = SchemaParser();
 
-      test('an explicit generic type argument on a list of enums', () {
-        const source = '''
+    test('an explicit generic type argument on a list of enums', () {
+      const source = '''
 enum Priority { low, high }
 
 final testSchema = ks.object({
   'levels': ks.list(ks.enums<Priority>(Priority.values)),
 });
 ''';
-        final unit = parseString(content: source).unit;
-        final decl = unit.declarations.last as TopLevelVariableDeclaration;
-        final classes = parser.parseElement(
-          _FakeElement('testSchema'),
-          decl,
-          compilationUnit: unit,
-        );
+      final unit = parseString(content: source).unit;
+      final decl = unit.declarations.last as TopLevelVariableDeclaration;
+      final classes = parser.parseElement(
+        _FakeElement('testSchema'),
+        decl,
+        compilationUnit: unit,
+      );
 
-        expect(classes.first.fields.single.listItemType, 'Priority');
-      });
+      expect(classes.first.fields.single.listItemType, 'Priority');
+    });
 
-      test('a namespaced Foo.Bar.values access on a list of enums', () {
-        const source = '''
+    test('a namespaced Foo.Bar.values access on a list of enums', () {
+      const source = '''
 final testSchema = ks.object({
   'levels': ks.list(ks.enums(prefix.Priority.values)),
 });
 ''';
-        final unit = parseString(content: source).unit;
-        final decl = unit.declarations.first as TopLevelVariableDeclaration;
-        final classes = parser.parseElement(
-          _FakeElement('testSchema'),
-          decl,
-          compilationUnit: unit,
-        );
+      final unit = parseString(content: source).unit;
+      final decl = unit.declarations.first as TopLevelVariableDeclaration;
+      final classes = parser.parseElement(
+        _FakeElement('testSchema'),
+        decl,
+        compilationUnit: unit,
+      );
 
-        expect(classes.first.fields.single.listItemType, 'prefix.Priority');
-      });
+      expect(classes.first.fields.single.listItemType, 'prefix.Priority');
+    });
 
-      test('an explicit generic type argument on a list of maps', () {
-        const source = '''
+    test('an explicit generic type argument on a list of maps', () {
+      const source = '''
 final testSchema = ks.object({
   'batches': ks.list(ks.map<String, int>()),
 });
 ''';
-        final unit = parseString(content: source).unit;
-        final decl = unit.declarations.first as TopLevelVariableDeclaration;
-        final classes = parser.parseElement(
-          _FakeElement('testSchema'),
-          decl,
-          compilationUnit: unit,
-        );
+      final unit = parseString(content: source).unit;
+      final decl = unit.declarations.first as TopLevelVariableDeclaration;
+      final classes = parser.parseElement(
+        _FakeElement('testSchema'),
+        decl,
+        compilationUnit: unit,
+      );
 
-        expect(classes.first.fields.single.listItemType, 'Map<String, int>');
-      });
+      expect(classes.first.fields.single.listItemType, 'Map<String, int>');
+    });
 
-      test('inferred key/value validators on a list of maps', () {
-        const source = '''
+    test('inferred key/value validators on a list of maps', () {
+      const source = '''
 final testSchema = ks.object({
   'batches': ks.list(ks.map(ks.string(), ks.int())),
 });
 ''';
-        final unit = parseString(content: source).unit;
-        final decl = unit.declarations.first as TopLevelVariableDeclaration;
-        final classes = parser.parseElement(
-          _FakeElement('testSchema'),
-          decl,
-          compilationUnit: unit,
-        );
+      final unit = parseString(content: source).unit;
+      final decl = unit.declarations.first as TopLevelVariableDeclaration;
+      final classes = parser.parseElement(
+        _FakeElement('testSchema'),
+        decl,
+        compilationUnit: unit,
+      );
 
-        expect(classes.first.fields.single.listItemType, 'Map<String, int>');
-      });
+      expect(classes.first.fields.single.listItemType, 'Map<String, int>');
+    });
 
-      test('a malformed ks.object(className: ...) missing its field map falls back to the className', () {
+    test(
+      'a malformed ks.object(className: ...) missing its field map falls back to the className',
+      () {
         const source = '''
 final testSchema = ks.object({
   'items': ks.list(ks.object(className: 'BrokenSchema')),
@@ -845,32 +872,29 @@ final testSchema = ks.object({
         );
 
         expect(classes.first.fields.single.listItemType, 'BrokenSchema');
-      });
+      },
+    );
 
-      test(
-        'an undeclared bare identifier falls back to its capitalized name',
-        () {
-          const source = '''
+    test(
+      'an undeclared bare identifier falls back to its capitalized name',
+      () {
+        const source = '''
 final testSchema = ks.object({
   'items': ks.list(someUndeclaredThing),
 });
 ''';
-          final unit = parseString(content: source).unit;
-          final decl = unit.declarations.first as TopLevelVariableDeclaration;
-          final classes = parser.parseElement(
-            _FakeElement('testSchema'),
-            decl,
-            compilationUnit: unit,
-          );
+        final unit = parseString(content: source).unit;
+        final decl = unit.declarations.first as TopLevelVariableDeclaration;
+        final classes = parser.parseElement(
+          _FakeElement('testSchema'),
+          decl,
+          compilationUnit: unit,
+        );
 
-          expect(
-            classes.first.fields.single.listItemType,
-            'SomeUndeclaredThing',
-          );
-        },
-      );
-    },
-  );
+        expect(classes.first.fields.single.listItemType, 'SomeUndeclaredThing');
+      },
+    );
+  });
 }
 
 class _FakeElement implements Element {

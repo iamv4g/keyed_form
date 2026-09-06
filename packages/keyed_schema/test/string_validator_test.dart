@@ -98,17 +98,20 @@ void main() {
       expect(secondRuleRan, isFalse);
     });
 
-    test('refine throws KSAsyncValidationError when async rule evaluated synchronously', () {
-      final validator = ks.string().refine(
-        (v) async => v == 'valid',
-        error: .text('Must be valid'),
-      );
+    test(
+      'refine throws KSAsyncValidationError when async rule evaluated synchronously',
+      () {
+        final validator = ks.string().refine(
+          (v) async => v == 'valid',
+          error: .text('Must be valid'),
+        );
 
-      expect(
-        () => validator.validate('invalid'),
-        throwsA(isA<KSAsyncValidationError>()),
-      );
-    });
+        expect(
+          () => validator.validate('invalid'),
+          throwsA(isA<KSAsyncValidationError>()),
+        );
+      },
+    );
 
     test('supports i18n callback message with KSError.builder', () {
       var currentLocale = 'en';

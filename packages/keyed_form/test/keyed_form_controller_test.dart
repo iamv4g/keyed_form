@@ -66,7 +66,10 @@ void main() {
       final base = const Trip(
         name: 'T',
         days: 1,
-        stops: [Stop(clientId: 'a', label: 'A'), Stop(clientId: 'b', label: 'B')],
+        stops: [
+          Stop(clientId: 'a', label: 'A'),
+          Stop(clientId: 'b', label: 'B'),
+        ],
       );
       final form = scopedForm(initial: base);
 
@@ -74,18 +77,18 @@ void main() {
 
       expect(form.differs(TripFields.stop('a')), isFalse);
       expect(form.differs(TripFields.stop('b')), isTrue);
-      expect(
-        form.dirtyRows(TripFields.stops).map((k) => k.toPath()),
-        ['stops.[\'b\']'],
-      );
+      expect(form.dirtyRows(TripFields.stops).map((k) => k.toPath()), [
+        'stops.[\'b\']',
+      ]);
     });
   });
 
   group('error visibility by mode', () {
     test('onChange: error shows immediately after the field is written', () {
-      final form = flatForm(mode: KeyedFormMode.onChange, initial: const Trip(days: 1))
-        ..setField(TripFields.name, 'x')
-        ..setField(TripFields.name, '');
+      final form =
+          flatForm(mode: KeyedFormMode.onChange, initial: const Trip(days: 1))
+            ..setField(TripFields.name, 'x')
+            ..setField(TripFields.name, '');
 
       expect(form.visibleErrorFor(TripFields.name), 'name.required');
     });
@@ -136,7 +139,10 @@ void main() {
         initial: const Trip(
           name: 'T',
           days: 1,
-          stops: [Stop(clientId: 'a'), Stop(clientId: 'b')],
+          stops: [
+            Stop(clientId: 'a'),
+            Stop(clientId: 'b'),
+          ],
         ),
       );
 
@@ -144,7 +150,10 @@ void main() {
       form.setField(TripFields.stopLabel('a'), '');
 
       // 'a' is now invalid; 'b' was never validated (still no error recorded).
-      expect(form.errors.byKey(TripFields.stopLabel('a').key), 'label.required');
+      expect(
+        form.errors.byKey(TripFields.stopLabel('a').key),
+        'label.required',
+      );
       expect(form.errors.byKey(TripFields.stopLabel('b').key), isNull);
     });
 
@@ -153,7 +162,11 @@ void main() {
         initial: const Trip(
           name: 'T',
           days: 1,
-          stops: [Stop(clientId: 'a'), Stop(clientId: 'b'), Stop(clientId: 'c')],
+          stops: [
+            Stop(clientId: 'a'),
+            Stop(clientId: 'b'),
+            Stop(clientId: 'c'),
+          ],
         ),
       );
 
@@ -163,17 +176,16 @@ void main() {
         TripFields.stop('c').key,
       ]);
       // a, b, c all empty-label → three errors in order.
-      expect(
-        form.errors.keys.map((k) => k.toPath()).toList(),
-        [for (final id in ['a', 'b', 'c']) "stops.['$id'].label"],
-      );
+      expect(form.errors.keys.map((k) => k.toPath()).toList(), [
+        for (final id in ['a', 'b', 'c']) "stops.['$id'].label",
+      ]);
 
       // Re-validate 'a' only: its key moves to the end, b/c keep their order.
       form.setField(TripFields.stopLabel('a'), 'A');
-      expect(
-        form.errors.keys.map((k) => k.toPath()).toList(),
-        ["stops.['b'].label", "stops.['c'].label"],
-      );
+      expect(form.errors.keys.map((k) => k.toPath()).toList(), [
+        "stops.['b'].label",
+        "stops.['c'].label",
+      ]);
     });
 
     test('validateScopes reveals scopes and returns only failing ones', () {
@@ -181,7 +193,10 @@ void main() {
         initial: const Trip(
           name: 'T',
           days: 1,
-          stops: [Stop(clientId: 'a', label: 'A'), Stop(clientId: 'b')],
+          stops: [
+            Stop(clientId: 'a', label: 'A'),
+            Stop(clientId: 'b'),
+          ],
         ),
       );
 
@@ -286,10 +301,7 @@ void main() {
 
     test('removeById returns the row and drops its errors', () {
       final form = withStops(['a', 'b']);
-      form.validateScopes([
-        TripFields.stop('a').key,
-        TripFields.stop('b').key,
-      ]);
+      form.validateScopes([TripFields.stop('a').key, TripFields.stop('b').key]);
       // labels equal their ids, so no errors — make 'b' invalid first.
       form.setField(TripFields.stopLabel('b'), '');
       form.touch(TripFields.stopLabel('b').key);
@@ -297,8 +309,11 @@ void main() {
 
       final removed = form.list(TripFields.stops).removeById('b');
       expect(removed?.clientId, 'b');
-      expect(form.errors.byKey(TripFields.stopLabel('b').key), isNull,
-          reason: 'removeSubtree runs on the write');
+      expect(
+        form.errors.byKey(TripFields.stopLabel('b').key),
+        isNull,
+        reason: 'removeSubtree runs on the write',
+      );
     });
 
     test('move / swap reorder by position', () {
