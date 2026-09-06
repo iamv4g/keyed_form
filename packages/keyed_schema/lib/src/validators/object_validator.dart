@@ -109,7 +109,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
       final fieldName = entry.key;
       final validator = entry.value;
       final fieldValue = data[fieldName];
-      final fieldKey = rootPrefix + FieldKey.name(fieldName);
+      final fieldKey = rootPrefix + .name(fieldName);
 
       if (validator is KSObject) {
         final nestedErrors = validator.validateMap(
@@ -154,7 +154,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
                     ? item
                     : Map<String, Object?>.from(item);
                 final idVal = typedItem['clientId'] ?? typedItem['id'] ?? i;
-                final itemKey = fieldKey + FieldKey.id(idVal);
+                final itemKey = fieldKey + .id(idVal);
                 final itemErrors = elemValidator.validateMap(
                   typedItem,
                   prefix: itemKey,
@@ -173,7 +173,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
                     ? item
                     : Map<String, Object?>.from(item);
                 final idVal = typedItem['clientId'] ?? typedItem['id'] ?? i;
-                final itemKey = fieldKey + FieldKey.id(idVal);
+                final itemKey = fieldKey + .id(idVal);
                 final itemErrors = elemValidator.validateMap(
                   typedItem,
                   prefix: itemKey,
@@ -208,9 +208,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
       if (!testResult) {
         final targetKey = ref.key != null
             ? rootPrefix + ref.key!
-            : (ref.path != null
-                  ? rootPrefix + FieldKey.name(ref.path!)
-                  : rootPrefix);
+            : (ref.path != null ? rootPrefix + .name(ref.path!) : rootPrefix);
         const defaultMsg = 'Invalid';
         final issue = KSCustomIssue(
           path: ref.path != null ? [ref.path!] : const [],
@@ -252,7 +250,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
       final fieldName = entry.key;
       final validator = entry.value;
       final fieldValue = data[fieldName];
-      final fieldKey = rootPrefix + FieldKey.name(fieldName);
+      final fieldKey = rootPrefix + .name(fieldName);
 
       if (validator is KSObject) {
         final nestedErrors = await validator.validateMapAsync(
@@ -297,7 +295,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
                     ? item
                     : Map<String, Object?>.from(item);
                 final idVal = typedItem['clientId'] ?? typedItem['id'] ?? i;
-                final itemKey = fieldKey + FieldKey.id(idVal);
+                final itemKey = fieldKey + .id(idVal);
                 final itemErrors = await elemValidator.validateMapAsync(
                   typedItem,
                   prefix: itemKey,
@@ -316,7 +314,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
                     ? item
                     : Map<String, Object?>.from(item);
                 final idVal = typedItem['clientId'] ?? typedItem['id'] ?? i;
-                final itemKey = fieldKey + FieldKey.id(idVal);
+                final itemKey = fieldKey + .id(idVal);
                 final itemErrors = elemValidator.validateMap(
                   typedItem,
                   prefix: itemKey,
@@ -347,9 +345,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
       if (!isValid) {
         final targetKey = ref.key != null
             ? rootPrefix + ref.key!
-            : (ref.path != null
-                  ? rootPrefix + FieldKey.name(ref.path!)
-                  : rootPrefix);
+            : (ref.path != null ? rootPrefix + .name(ref.path!) : rootPrefix);
         const defaultMsg = 'Invalid';
         final issue = KSCustomIssue(
           path: ref.path != null ? [ref.path!] : const [],

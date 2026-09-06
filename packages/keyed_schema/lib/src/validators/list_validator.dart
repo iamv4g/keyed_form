@@ -4,9 +4,8 @@ import '../error.dart';
 import '../issue.dart';
 import 'validator.dart';
 
-typedef ListIssueRule<E> = (KSIssue issue, KSError? ruleError)? Function(
-  List<E>? value,
-);
+typedef ListIssueRule<E> =
+    (KSIssue issue, KSError? ruleError)? Function(List<E>? value);
 
 typedef ListRefinement<E> = ({
   FutureOr<bool> Function(List<E>? value) test,
@@ -90,11 +89,7 @@ class KSList<E> extends KSValidator<List<E>?> {
         if (v == null) return null;
         if (v.length < count) {
           return (
-            KSTooSmallIssue(
-              origin: KSIssueOrigin.list,
-              minimum: count,
-              input: v,
-            ),
+            KSTooSmallIssue(origin: .list, minimum: count, input: v),
             error,
           );
         }
@@ -109,7 +104,7 @@ class KSList<E> extends KSValidator<List<E>?> {
         if (v == null) return null;
         if (v.length > count) {
           return (
-            KSTooBigIssue(origin: KSIssueOrigin.list, maximum: count, input: v),
+            KSTooBigIssue(origin: .list, maximum: count, input: v),
             error,
           );
         }

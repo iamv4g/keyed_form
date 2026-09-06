@@ -335,7 +335,7 @@ class KSInt extends _KSNumBase<int, KSInt> {
   });
 
   @override
-  KSIssueOrigin get origin => KSIssueOrigin.int;
+  KSIssueOrigin get origin => .int;
 
   @override
   KSInt copyWith({
@@ -381,7 +381,7 @@ class KSDouble extends _KSNumBase<double, KSDouble> {
   });
 
   @override
-  KSIssueOrigin get origin => KSIssueOrigin.double;
+  KSIssueOrigin get origin => .double;
 
   @override
   KSDouble copyWith({
@@ -427,7 +427,7 @@ class KSNum extends _KSNumBase<num, KSNum> {
   });
 
   @override
-  KSIssueOrigin get origin => KSIssueOrigin.number;
+  KSIssueOrigin get origin => .number;
 
   @override
   KSNum copyWith({

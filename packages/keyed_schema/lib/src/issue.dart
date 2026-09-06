@@ -67,7 +67,7 @@ final class KSInvalidTypeIssue extends KSIssue {
     super.path,
     String? message,
   }) : super(
-         code: KSIssueCode.invalidType,
+         code: .invalidType,
          message:
              message ?? (input == null ? 'Required' : 'Expected $expected'),
        );
@@ -86,16 +86,16 @@ final class KSTooSmallIssue extends KSIssue {
     super.path,
     String? message,
   }) : super(
-         code: KSIssueCode.tooSmall,
+         code: .tooSmall,
          message:
              message ??
              (exact
-                 ? (origin == KSIssueOrigin.string
+                 ? (origin == .string
                        ? 'Must be exactly $minimum characters'
                        : 'Must be exactly $minimum')
-                 : (origin == KSIssueOrigin.string
+                 : (origin == .string
                        ? 'Must be at least $minimum characters'
-                       : (origin == KSIssueOrigin.list
+                       : (origin == .list
                              ? 'Must have at least $minimum items'
                              : 'Must be at least $minimum'))),
        );
@@ -117,18 +117,18 @@ final class KSTooBigIssue extends KSIssue {
     super.path,
     String? message,
   }) : super(
-         code: KSIssueCode.tooBig,
+         code: .tooBig,
          message:
              message ??
              (exact
-                 ? (origin == KSIssueOrigin.string
+                 ? (origin == .string
                        ? 'Must be exactly $maximum characters'
-                       : (origin == KSIssueOrigin.list
+                       : (origin == .list
                              ? 'Must have exactly $maximum items'
                              : 'Must be exactly $maximum'))
-                 : (origin == KSIssueOrigin.string
+                 : (origin == .string
                        ? 'Must be at most $maximum characters'
-                       : (origin == KSIssueOrigin.list
+                       : (origin == .list
                              ? 'Must have at most $maximum items'
                              : 'Must be at most $maximum'))),
        );
@@ -147,7 +147,7 @@ final class KSInvalidFormatIssue extends KSIssue {
     super.input,
     super.path,
     required super.message,
-  }) : super(code: KSIssueCode.invalidFormat);
+  }) : super(code: .invalidFormat);
 
   final KSStringFormat format;
   final String? pattern;
@@ -160,10 +160,7 @@ final class KSInvalidValueIssue extends KSIssue {
     super.input,
     super.path,
     String? message,
-  }) : super(
-         code: KSIssueCode.invalidValue,
-         message: message ?? 'Invalid selection',
-       );
+  }) : super(code: .invalidValue, message: message ?? 'Invalid selection');
 
   final List<Object?> values;
 }
@@ -175,7 +172,7 @@ final class KSCustomIssue extends KSIssue {
     super.input,
     super.path,
     required super.message,
-  }) : super(code: KSIssueCode.custom);
+  }) : super(code: .custom);
 
   final Map<String, Object?>? params;
 }

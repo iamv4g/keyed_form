@@ -70,7 +70,7 @@ class KSDiscriminatedUnion<T> extends KSValidator<Map<String, Object?>?> {
     final discriminatorValue = data[discriminatorKey]?.toString();
     if (discriminatorValue == null ||
         !variants.containsKey(discriminatorValue)) {
-      final targetKey = rootPrefix + FieldKey.name(discriminatorKey);
+      final targetKey = rootPrefix + .name(discriminatorKey);
       final issue = KSCustomIssue(
         path: [discriminatorKey],
         message: 'Invalid or missing discriminator "$discriminatorKey"',
@@ -105,7 +105,7 @@ class KSDiscriminatedUnion<T> extends KSValidator<Map<String, Object?>?> {
     final discriminatorValue = data[discriminatorKey]?.toString();
     if (discriminatorValue == null ||
         !variants.containsKey(discriminatorValue)) {
-      final targetKey = rootPrefix + FieldKey.name(discriminatorKey);
+      final targetKey = rootPrefix + .name(discriminatorKey);
       final issue = KSCustomIssue(
         path: [discriminatorKey],
         message: 'Invalid or missing discriminator "$discriminatorKey"',

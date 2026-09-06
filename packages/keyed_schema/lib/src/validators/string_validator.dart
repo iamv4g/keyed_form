@@ -4,9 +4,8 @@ import '../error.dart';
 import '../issue.dart';
 import 'validator.dart';
 
-typedef StringIssueRule = (KSIssue issue, KSError? ruleError)? Function(
-  String? value,
-);
+typedef StringIssueRule =
+    (KSIssue issue, KSError? ruleError)? Function(String? value);
 
 typedef StringRefinement = ({
   FutureOr<bool> Function(String? value) test,
@@ -101,11 +100,7 @@ class KSString extends KSValidator<String?> {
         if (v == null || v.isEmpty) return null;
         if (v.length < length) {
           return (
-            KSTooSmallIssue(
-              origin: KSIssueOrigin.string,
-              minimum: length,
-              input: v,
-            ),
+            KSTooSmallIssue(origin: .string, minimum: length, input: v),
             error,
           );
         }
@@ -120,11 +115,7 @@ class KSString extends KSValidator<String?> {
         if (v == null || v.isEmpty) return null;
         if (v.length > length) {
           return (
-            KSTooBigIssue(
-              origin: KSIssueOrigin.string,
-              maximum: length,
-              input: v,
-            ),
+            KSTooBigIssue(origin: .string, maximum: length, input: v),
             error,
           );
         }
@@ -140,7 +131,7 @@ class KSString extends KSValidator<String?> {
         if (v.length != exactLength) {
           return (
             KSTooSmallIssue(
-              origin: KSIssueOrigin.string,
+              origin: .string,
               minimum: exactLength,
               exact: true,
               input: v,
@@ -165,7 +156,7 @@ class KSString extends KSValidator<String?> {
         if (!emailRegex.hasMatch(v)) {
           return (
             KSInvalidFormatIssue(
-              format: KSStringFormat.email,
+              format: .email,
               input: v,
               message: 'Invalid email address',
             ),
@@ -184,7 +175,7 @@ class KSString extends KSValidator<String?> {
         if (!regExp.hasMatch(v)) {
           return (
             KSInvalidFormatIssue(
-              format: KSStringFormat.regex,
+              format: .regex,
               pattern: regExp.pattern,
               input: v,
               message: 'Invalid format',
@@ -205,7 +196,7 @@ class KSString extends KSValidator<String?> {
         if (!numRegex.hasMatch(v)) {
           return (
             KSInvalidFormatIssue(
-              format: KSStringFormat.numeric,
+              format: .numeric,
               input: v,
               message: 'Must be a number',
             ),
@@ -225,7 +216,7 @@ class KSString extends KSValidator<String?> {
         if (!timeRegex.hasMatch(v)) {
           return (
             KSInvalidFormatIssue(
-              format: KSStringFormat.time,
+              format: .time,
               input: v,
               message: 'Time format must be HH:mm',
             ),

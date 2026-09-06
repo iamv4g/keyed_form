@@ -32,7 +32,7 @@ class KeyedFormController<Root> extends ChangeNotifier {
   KeyedFormController({
     required Root initialValue,
     required this.resolver,
-    this.mode = KeyedFormMode.onTouched,
+    this.mode = .onTouched,
     this.scopeOf,
   }) : _value = initialValue,
        _original = initialValue;
@@ -104,7 +104,7 @@ class KeyedFormController<Root> extends ChangeNotifier {
     final byId = {for (final row in originalRows) row.clientId: row};
     for (final row in current) {
       if (byId[row.clientId] != row) {
-        yield listField.key + FieldKey.id(row.clientId);
+        yield listField.key + .id(row.clientId);
       }
     }
   }
@@ -135,8 +135,7 @@ class KeyedFormController<Root> extends ChangeNotifier {
 
   /// The visible error keys, in document order — feed straight to a
   /// scroll-to-first-error routine.
-  Iterable<FieldKey> get visibleErrorKeys =>
-      _errors.keys.where(_isVisible);
+  Iterable<FieldKey> get visibleErrorKeys => _errors.keys.where(_isVisible);
 
   /// Whether any *visible* error sits at or under [root] — for a day/section
   /// header badge.
@@ -144,13 +143,11 @@ class KeyedFormController<Root> extends ChangeNotifier {
       _errors.keys.any((key) => root.contains(key) && _isVisible(key));
 
   bool _isVisible(FieldKey key) => switch (mode) {
-    KeyedFormMode.all => true,
-    KeyedFormMode.onSubmit => _submitted || _revealedCovers(key),
-    KeyedFormMode.onChange ||
-    KeyedFormMode.onBlur ||
-    KeyedFormMode.onTouched => _touched.contains(key) ||
-        _submitted ||
-        _revealedCovers(key),
+    .all => true,
+    .onSubmit => _submitted || _revealedCovers(key),
+    .onChange ||
+    .onBlur ||
+    .onTouched => _touched.contains(key) || _submitted || _revealedCovers(key),
   };
 
   bool _revealedCovers(FieldKey key) =>
@@ -179,7 +176,7 @@ class KeyedFormController<Root> extends ChangeNotifier {
   void _commit(FieldKey writtenKey, Root next) {
     if (next == _value) return;
     _value = next;
-    if (mode == KeyedFormMode.onChange) _touched.add(writtenKey);
+    if (mode == .onChange) _touched.add(writtenKey);
     _revalidateForWrite(writtenKey);
     notifyListeners();
   }
@@ -207,7 +204,7 @@ class KeyedFormController<Root> extends ChangeNotifier {
       }
     }
 
-    if (mode == KeyedFormMode.onChange) _touched.add(field.key);
+    if (mode == .onChange) _touched.add(field.key);
     _revalidateForWrite(field.key);
     notifyListeners();
   }
@@ -251,7 +248,8 @@ class KeyedFormController<Root> extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _revalidateForWrite(FieldKey writtenKey) => _revalidateScopeOf(writtenKey);
+  void _revalidateForWrite(FieldKey writtenKey) =>
+      _revalidateScopeOf(writtenKey);
 
   void _revalidateScopeOf(FieldKey key) {
     final scopeOf = this.scopeOf;

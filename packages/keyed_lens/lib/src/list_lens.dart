@@ -11,7 +11,7 @@ import 'package:keyed_lens/src/opt.dart';
 /// the list unchanged, per the affine no-op contract.
 final class ListItemLens<E> extends AffineLens<List<E>, E> {
   ListItemLens({required Object id, required bool Function(E element) matches})
-    : this._(FieldKey.id(id), matches);
+    : this._(.id(id), matches);
 
   ListItemLens._(this.key, this._matches);
 
