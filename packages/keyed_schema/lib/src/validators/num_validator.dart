@@ -4,9 +4,14 @@ import '../error.dart';
 import '../issue.dart';
 import 'validator.dart';
 
+/// A single built-in numeric check: returns the [KSIssue] the value failed
+/// (with an optional per-rule [KSError] override), or `null` when it passed.
 typedef NumIssueRule<T extends num> =
     (KSIssue issue, KSError? ruleError)? Function(T? value);
 
+/// A user-supplied predicate attached with `refine`: `test` receives the value
+/// (optionally gated by `when`), `error` overrides the message, `abort` stops
+/// later refinements on failure, and `params` flows into the [KSCustomIssue].
 typedef NumRefinement<T extends num> = ({
   FutureOr<bool> Function(T? value) test,
   KSError? error,
@@ -47,13 +52,25 @@ abstract class _KSNumBase<T extends num, Self extends _KSNumBase<T, Self>>
   @override
   final KSError? error;
 
+  /// Lower bound set by [min], or `null`. Metadata for the code generator;
+  /// runtime checks use the rule closures.
   final num? minVal;
+
+  /// Upper bound set by [max], or `null`.
   final num? maxVal;
+
+  /// Whether a [positive] rule has been added.
   final bool isPositive;
+
+  /// Whether a [negative] rule has been added.
   final bool isNegative;
 
+  /// The [KSIssueOrigin] reported in range issues (`int`, `double` or
+  /// `number`) — supplied by each concrete subclass.
   KSIssueOrigin get origin;
 
+  /// Returns a copy with the given fields replaced; every fluent method is
+  /// built on top of this.
   Self copyWith({
     List<NumIssueRule<T>>? rules,
     List<NumRefinement<T>>? refinements,
@@ -67,12 +84,16 @@ abstract class _KSNumBase<T extends num, Self extends _KSNumBase<T, Self>>
     bool? isNegative,
   });
 
+  /// Allows the field to be omitted without failing.
   Self optional() => copyWith(isOptional: true);
 
+  /// Allows the field to be `null` without failing.
   Self nullable() => copyWith(isNullable: true);
 
+  /// Substitutes [value] when the input is `null` before validating.
   Self defaultTo(T value) => copyWith(defaultValue: value);
 
+  /// Requires the value to be `>= min`.
   Self min(num min, {KSError? error}) {
     final nextRules = List<NumIssueRule<T>>.from(_rules)
       ..add((v) {
@@ -88,6 +109,7 @@ abstract class _KSNumBase<T extends num, Self extends _KSNumBase<T, Self>>
     return copyWith(rules: nextRules, minVal: min);
   }
 
+  /// Requires the value to be `<= max`.
   Self max(num max, {KSError? error}) {
     final nextRules = List<NumIssueRule<T>>.from(_rules)
       ..add((v) {
@@ -100,6 +122,7 @@ abstract class _KSNumBase<T extends num, Self extends _KSNumBase<T, Self>>
     return copyWith(rules: nextRules, maxVal: max);
   }
 
+  /// Requires the value to be strictly greater than zero.
   Self positive({KSError? error}) {
     final nextRules = List<NumIssueRule<T>>.from(_rules)
       ..add((v) {
@@ -121,6 +144,7 @@ abstract class _KSNumBase<T extends num, Self extends _KSNumBase<T, Self>>
     return copyWith(rules: nextRules, isPositive: true);
   }
 
+  /// Requires the value to be strictly less than zero.
   Self negative({KSError? error}) {
     final nextRules = List<NumIssueRule<T>>.from(_rules)
       ..add((v) {
@@ -142,6 +166,8 @@ abstract class _KSNumBase<T extends num, Self extends _KSNumBase<T, Self>>
     return copyWith(rules: nextRules, isNegative: true);
   }
 
+  /// Adds a custom check [test] (sync or async), failing with [error] when it
+  /// returns `false`. See [NumRefinement] for the parameter roles.
   Self refine(
     FutureOr<bool> Function(T? value) test, {
     KSError? error,

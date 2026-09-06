@@ -1,3 +1,6 @@
+/// The `build_runner` entry point — see [keyedFormBuilder].
+library;
+
 import 'package:build/build.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:source_gen/source_gen.dart';

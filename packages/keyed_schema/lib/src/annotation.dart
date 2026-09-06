@@ -1,5 +1,7 @@
 /// Annotation placed at the file level (`@keyedSchema library;`) or on top-level schema declarations.
 class KeyedSchema {
+  /// Marks the annotated library for generation, appending [suffix] to
+  /// generated class names.
   const KeyedSchema({this.suffix = 'Schema'});
 
   /// Suffix appended to generated class names (defaults to `'Schema'`).

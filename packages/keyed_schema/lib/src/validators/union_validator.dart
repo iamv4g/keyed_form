@@ -16,8 +16,13 @@ class KSDiscriminatedUnion<T> extends KSValidator<Map<String, Object?>?> {
     this.error,
   });
 
+  /// The field whose value selects which variant schema applies.
   final String discriminatorKey;
+
+  /// Variant schemas keyed by their discriminator value.
   final Map<String, KSObject> variants;
+
+  /// Explicit name for the generated union base class, or `null` to derive it.
   final String? className;
 
   @override
@@ -29,6 +34,7 @@ class KSDiscriminatedUnion<T> extends KSValidator<Map<String, Object?>?> {
   @override
   final KSError? error;
 
+  /// Returns a copy with the given fields replaced.
   KSDiscriminatedUnion<T> copyWith({
     String? discriminatorKey,
     Map<String, KSObject>? variants,
@@ -47,7 +53,10 @@ class KSDiscriminatedUnion<T> extends KSValidator<Map<String, Object?>?> {
     );
   }
 
+  /// Allows the field to be omitted without failing.
   KSDiscriminatedUnion<T> optional() => copyWith(isOptional: true);
+
+  /// Allows the field to be `null` without failing.
   KSDiscriminatedUnion<T> nullable() => copyWith(isNullable: true);
 
   /// Synchronously validates [data] against the matched variant schema.

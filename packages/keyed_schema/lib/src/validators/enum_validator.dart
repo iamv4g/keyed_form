@@ -4,9 +4,13 @@ import '../error.dart';
 import '../issue.dart';
 import 'validator.dart';
 
+/// A single built-in enum check: returns the [KSIssue] the value failed (with
+/// an optional per-rule [KSError] override), or `null` when it passed.
 typedef EnumIssueRule<E extends Enum> =
     (KSIssue issue, KSError? ruleError)? Function(E? value);
 
+/// A user-supplied predicate attached with [KSEnum.refine]; see [KSEnum.refine]
+/// for the field roles.
 typedef EnumRefinement<E extends Enum> = ({
   FutureOr<bool> Function(E? value) test,
   KSError? error,
@@ -28,6 +32,7 @@ class KSEnum<E extends Enum> extends KSValidator<E?> {
   }) : _rules = rules ?? [],
        refinements = refinements ?? [];
 
+  /// The enum constants accepted as valid; anything else fails validation.
   final List<E> values;
   final List<EnumIssueRule<E>> _rules;
   final List<EnumRefinement<E>> refinements;
@@ -44,6 +49,7 @@ class KSEnum<E extends Enum> extends KSValidator<E?> {
   @override
   final KSError? error;
 
+  /// Returns a copy with the given fields replaced.
   KSEnum<E> copyWith({
     List<E>? values,
     List<EnumIssueRule<E>>? rules,
@@ -64,10 +70,18 @@ class KSEnum<E extends Enum> extends KSValidator<E?> {
     );
   }
 
+  /// Allows the field to be omitted without failing.
   KSEnum<E> optional() => copyWith(isOptional: true);
+
+  /// Allows the field to be `null` without failing.
   KSEnum<E> nullable() => copyWith(isNullable: true);
+
+  /// Substitutes [value] when the input is `null` before validating.
   KSEnum<E> defaultTo(E value) => copyWith(defaultValue: value);
 
+  /// Adds a custom check [test] (sync or async), failing with [error] when it
+  /// returns `false`. [when] gates it, [abort] skips later refinements on
+  /// failure, and [params] flows into the resulting [KSCustomIssue].
   KSEnum<E> refine(
     FutureOr<bool> Function(E? value) test, {
     KSError? error,

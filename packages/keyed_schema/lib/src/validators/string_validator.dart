@@ -4,9 +4,16 @@ import '../error.dart';
 import '../issue.dart';
 import 'validator.dart';
 
+/// A single built-in string check: given the input, returns the [KSIssue] it
+/// failed (with an optional per-rule [KSError] override), or `null` when it
+/// passed. Rules are added by [KSString.min], [KSString.email] and friends.
 typedef StringIssueRule =
     (KSIssue issue, KSError? ruleError)? Function(String? value);
 
+/// A user-supplied predicate attached with [KSString.refine]: `test` receives
+/// the value (optionally gated by `when`), `error` overrides the message,
+/// `abort` stops later refinements on failure, and `params` is passed through
+/// to the resulting [KSCustomIssue].
 typedef StringRefinement = ({
   FutureOr<bool> Function(String? value) test,
   KSError? error,
@@ -48,14 +55,30 @@ class KSString extends KSValidator<String?> {
   @override
   final KSError? error;
 
-  // Metadata for Code Generator AST inspection
+  // Metadata for Code Generator AST inspection — the generator reads these
+  // back to reproduce constraints in generated models; runtime validation
+  // uses the rule closures, not these fields.
+
+  /// Minimum length set by [min] / [length], or `null`.
   final int? minLength;
+
+  /// Maximum length set by [max] / [length], or `null`.
   final int? maxLength;
+
+  /// Whether an [email] rule has been added.
   final bool isEmail;
+
+  /// Whether a [numeric] rule has been added.
   final bool isNumeric;
+
+  /// Whether a [time] rule has been added.
   final bool isTime;
+
+  /// The pattern string of a [regex] rule, or `null`.
   final String? regexPattern;
 
+  /// Returns a copy with the given fields replaced; every fluent method
+  /// (`min`, `email`, `optional`, …) is built on top of this.
   KSString copyWith({
     List<StringIssueRule>? rules,
     List<StringRefinement>? refinements,
@@ -86,14 +109,20 @@ class KSString extends KSValidator<String?> {
     );
   }
 
+  /// Allows the field to be omitted or empty without failing.
   KSString optional() => copyWith(isOptional: true);
 
+  /// Allows the field to be `null` without failing.
   KSString nullable() => copyWith(isNullable: true);
 
+  /// Substitutes [value] when the input is `null` before validating.
   KSString defaultTo(String value) => copyWith(defaultValue: value);
 
+  /// Requires a non-empty string (equivalent to `min(1)`).
   KSString nonEmpty({KSError? error}) => min(1, error: error);
 
+  /// Requires at least [length] characters. Empty input is left to the
+  /// optional/nullable/required check, not flagged here.
   KSString min(int length, {KSError? error}) {
     final nextRules = List<StringIssueRule>.from(_rules)
       ..add((v) {
@@ -109,6 +138,7 @@ class KSString extends KSValidator<String?> {
     return copyWith(rules: nextRules, minLength: length);
   }
 
+  /// Requires at most [length] characters.
   KSString max(int length, {KSError? error}) {
     final nextRules = List<StringIssueRule>.from(_rules)
       ..add((v) {
@@ -124,6 +154,7 @@ class KSString extends KSValidator<String?> {
     return copyWith(rules: nextRules, maxLength: length);
   }
 
+  /// Requires exactly [exactLength] characters.
   KSString length(int exactLength, {KSError? error}) {
     final nextRules = List<StringIssueRule>.from(_rules)
       ..add((v) {
@@ -148,6 +179,7 @@ class KSString extends KSValidator<String?> {
     );
   }
 
+  /// Requires the value to look like an email address.
   KSString email({KSError? error}) {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     final nextRules = List<StringIssueRule>.from(_rules)
@@ -168,6 +200,7 @@ class KSString extends KSValidator<String?> {
     return copyWith(rules: nextRules, isEmail: true);
   }
 
+  /// Requires the value to match [regExp].
   KSString regex(RegExp regExp, {KSError? error}) {
     final nextRules = List<StringIssueRule>.from(_rules)
       ..add((v) {
@@ -188,6 +221,7 @@ class KSString extends KSValidator<String?> {
     return copyWith(rules: nextRules, regexPattern: regExp.pattern);
   }
 
+  /// Requires the value to be a decimal number in string form.
   KSString numeric({KSError? error}) {
     final numRegex = RegExp(r'^-?\d+(\.\d+)?$');
     final nextRules = List<StringIssueRule>.from(_rules)
@@ -208,6 +242,7 @@ class KSString extends KSValidator<String?> {
     return copyWith(rules: nextRules, isNumeric: true);
   }
 
+  /// Requires an `HH:mm` 24-hour time string.
   KSString time({KSError? error}) {
     final timeRegex = RegExp(r'^([01]\d|2[0-3]):[0-5]\d$');
     final nextRules = List<StringIssueRule>.from(_rules)
@@ -228,6 +263,9 @@ class KSString extends KSValidator<String?> {
     return copyWith(rules: nextRules, isTime: true);
   }
 
+  /// Adds a custom check [test] (sync or async). Fails with [error] when it
+  /// returns `false`; [when] gates it, [abort] skips later refinements on
+  /// failure, and [params] flows into the resulting [KSCustomIssue].
   KSString refine(
     FutureOr<bool> Function(String? value) test, {
     KSError? error,

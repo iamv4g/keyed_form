@@ -4,9 +4,13 @@ import '../error.dart';
 import '../issue.dart';
 import 'validator.dart';
 
+/// A single built-in list check: returns the [KSIssue] the list failed (with
+/// an optional per-rule [KSError] override), or `null` when it passed.
 typedef ListIssueRule<E> =
     (KSIssue issue, KSError? ruleError)? Function(List<E>? value);
 
+/// A user-supplied predicate attached with [KSList.refine]; see [KSList.refine]
+/// for the field roles.
 typedef ListRefinement<E> = ({
   FutureOr<bool> Function(List<E>? value) test,
   KSError? error,
@@ -31,6 +35,7 @@ class KSList<E> extends KSValidator<List<E>?> {
   }) : _rules = rules ?? [],
        refinements = refinements ?? [];
 
+  /// Applied to every element of the list.
   final KSValidator<E> elementValidator;
   final List<ListIssueRule<E>> _rules;
   final List<ListRefinement<E>> refinements;
@@ -47,10 +52,16 @@ class KSList<E> extends KSValidator<List<E>?> {
   @override
   final KSError? error;
 
+  /// Minimum length set by [min], or `null` (metadata for the generator).
   final int? minItems;
+
+  /// Maximum length set by [max], or `null`.
   final int? maxItems;
+
+  /// Whether a [nonEmpty] rule has been added.
   final bool isNonEmpty;
 
+  /// Returns a copy with the given fields replaced.
   KSList<E> copyWith({
     KSValidator<E>? elementValidator,
     List<ListIssueRule<E>>? rules,
@@ -77,12 +88,19 @@ class KSList<E> extends KSValidator<List<E>?> {
     );
   }
 
+  /// Allows the field to be omitted without failing.
   KSList<E> optional() => copyWith(isOptional: true);
+
+  /// Allows the field to be `null` without failing.
   KSList<E> nullable() => copyWith(isNullable: true);
+
+  /// Substitutes [value] when the input is `null` before validating.
   KSList<E> defaultTo(List<E> value) => copyWith(defaultValue: value);
 
+  /// Requires at least one element (equivalent to `min(1)`).
   KSList<E> nonEmpty({KSError? error}) => min(1, error: error);
 
+  /// Requires at least [count] elements.
   KSList<E> min(int count, {KSError? error}) {
     final nextRules = List<ListIssueRule<E>>.from(_rules)
       ..add((v) {
@@ -98,6 +116,7 @@ class KSList<E> extends KSValidator<List<E>?> {
     return copyWith(rules: nextRules, minItems: count);
   }
 
+  /// Requires at most [count] elements.
   KSList<E> max(int count, {KSError? error}) {
     final nextRules = List<ListIssueRule<E>>.from(_rules)
       ..add((v) {
@@ -113,6 +132,9 @@ class KSList<E> extends KSValidator<List<E>?> {
     return copyWith(rules: nextRules, maxItems: count);
   }
 
+  /// Adds a custom check [test] (sync or async) over the whole list, failing
+  /// with [error] when it returns `false`. [when] gates it, [abort] skips
+  /// later refinements on failure, and [params] flows into the [KSCustomIssue].
   KSList<E> refine(
     FutureOr<bool> Function(List<E>? value) test, {
     KSError? error,

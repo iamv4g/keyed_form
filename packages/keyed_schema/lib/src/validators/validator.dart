@@ -36,7 +36,7 @@ abstract class KSValidator<T> {
 /// Resolves an issue to an error string following the precedence:
 /// 1. [ruleError] (if defined and resolves to non-null)
 /// 2. [validatorError] (if defined and resolves to non-null)
-/// 3. [issue.message] (default fallback)
+/// 3. `issue.message` (default fallback)
 String? resolveIssue(
   KSIssue? issue, {
   KSError? ruleError,
@@ -59,9 +59,7 @@ String resolveKSMessage(Object? message, [String fallback = 'Invalid']) {
   return switch (message) {
     String value => value,
     String Function() callback => callback(),
-    KSError err => err.resolve(
-      KSCustomIssue(message: fallback),
-    ) ?? fallback,
+    KSError err => err.resolve(KSCustomIssue(message: fallback)) ?? fallback,
     _ => fallback,
   };
 }
