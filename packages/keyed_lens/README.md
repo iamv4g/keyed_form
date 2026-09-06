@@ -28,8 +28,8 @@ name rather than by position:
 - **Config / settings screens**, **data-grid cell addressing**
   (`ListItemLens.at(id)`), **deep links into nested state**
 
-`keyed_schema`, `keyed_form` and `keyed_form_flutter` are built on top of this
-package — they are consumers, not the reason it exists.
+The `keyed_form` family (`keyed_form_core` and everything above it) is built on
+top of this package — those are consumers, not the reason it exists.
 
 ## Pieces
 
@@ -44,9 +44,6 @@ package — they are consumers, not the reason it exists.
 - `whenPresent()` — refines `AffineLens<Root, V?>` to `AffineLens<Root, V>`.
 - `Opt` (`Some`/`None`) — internal distinction between "path missing" and
   "present but null"; prefer `getOrNull`/`update` in application code.
-- `FieldErrors<E>` — callable, `FieldKey`-keyed sidecar map looked up by
-  accessor: `errors(field)`. `E` is arbitrary — validation messages, but
-  equally per-field warnings, sync status or highlight flags.
 
 ## Getting a lens
 
@@ -66,7 +63,7 @@ Compose with `.then(...)` / `.thenTotal(...)`; the behavior **and** the
 
 For schema-driven models, [`keyed_form_gen`](../keyed_form_gen) generates the
 data classes plus a `<Root>Fields` namespace of these accessors from a
-`keyed_schema` declaration, so you don't hand-write them.
+`keyed_form_schema` declaration, so you don't hand-write them.
 
 ## FieldKey serialization
 
@@ -105,16 +102,13 @@ from *outside* — a server patch or deep link — back to a lens). There is no
 consumer for it yet; it earns its own story when server patches or deep links
 arrive, as a new named codec would rather than a change to this frozen one.
 
-## `FieldRef` aliases
-
-For layers that shouldn't have to talk about optics at all, `FieldRef<R, V>`
-aliases `AffineLens` and `TotalFieldRef<R, V>` aliases `Lens` — the exact
-same types under a "field reference" name. `keyed_form_gen` emits its
-generated accessors as `FieldRef`.
+The `keyed_form` layers wrap these types under a "field reference" vocabulary
+(`FieldRef` / `StrictFieldRef` / `VariantRef` in `keyed_form_core`) so form
+code never has to say "lens".
 
 ## Scope
 
 `Prism` ships — a minimal type-narrowing optic for composing through the
 variants of a sum type. Deliberately out of scope: Iso/Traversal, a
-validation DSL (see `keyed_schema`), and any state-management, serialization
-or Flutter dependency.
+validation DSL (see `keyed_form_schema`), and any state-management,
+serialization or Flutter dependency.

@@ -1,4 +1,4 @@
-import 'package:keyed_lens/keyed_lens.dart';
+import 'package:keyed_form_core/keyed_form_core.dart';
 
 /// Validates a draft and returns its field-keyed errors — the equivalent of a
 /// react-hook-form `resolver` / a zod `safeParse`.

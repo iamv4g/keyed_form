@@ -1,7 +1,7 @@
 name: keyed_form
 description: >-
-  A form-state controller for immutable aggregates, built on keyed_lens: holds
-  the working draft, FieldKey-addressed validation errors and
+  A form-state controller for immutable aggregates, built on keyed_form_core:
+  holds the working draft, FieldKey-addressed validation errors and
   touched/dirty/submit state.
 version: 0.1.0
 
@@ -15,7 +15,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  keyed_lens: ^0.1.0
+  keyed_form_core: ^0.1.0
   listen: ^1.0.1
   meta: ^1.11.0
 

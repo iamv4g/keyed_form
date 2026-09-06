@@ -1,4 +1,4 @@
-import 'package:keyed_schema/keyed_schema.dart';
+import 'package:keyed_form_schema/keyed_form_schema.dart';
 import 'package:test/test.dart';
 
 enum TestStatus { draft, published, archived }

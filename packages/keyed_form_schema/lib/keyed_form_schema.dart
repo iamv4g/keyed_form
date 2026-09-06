@@ -1,10 +1,14 @@
-/// Schema-driven declarative validation and type-safe form definitions for keyed_lens.
+/// Declarative, schema-driven validation and type-safe form models.
+///
+/// Compose field validators (`ks.string()`, `ks.int()`, …) into object schemas
+/// (`ks.object({...})`) that yield [FieldKey]-addressed [FieldErrors]. Combine
+/// with `keyed_form_gen` to generate the immutable data classes and field
+/// references. Re-exports `keyed_form_core` (and thus `@keyedSchema`).
 library;
 
-export 'package:keyed_lens/keyed_lens.dart';
+export 'package:keyed_form_core/keyed_form_core.dart';
 export 'package:uuid/uuid.dart';
 
-export 'src/annotation.dart';
 export 'src/error.dart';
 export 'src/issue.dart';
 export 'src/ks.dart';

@@ -1,4 +1,4 @@
-/// Class-naming helpers shared by [DataClassGenerator] and its optics-wrapper
+/// Class-naming helpers shared by [DataClassGenerator] and its field-ref wrapper
 /// subsystem. Not exported from the package's public API — internal to the
 /// generator only.
 library;
@@ -32,12 +32,15 @@ String getFieldsClassName(String name, String suffix) {
   return '${name}Fields';
 }
 
-String getPrismsClassName(String name, String suffix) {
+/// The library-private holder class for a union's per-variant [VariantRef]s
+/// (e.g. `_SectionVariants`). Only the generated `.asX` narrower getters
+/// reference it.
+String getVariantsClassName(String name, String suffix) {
   if (name.length > suffix.length && name.endsWith(suffix)) {
-    return '${name.substring(0, name.length - suffix.length)}Prisms';
+    return '_${name.substring(0, name.length - suffix.length)}Variants';
   }
   if (name.length > 'Schema'.length && name.endsWith('Schema')) {
-    return '${name.substring(0, name.length - 'Schema'.length)}Prisms';
+    return '_${name.substring(0, name.length - 'Schema'.length)}Variants';
   }
-  return '${name}Prisms';
+  return '_${name}Variants';
 }

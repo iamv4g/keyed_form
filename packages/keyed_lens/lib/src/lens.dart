@@ -106,19 +106,6 @@ abstract class Lens<Root, Value> extends AffineLens<Root, Value> {
       _ComposedLens(this, next);
 }
 
-/// A typed reference to one field of [R] — read, write, validate, dirty-check
-/// or focus that field without rebuilding the whole aggregate.
-///
-/// Alias of [AffineLens]: the "field reference" vocabulary for form/editor
-/// layers that should not have to talk about optics. The target may be
-/// missing (a removed row), so reads can return null and writes can no-op.
-typedef FieldRef<R, V> = AffineLens<R, V>;
-
-/// A [FieldRef] whose target always exists — reads are non-null and writes
-/// always apply. Alias of [Lens]. A chain stays total only while every
-/// segment is total.
-typedef TotalFieldRef<R, V> = Lens<R, V>;
-
 final class _FunctionAffineLens<Root, Value> extends AffineLens<Root, Value> {
   const _FunctionAffineLens(this.key, this._find, this._set);
 

@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
-import 'package:keyed_schema/keyed_schema.dart';
+import 'package:keyed_form_core/keyed_form_core.dart';
 import 'package:source_gen/source_gen.dart';
 
 import 'generators/data_class_generator.dart';
@@ -20,8 +20,8 @@ class _NamedElement implements Element {
 
 /// `source_gen` generator for a `@keyedSchema`-annotated library: it expands
 /// every top-level schema declared in that file into immutable data models, a
-/// `<Root>Fields` lens namespace, and type-safe validation functions, emitted
-/// into the library's `.kfg.dart` part.
+/// `<Root>Fields` field-reference namespace, and type-safe validation
+/// functions, emitted into the library's `.kfg.dart` part.
 class KeyedFormGenerator extends GeneratorForAnnotation<KeyedSchema> {
   /// Creates the generator. Wired in by `keyedFormBuilder`; construct it
   /// directly only for a custom build.

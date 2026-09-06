@@ -1,13 +1,13 @@
 # keyed_form
 
 A form-state controller for immutable aggregates — the react-hook-form of
-the `keyed_lens` family. Pure Dart, no Flutter dependency.
+the `keyed_form` family. Pure Dart, no Flutter dependency.
 
 `KeyedFormController<Root>` owns the editable draft, the field-keyed
 validation errors, and the touched/dirty/revealed bookkeeping that decides
 *when* an error is shown. Reads, writes, validation lookups and dirty
-checks all speak the `FieldRef` (lens) vocabulary from
-[`keyed_lens`](../keyed_lens), which this package re-exports — so UI code
+checks all speak the `FieldRef` vocabulary from
+[`keyed_form_core`](../keyed_form_core), re-exported here — so UI code
 addresses a field the same way whether it is reading it, writing it, or
 asking for its error.
 
@@ -74,5 +74,5 @@ of them still fail.
 
 Deliberately out of scope: widgets (that is
 [`keyed_form_flutter`](../keyed_form_flutter)), schema/validation DSL (that
-is [`keyed_schema`](../keyed_schema)), and any serialization format for the
+is [`keyed_form_schema`](../keyed_form_schema)), and any serialization format for the
 draft itself.

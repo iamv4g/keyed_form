@@ -1,0 +1,22 @@
+name: keyed_form_core
+description: >-
+  Shared vocabulary for the keyed_form family: FieldRef / StrictFieldRef /
+  VariantRef field references over keyed_lens optics, DelegatingFieldRef,
+  FieldErrors, and the @keyedSchema annotation.
+version: 0.1.0
+
+homepage: https://github.com/iamv4g/keyed_form
+repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_core
+issue_tracker: https://github.com/iamv4g/keyed_form/issues
+
+environment:
+  sdk: ^3.10.0
+
+resolution: workspace
+
+dependencies:
+  keyed_lens: ^0.1.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

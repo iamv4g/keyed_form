@@ -60,40 +60,42 @@ bool _listEq<T>(List<T> a, List<T> b) {
   return true;
 }
 
-// --- lenses (hand-written stand-ins for generated `<Root>Fields`) ------------
+// --- field refs (hand-written stand-ins for generated `<Root>Fields`) --------
 
 abstract final class TripFields {
-  static final Lens<Trip, String> name = Lens.of(
-    key: FieldKey.name('name'),
-    get: (t) => t.name,
-    set: (t, v) => t.copyWith(name: v),
-  );
+  static final StrictFieldRef<Trip, String> name =
+      StrictFieldRef<Trip, String>.of(
+        key: FieldKey.name('name'),
+        get: (t) => t.name,
+        set: (t, v) => t.copyWith(name: v),
+      );
 
-  static final Lens<Trip, int> days = Lens.of(
+  static final StrictFieldRef<Trip, int> days = StrictFieldRef<Trip, int>.of(
     key: FieldKey.name('days'),
     get: (t) => t.days,
     set: (t, v) => t.copyWith(days: v),
   );
 
-  static final Lens<Trip, List<Stop>> stops = Lens.of(
-    key: FieldKey.name('stops'),
-    get: (t) => t.stops,
-    set: (t, v) => t.copyWith(stops: v),
-  );
+  static final StrictFieldRef<Trip, List<Stop>> stops =
+      StrictFieldRef<Trip, List<Stop>>.of(
+        key: FieldKey.name('stops'),
+        get: (t) => t.stops,
+        set: (t, v) => t.copyWith(stops: v),
+      );
 
-  static AffineLens<Trip, Stop> stop(String id) =>
+  static FieldRef<Trip, Stop> stop(String id) =>
       stops.at(id, (s) => s.clientId == id);
 
-  static AffineLens<Trip, String> stopLabel(String id) => stop(id).then(
-    Lens.of(
+  static FieldRef<Trip, String> stopLabel(String id) => stop(id).then(
+    StrictFieldRef<Stop, String>.of(
       key: FieldKey.name('label'),
       get: (s) => s.label,
       set: (s, v) => s.copyWith(label: v),
     ),
   );
 
-  static AffineLens<Trip, int> stopNights(String id) => stop(id).then(
-    Lens.of(
+  static FieldRef<Trip, int> stopNights(String id) => stop(id).then(
+    StrictFieldRef<Stop, int>.of(
       key: FieldKey.name('nights'),
       get: (s) => s.nights,
       set: (s, v) => s.copyWith(nights: v),

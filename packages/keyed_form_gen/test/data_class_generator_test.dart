@@ -30,7 +30,9 @@ void main() {
       expect(code, contains('abstract final class HotelFields {'));
       expect(
         code,
-        contains('static Lens<HotelSchema, String?> get hotelName =>'),
+        contains(
+          'static StrictFieldRef<HotelSchema, String?> get hotelName =>',
+        ),
       );
       expect(code, contains('factory HotelSchema.create({'));
       expect(
@@ -90,7 +92,9 @@ void main() {
         expect(code, contains('abstract final class LoginFields {'));
         expect(
           code,
-          contains('static Lens<LoginSchema, String> get username =>'),
+          contains(
+            'static StrictFieldRef<LoginSchema, String> get username =>',
+          ),
         );
         expect(
           code,
@@ -273,14 +277,14 @@ void main() {
         expect(
           code,
           contains(
-            'final class InfoFieldRefs extends AffineLens<TourSchema, TourInfoSchema> {',
+            'final class InfoFieldRefs extends DelegatingFieldRef<TourSchema, TourInfoSchema> {',
           ),
         );
         expect(
           code,
           contains(
             'FieldRef<TourSchema, String> get name =>\n'
-            '      _self.then(TourInfoFields.name);',
+            '      inner.then(TourInfoFields.name);',
           ),
         );
       },
@@ -409,20 +413,20 @@ void main() {
         expect(
           code,
           contains(
-            'final class InfoFieldRefs extends AffineLens<RootSchema, InfoSchema> {',
+            'final class InfoFieldRefs extends DelegatingFieldRef<RootSchema, InfoSchema> {',
           ),
         );
         expect(
           code,
           contains(
-            'final class DetailFieldRefs extends AffineLens<RootSchema, DetailSchema> {',
+            'final class DetailFieldRefs extends DelegatingFieldRef<RootSchema, DetailSchema> {',
           ),
         );
         expect(
           code,
           contains(
             'FieldRef<RootSchema, String> get note =>\n'
-            '      _self.then(DetailFields.note);',
+            '      inner.then(DetailFields.note);',
           ),
         );
       },

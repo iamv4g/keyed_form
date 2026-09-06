@@ -1,8 +1,8 @@
 # keyed_form_gen
 
-Code generator for [`keyed_schema`](../keyed_schema) schemas.
+Code generator for [`keyed_form_schema`](../keyed_form_schema) schemas.
 
-Automatically translates declarative `ks.object({...})` schemas into **Immutable Data Models**, **field-name keyed optics** (`Fields` navigators + `FieldRefs` wrappers), and **type-safe validation functions**.
+Automatically translates declarative `ks.object({...})` schemas into **Immutable Data Models**, **field-name keyed references** (`Fields` navigators + `FieldRefs` wrappers), and **type-safe validation functions**.
 
 ---
 
@@ -16,11 +16,11 @@ From a single declarative schema declaration, `keyed_form_gen` generates:
    - Factory `.create()` method with auto-generated UUIDs.
    - `copyWith()`, value equality `operator ==`, and `hashCode`.
 
-2. **Keyed Optics (`keyed_lens`):**
+2. **Keyed field references (`keyed_form_core`):**
    - A `<Root>Fields` namespace class (e.g. `InvoiceFields`, `LineItemBuilderFields`)
      with a `static` navigator **per schema field**: `InvoiceFields.lineItem(ref)`
      for `'lineItems'`, `InvoiceFields.attachment(ref)` for `'attachments'`.
-   - Each navigator returns a `<Field>FieldRefs` wrapper — an `AffineLens` to
+   - Each navigator returns a `<Field>FieldRefs` wrapper — a `FieldRef` to
      that node that also exposes one leaf `FieldRef` getter per field, so
      you write `InvoiceFields.lineItem(ref).description`.
    - Row identity is a plain `String` clientId. A navigator takes a
@@ -47,8 +47,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  keyed_lens: ^0.1.0
-  keyed_schema: ^0.1.0
+  keyed_form_schema: ^0.1.0
 
 dev_dependencies:
   build_runner: ^2.4.0
@@ -69,7 +68,7 @@ whether a top-level variable or a top-level function (e.g. for dynamic i18n).
 @keyedSchema
 library;
 
-import 'package:keyed_schema/keyed_schema.dart';
+import 'package:keyed_form_schema/keyed_form_schema.dart';
 
 part 'invoice_schema.kfg.dart';
 

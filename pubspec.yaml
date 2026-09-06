@@ -6,7 +6,8 @@ environment:
 
 workspace:
   - packages/keyed_lens
-  - packages/keyed_schema
+  - packages/keyed_form_core
+  - packages/keyed_form_schema
   - packages/keyed_form_gen
   - packages/keyed_form
   - packages/keyed_form_flutter

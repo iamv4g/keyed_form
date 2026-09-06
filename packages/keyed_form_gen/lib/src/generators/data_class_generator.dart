@@ -139,15 +139,16 @@ class DataClassGenerator {
     buffer.writeln('}');
     buffer.writeln();
 
-    // Prisms container
-    final prismsName = getPrismsClassName(name, suffix);
-    buffer.writeln('abstract final class $prismsName {');
+    // Variant-ref container (library-private)
+    final variantsName = getVariantsClassName(name, suffix);
+    buffer.writeln('abstract final class $variantsName {');
     if (parsedClass.unionVariants != null) {
       for (final entry in parsedClass.unionVariants!.entries) {
         final variantKey = entry.key;
         final variantClass = entry.value;
         buffer.writeln(
-          '  static final $variantKey = Prism<$name, ${variantClass.name}>.type();',
+          '  static final $variantKey = '
+          'VariantRef<$name, ${variantClass.name}>.type();',
         );
       }
     }
@@ -160,7 +161,8 @@ class DataClassGenerator {
 
     for (final f in parsedClass.fields) {
       buffer.writeln(
-        '  static Lens<$name, ${f.dartType}> get ${f.name} => Lens.of(',
+        '  static StrictFieldRef<$name, ${f.dartType}> get ${f.name} => '
+        'StrictFieldRef<$name, ${f.dartType}>.of(',
       );
       buffer.writeln("    key: FieldKey.name('${f.name}'),");
       buffer.writeln('    get: (x) => x.${f.name},');
@@ -350,7 +352,8 @@ class DataClassGenerator {
 
     for (final f in parsedClass.fields) {
       buffer.writeln(
-        '  static Lens<$name, ${f.dartType}> get ${f.name} => Lens.of(',
+        '  static StrictFieldRef<$name, ${f.dartType}> get ${f.name} => '
+        'StrictFieldRef<$name, ${f.dartType}>.of(',
       );
       buffer.writeln("    key: FieldKey.name('${f.name}'),");
       buffer.writeln('    get: (x) => x.${f.name},');
@@ -534,7 +537,7 @@ class DataClassGenerator {
     for (final f in parsedClass.fields) {
       // On the root, a non-list nested-object field is reached through its
       // own `<Field>FieldRefs` wrapper (e.g. `TourInfoBuilderFields.info.name`)
-      // rather than the raw segment lens.
+      // rather than the raw segment field reference.
       if (!parsedClass.isListItem &&
           f.isNestedObject &&
           f.nestedClass != null) {
@@ -542,11 +545,11 @@ class DataClassGenerator {
         final refined = (f.isNullable || f.isOptional) ? '.whenPresent()' : '';
         buffer.writeln(
           '  /// Field references for the nested `${f.name}` object — '
-          '`$fieldsName.${f.name}.<field>`. Also a lens to the whole '
+          '`$fieldsName.${f.name}.<field>`. Also a field reference to the whole '
           '`${f.nestedClass!.name}` for `patch`.',
         );
         buffer.writeln('  static $wrapperName get ${f.name} => $wrapperName(');
-        buffer.writeln('    Lens.of(');
+        buffer.writeln('    StrictFieldRef<$name, ${f.dartType}>.of(');
         buffer.writeln("      key: FieldKey.name('${f.name}'),");
         buffer.writeln('      get: (x) => x.${f.name},');
         buffer.writeln('      set: (x, v) => x.copyWith(${f.name}: v),');
@@ -564,7 +567,8 @@ class DataClassGenerator {
         continue;
       }
       buffer.writeln(
-        '  static Lens<$name, ${f.dartType}> get ${f.name} => Lens.of(',
+        '  static StrictFieldRef<$name, ${f.dartType}> get ${f.name} => '
+        'StrictFieldRef<$name, ${f.dartType}>.of(',
       );
       buffer.writeln("    key: FieldKey.name('${f.name}'),");
       buffer.writeln('    get: (x) => x.${f.name},');

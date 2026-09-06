@@ -1,7 +1,7 @@
 @keyedSchema
 library;
 
-import 'package:keyed_schema/keyed_schema.dart';
+import 'package:keyed_form_schema/keyed_form_schema.dart';
 
 part 'function_schema.kfg.dart';
 

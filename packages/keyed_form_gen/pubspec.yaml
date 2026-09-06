@@ -1,7 +1,8 @@
 name: keyed_form_gen
 description: >-
-  build_runner code generator for keyed_schema: turns a schema into immutable
-  data models, keyed_lens optics and type-safe validation functions.
+  build_runner code generator for keyed_form_schema: turns a schema into
+  immutable data models, keyed_form_core field references and type-safe
+  validation functions.
 version: 0.1.0
 
 homepage: https://github.com/iamv4g/keyed_form
@@ -17,11 +18,12 @@ dependencies:
   analyzer: ^12.0.0
   build: ^4.0.0
   dart_style: ^3.1.0
-  keyed_schema: ^0.1.0
+  keyed_form_core: ^0.1.0
   source_gen: ^4.0.0
 
 dev_dependencies:
   build_runner: ^2.15.0
   build_test: ^3.5.0
+  keyed_form_schema: ^0.1.0
   lints: ^6.0.0
   test: ^1.25.0
