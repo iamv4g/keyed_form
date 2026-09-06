@@ -4,7 +4,6 @@ description: >-
   validators into object schemas that yield keyed_lens FieldKey-addressed errors.
   Pure Dart.
 version: 0.1.0
-publish_to: "none"
 
 homepage: https://github.com/iamv4g/keyed_form
 repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_schema
