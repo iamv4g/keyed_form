@@ -9,14 +9,8 @@ void main() {
       final errors = invalidDraft.validate();
 
       expect(errors.length, 2);
-      expect(
-        errors.byKey(LoginFields.username.key),
-        'Username is required',
-      );
-      expect(
-        errors.byKey(LoginFields.password.key),
-        'Password is required',
-      );
+      expect(errors.byKey(LoginFields.username.key), 'Username is required');
+      expect(errors.byKey(LoginFields.password.key), 'Password is required');
 
       const validDraft = LoginSchema(
         username: 'admin',

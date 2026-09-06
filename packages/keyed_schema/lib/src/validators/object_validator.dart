@@ -8,6 +8,10 @@ import 'list_validator.dart';
 import 'union_validator.dart';
 import 'validator.dart';
 
+/// A cross-field check attached with [KSObject.refine]: `test` receives the
+/// whole data map, `path` / `key` place the resulting error on a field
+/// (defaulting to the object root), `when` gates it, `abort` stops later
+/// refinements, and `params` flows into the [KSCustomIssue].
 typedef ObjectRefinement = ({
   FutureOr<bool> Function(Map<String, Object?> data) test,
   KSError? error,
@@ -29,8 +33,14 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
     this.error,
   }) : refinements = refinements ?? [];
 
+  /// Explicit name for the generated data class, or `null` to derive it from
+  /// the schema variable / field name.
   final String? className;
+
+  /// The field validators, keyed by field name.
   final Map<String, KSValidator<Object?>> fields;
+
+  /// Cross-field checks added with [refine], run after per-field validation.
   final List<ObjectRefinement> refinements;
 
   @override
@@ -42,6 +52,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
   @override
   final KSError? error;
 
+  /// Returns a copy with the given fields replaced.
   KSObject copyWith({
     String? className,
     Map<String, KSValidator<Object?>>? fields,
@@ -60,9 +71,14 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
     );
   }
 
+  /// Allows the whole object to be omitted without failing.
   KSObject optional() => copyWith(isOptional: true);
+
+  /// Allows the whole object to be `null` without failing.
   KSObject nullable() => copyWith(isNullable: true);
 
+  /// Adds a cross-field check [test] (sync or async) over the whole data map.
+  /// See [ObjectRefinement] for the parameter roles.
   KSObject refine(
     FutureOr<bool> Function(Map<String, Object?> data) test, {
     KSError? error,

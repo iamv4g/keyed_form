@@ -31,6 +31,7 @@ class KSMap<K, V> extends KSValidator<Map<K, V>?> {
   @override
   final Map<K, V>? defaultValue;
 
+  /// Allows the field to be omitted without failing.
   KSMap<K, V> optional() => KSMap<K, V>(
     keyValidator: keyValidator,
     valueValidator: valueValidator,
@@ -40,6 +41,7 @@ class KSMap<K, V> extends KSValidator<Map<K, V>?> {
     error: error,
   );
 
+  /// Allows the field to be `null` without failing.
   KSMap<K, V> nullable() => KSMap<K, V>(
     keyValidator: keyValidator,
     valueValidator: valueValidator,
@@ -49,6 +51,7 @@ class KSMap<K, V> extends KSValidator<Map<K, V>?> {
     error: error,
   );
 
+  /// Substitutes [value] when the input is `null` before validating.
   KSMap<K, V> defaultTo(Map<K, V> value) => KSMap<K, V>(
     keyValidator: keyValidator,
     valueValidator: valueValidator,
@@ -95,11 +98,7 @@ class KSMap<K, V> extends KSValidator<Map<K, V>?> {
     if (val == null) {
       if (isOptional || isNullable) return null;
       return resolveIssue(
-        KSInvalidTypeIssue(
-          expected: 'map',
-          input: null,
-          message: 'Required',
-        ),
+        KSInvalidTypeIssue(expected: 'map', input: null, message: 'Required'),
         validatorError: error,
       );
     }

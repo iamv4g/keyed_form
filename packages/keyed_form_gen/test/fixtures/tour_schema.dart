@@ -1,8 +1,10 @@
+@keyedSchema
+library;
+
 import 'package:keyed_schema/keyed_schema.dart';
 
 part 'tour_schema.kfg.dart';
 
-@keyedSchema
 final tourSchema = ks.object({
   'title': ks.string().min(
     3,

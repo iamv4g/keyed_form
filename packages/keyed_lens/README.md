@@ -1,17 +1,35 @@
 # keyed_lens
 
-Keyed optics for immutable aggregates — pure Dart, no Flutter.
+Keyed optics for immutable aggregates — pure Dart, zero dependencies.
 
-**Not** a general-purpose optics library. Every lens here carries a
-`FieldKey`: a stable, serializable, structurally-comparable identity
-(`days.d1.groups.g2.name`). That coupling is the point — it is what lets
-one abstraction address a field across every concern of a structured
-editor:
+Compose typed accessors (`Lens` / `AffineLens`) into an immutable object tree,
+where **every accessor carries a `FieldKey`**: a stable, serializable,
+structurally-comparable identity (`days.['d1'].groups.['g2'].name`). One value
+addresses the same field for reading, writing, diffing — and for any keyed
+side-channel you keep next to the data.
 
-- validation errors keyed by field (`FieldErrors`, looked up by lens)
-- per-field dirty checks (`lens.differs(original, current)`)
-- focus / scroll-to-error targets
-- undo grouping and server patches (a `FieldKey` round-trips as a path)
+That identity is the distinguishing feature, not full optics. There is no
+Iso/Traversal and no profunctor machinery: this is the smallest lens core
+that also answers *"which field is this?"* in a form you can log, persist and
+send over the wire.
+
+## What it's for
+
+Anything that needs to point at a field of an immutable aggregate by a durable
+name rather than by position:
+
+- **Editors / forms** — errors keyed by field, per-field dirty checks
+  (`lens.differs(original, current)`), focus / scroll targets
+- **Undo / redo** — group history entries by `FieldKey`; `set` returns a new
+  root and shares the rest
+- **Server sync / patches** — a `FieldKey` round-trips as a path string, so
+  `{ "path": "days.['d1'].name", "value": … }` maps back to a write
+- **Diffing / change tracking** — walk two roots through the same accessors
+- **Config / settings screens**, **data-grid cell addressing**
+  (`ListItemLens.at(id)`), **deep links into nested state**
+
+`keyed_schema`, `keyed_form` and `keyed_form_flutter` are built on top of this
+package — they are consumers, not the reason it exists.
 
 ## Pieces
 
@@ -26,8 +44,29 @@ editor:
 - `whenPresent()` — refines `AffineLens<Root, V?>` to `AffineLens<Root, V>`.
 - `Opt` (`Some`/`None`) — internal distinction between "path missing" and
   "present but null"; prefer `getOrNull`/`update` in application code.
-- `FieldErrors<E>` — callable, `FieldKey`-keyed error container:
-  `errors(lens)`.
+- `FieldErrors<E>` — callable, `FieldKey`-keyed sidecar map looked up by
+  accessor: `errors(field)`. `E` is arbitrary — validation messages, but
+  equally per-field warnings, sync status or highlight flags.
+
+## Getting a lens
+
+You write the leaf accessors — each `set` body is a one-liner over your
+`copyWith` (freezed, dart_mappable, hand-rolled — this package doesn't care):
+
+```dart
+final tourDays = Lens<Tour, List<Day>>.of(
+  key: FieldKey.name('days'),
+  get: (t) => t.days,
+  set: (t, v) => t.copyWith(days: v),
+);
+```
+
+Compose with `.then(...)` / `.thenTotal(...)`; the behavior **and** the
+`FieldKey` concatenate, so a fully composed accessor knows its own identity.
+
+For schema-driven models, [`keyed_form_gen`](../keyed_form_gen) generates the
+data classes plus a `<Root>Fields` namespace of these accessors from a
+`keyed_schema` declaration, so you don't hand-write them.
 
 ## FieldKey serialization
 
@@ -66,33 +105,16 @@ from *outside* — a server patch or deep link — back to a lens). There is no
 consumer for it yet; it earns its own story when server patches or deep links
 arrive, as a new named codec would rather than a change to this frozen one.
 
-Normally you don't hand-write lenses: [`keyed_form_gen`](../keyed_form_gen)
-turns a `keyed_schema` declaration into the data classes, a `<Root>Fields`
-namespace, and `<Field>FieldRefs` wrappers keyed by field name. Hand-authoring is the escape
-hatch — each segment `set` body is a one-liner over your `copyWith`
-(dart_mappable, freezed, hand-rolled — this package doesn't care):
-
-```dart
-final tourDays = Lens<Tour, List<Day>>.of(
-  key: FieldKey.name('days'),
-  get: (t) => t.days,
-  set: (t, v) => t.copyWith(days: v),
-);
-```
-
 ## `FieldRef` aliases
 
-For form / editor layers that shouldn't have to talk about optics,
-`FieldRef<R, V>` aliases `AffineLens` and `TotalFieldRef<R, V>` aliases
-`Lens` — same types, "field reference" vocabulary. `keyed_form_gen` emits
-its wrapper leaf getters as `FieldRef`.
-
-The Flutter layer (text binding, field anchors) lives in
-[`keyed_form_flutter`](../keyed_form_flutter).
+For layers that shouldn't have to talk about optics at all, `FieldRef<R, V>`
+aliases `AffineLens` and `TotalFieldRef<R, V>` aliases `Lens` — the exact
+same types under a "field reference" name. `keyed_form_gen` emits its
+generated accessors as `FieldRef`.
 
 ## Scope
 
-`Prism` ships (a minimal type-narrowing optic — `keyed_form_gen` uses it to
-compose through discriminated-union variants). Deliberately out of scope:
-Iso/Traversal, a validation DSL (that is `keyed_schema`), any
-state-management or serialization dependency.
+`Prism` ships — a minimal type-narrowing optic for composing through the
+variants of a sum type. Deliberately out of scope: Iso/Traversal, a
+validation DSL (see `keyed_schema`), and any state-management, serialization
+or Flutter dependency.

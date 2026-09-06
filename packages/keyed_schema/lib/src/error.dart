@@ -31,12 +31,16 @@ final class _KSErrorBuilder implements KSError {
   String? resolve(KSIssue issue) => builder(issue);
 }
 
-/// Thrown when an asynchronous refinement rule is executed during synchronous validation.
+/// Thrown when an `async` `refine` rule runs during synchronous validation —
+/// call `validateAsync` / `validateMapAsync` instead.
 class KSAsyncValidationError implements Exception {
+  /// Creates the error, optionally overriding the default [message].
   const KSAsyncValidationError([
-    this.message = 'Async refinement used during synchronous validation. Use validateAsync() or validateMapAsync() instead.',
+    this.message =
+        'Async refinement used during synchronous validation. Use validateAsync() or validateMapAsync() instead.',
   ]);
 
+  /// Human-readable explanation.
   final String message;
 
   @override

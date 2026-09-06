@@ -38,12 +38,11 @@ abstract class Prism<Source, Variant extends Source>
     FieldKey? key,
     required Opt<Variant> Function(Source source) preview,
     Source Function(Variant variant)? review,
-  }) =>
-      _FunctionPrism<Source, Variant>(
-        key ?? FieldKey.empty,
-        preview,
-        review ?? (variant) => variant,
-      );
+  }) => _FunctionPrism<Source, Variant>(
+    key ?? FieldKey.empty,
+    preview,
+    review ?? (variant) => variant,
+  );
 
   /// Constructs a [Source] containing this [Variant].
   Source review(Variant variant);
@@ -91,9 +90,9 @@ final class _FunctionPrism<Source, Variant extends Source>
 
   @override
   Source set(Source source, Variant value) => switch (find(source)) {
-        Some() => _review(value),
-        None() => source,
-      };
+    Some() => _review(value),
+    None() => source,
+  };
 }
 
 /// Extension adding explicit type-narrowing semantics to [AffineLens].
@@ -105,6 +104,5 @@ extension AffineLensNarrowX<Root, Value> on AffineLens<Root, Value> {
   /// type-narrowing intent at call sites.
   AffineLens<Root, Variant> narrow<Variant extends Value>(
     Prism<Value, Variant> prism,
-  ) =>
-      then(prism);
+  ) => then(prism);
 }

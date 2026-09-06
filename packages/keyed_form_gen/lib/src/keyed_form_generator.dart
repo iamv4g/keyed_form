@@ -18,7 +18,13 @@ class _NamedElement implements Element {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+/// `source_gen` generator for a `@keyedSchema`-annotated library: it expands
+/// every top-level schema declared in that file into immutable data models, a
+/// `<Root>Fields` lens namespace, and type-safe validation functions, emitted
+/// into the library's `.kfg.dart` part.
 class KeyedFormGenerator extends GeneratorForAnnotation<KeyedSchema> {
+  /// Creates the generator. Wired in by `keyedFormBuilder`; construct it
+  /// directly only for a custom build.
   const KeyedFormGenerator();
 
   @override

@@ -1,9 +1,13 @@
 /// Keyed optics for immutable aggregates.
 ///
-/// Not a general-purpose optics library: every lens carries a [FieldKey] —
-/// a stable, serializable identity — because the point is addressing fields
-/// of an aggregate across concerns (errors, dirty, focus, patches), not
-/// functional-programming completeness.
+/// Every [Lens] / [AffineLens] carries a [FieldKey] — a stable, serializable
+/// identity — so one accessor addresses the same field for reading, writing,
+/// diffing, and any keyed side-channel kept next to the data (validation
+/// errors, dirty state, focus, undo grouping, server patches, deep links).
+///
+/// That identity is the distinguishing feature, not optics completeness:
+/// there is no Iso/Traversal and no profunctor machinery, and the package
+/// has zero dependencies.
 library;
 
 export 'src/field_errors.dart';

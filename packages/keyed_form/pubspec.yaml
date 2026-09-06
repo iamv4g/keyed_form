@@ -1,11 +1,9 @@
 name: keyed_form
 description: >-
-  A form-state controller for immutable aggregates — the react-hook-form of the
-  keyed_lens family. Holds the draft, validation errors, touched/dirty state and
-  by-id list editing behind a FieldKey-addressed API. Pure Dart, no Flutter
-  dependency; observability via package:listen.
+  A form-state controller for immutable aggregates, built on keyed_lens: holds
+  the working draft, FieldKey-addressed validation errors and
+  touched/dirty/submit state.
 version: 0.1.0
-publish_to: 'none'
 
 homepage: https://github.com/iamv4g/keyed_form
 repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form

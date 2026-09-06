@@ -101,7 +101,8 @@ class KeyedFormField<Root, V> extends StatefulWidget {
   );
 
   @override
-  State<KeyedFormField<Root, V>> createState() => _KeyedFormFieldState<Root, V>();
+  State<KeyedFormField<Root, V>> createState() =>
+      _KeyedFormFieldState<Root, V>();
 }
 
 class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {

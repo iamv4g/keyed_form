@@ -19,11 +19,7 @@ import 'keyed_form_scope.dart';
 /// )
 /// ```
 class KeyedFieldList<Root, Item extends KeyedRow> extends StatefulWidget {
-  const KeyedFieldList({
-    required this.field,
-    required this.builder,
-    super.key,
-  });
+  const KeyedFieldList({required this.field, required this.builder, super.key});
 
   final FieldRef<Root, List<Item>> field;
   final Widget Function(
@@ -63,12 +59,9 @@ class _KeyedFieldListState<Root, Item extends KeyedRow>
     }
   }
 
-  List<String> _currentIds() => [
-    for (final item in _items()) item.clientId,
-  ];
+  List<String> _currentIds() => [for (final item in _items()) item.clientId];
 
-  List<Item> _items() =>
-      widget.field.getOrNull(_controller!.value) ?? const [];
+  List<Item> _items() => widget.field.getOrNull(_controller!.value) ?? const [];
 
   static bool _sameOrder(List<String> a, List<String> b) {
     if (a.length != b.length) return false;
@@ -85,9 +78,6 @@ class _KeyedFieldListState<Root, Item extends KeyedRow>
   }
 
   @override
-  Widget build(BuildContext context) => widget.builder(
-    context,
-    _items(),
-    _controller!.list<Item>(widget.field),
-  );
+  Widget build(BuildContext context) =>
+      widget.builder(context, _items(), _controller!.list<Item>(widget.field));
 }

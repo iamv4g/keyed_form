@@ -57,27 +57,30 @@ void main() {
       expect(formSchema.validateMap(valid).isEmpty, isTrue);
     });
 
-    test('refine form-level error maps to FieldKey.root when path and key are omitted', () {
-      final formSchema = ks
-          .object({
-            'email': ks.string().optional().nullable(),
-            'phone': ks.string().optional().nullable(),
-          })
-          .refine(
-            (data) => data['email'] != null || data['phone'] != null,
-            error: .text('At least one contact method is required'),
-          );
+    test(
+      'refine form-level error maps to FieldKey.root when path and key are omitted',
+      () {
+        final formSchema = ks
+            .object({
+              'email': ks.string().optional().nullable(),
+              'phone': ks.string().optional().nullable(),
+            })
+            .refine(
+              (data) => data['email'] != null || data['phone'] != null,
+              error: .text('At least one contact method is required'),
+            );
 
-      final invalid = {'email': null, 'phone': null};
-      final errors = formSchema.validateMap(invalid);
-      expect(
-        errors.byKey(FieldKey.root),
-        'At least one contact method is required',
-      );
+        final invalid = {'email': null, 'phone': null};
+        final errors = formSchema.validateMap(invalid);
+        expect(
+          errors.byKey(FieldKey.root),
+          'At least one contact method is required',
+        );
 
-      final valid = {'email': 'test@example.com', 'phone': null};
-      expect(formSchema.validateMap(valid).isEmpty, isTrue);
-    });
+        final valid = {'email': 'test@example.com', 'phone': null};
+        expect(formSchema.validateMap(valid).isEmpty, isTrue);
+      },
+    );
 
     test('refine with key targets deep FieldKey', () {
       final customKey =
@@ -174,33 +177,36 @@ void main() {
       expect(errors.byKey(FieldKey.root), 'Error with code: CUSTOM_ERR_42');
     });
 
-    test('unified refine: async check works in validateMapAsync and throws KSAsyncValidationError in validateMap', () async {
-      final schema = ks
-          .object({'username': ks.string()})
-          .refine(
-            (data) async {
-              await Future<void>.delayed(const Duration(milliseconds: 5));
-              return data['username'] != 'taken';
-            },
-            path: 'username',
-            error: .text('Username is already taken'),
-          );
+    test(
+      'unified refine: async check works in validateMapAsync and throws KSAsyncValidationError in validateMap',
+      () async {
+        final schema = ks
+            .object({'username': ks.string()})
+            .refine(
+              (data) async {
+                await Future<void>.delayed(const Duration(milliseconds: 5));
+                return data['username'] != 'taken';
+              },
+              path: 'username',
+              error: .text('Username is already taken'),
+            );
 
-      // Synchronous validateMap throws KSAsyncValidationError
-      expect(
-        () => schema.validateMap({'username': 'taken'}),
-        throwsA(isA<KSAsyncValidationError>()),
-      );
+        // Synchronous validateMap throws KSAsyncValidationError
+        expect(
+          () => schema.validateMap({'username': 'taken'}),
+          throwsA(isA<KSAsyncValidationError>()),
+        );
 
-      // Asynchronous validateMapAsync works as expected
-      final errors = await schema.validateMapAsync({'username': 'taken'});
-      expect(
-        errors.byKey(FieldKey.name('username')),
-        'Username is already taken',
-      );
+        // Asynchronous validateMapAsync works as expected
+        final errors = await schema.validateMapAsync({'username': 'taken'});
+        expect(
+          errors.byKey(FieldKey.name('username')),
+          'Username is already taken',
+        );
 
-      final valid = await schema.validateMapAsync({'username': 'available'});
-      expect(valid.isEmpty, isTrue);
-    });
+        final valid = await schema.validateMapAsync({'username': 'available'});
+        expect(valid.isEmpty, isTrue);
+      },
+    );
   });
 }

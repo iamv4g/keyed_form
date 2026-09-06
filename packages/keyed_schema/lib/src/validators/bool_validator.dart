@@ -4,10 +4,13 @@ import '../error.dart';
 import '../issue.dart';
 import 'validator.dart';
 
-typedef BoolIssueRule = (KSIssue issue, KSError? ruleError)? Function(
-  bool? value,
-);
+/// A single built-in boolean check: returns the [KSIssue] the value failed
+/// (with an optional per-rule [KSError] override), or `null` when it passed.
+typedef BoolIssueRule =
+    (KSIssue issue, KSError? ruleError)? Function(bool? value);
 
+/// A user-supplied predicate attached with [KSBool.refine]; see the fields'
+/// roles under [KSBool.refine].
 typedef BoolRefinement = ({
   FutureOr<bool> Function(bool? value) test,
   KSError? error,
@@ -44,8 +47,10 @@ class KSBool extends KSValidator<bool?> {
   @override
   final KSError? error;
 
+  /// Whether a [trueOnly] rule has been added (metadata for the generator).
   final bool isTrueOnly;
 
+  /// Returns a copy with the given fields replaced.
   KSBool copyWith({
     List<BoolIssueRule>? rules,
     List<BoolRefinement>? refinements,
@@ -66,6 +71,7 @@ class KSBool extends KSValidator<bool?> {
     );
   }
 
+  /// Requires the value to be `true` — for "must accept the terms" checkboxes.
   KSBool trueOnly({KSError? error}) {
     final nextRules = List<BoolIssueRule>.from(_rules)
       ..add(
@@ -76,10 +82,18 @@ class KSBool extends KSValidator<bool?> {
     return copyWith(rules: nextRules, isTrueOnly: true);
   }
 
+  /// Allows the field to be omitted without failing.
   KSBool optional() => copyWith(isOptional: true);
+
+  /// Allows the field to be `null` without failing.
   KSBool nullable() => copyWith(isNullable: true);
+
+  /// Substitutes [value] when the input is `null` before validating.
   KSBool defaultTo(bool value) => copyWith(defaultValue: value);
 
+  /// Adds a custom check [test] (sync or async), failing with [error] when it
+  /// returns `false`. [when] gates it, [abort] skips later refinements on
+  /// failure, and [params] flows into the resulting [KSCustomIssue].
   KSBool refine(
     FutureOr<bool> Function(bool? value) test, {
     KSError? error,

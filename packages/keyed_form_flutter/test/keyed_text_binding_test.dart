@@ -45,8 +45,9 @@ void main() {
     await tester.pump();
 
     expect(log, ['abcd']);
-    final controller =
-        tester.widget<TextField>(find.byType(TextField)).controller!;
+    final controller = tester
+        .widget<TextField>(find.byType(TextField))
+        .controller!;
     expect(controller.text, 'abcd');
     expect(controller.selection.extentOffset, 4);
   });
@@ -57,8 +58,9 @@ void main() {
     final log = <String>[];
     await tester.pumpWidget(_Host(initial: 'hello world', log: log));
 
-    final controller =
-        tester.widget<TextField>(find.byType(TextField)).controller!;
+    final controller = tester
+        .widget<TextField>(find.byType(TextField))
+        .controller!;
     controller.selection = const TextSelection.collapsed(offset: 11);
 
     tester.state<_HostState>(find.byType(_Host)).push('hi');
@@ -73,8 +75,9 @@ void main() {
     final log = <String>[];
     await tester.pumpWidget(_Host(initial: 'abc', log: log));
 
-    final controller =
-        tester.widget<TextField>(find.byType(TextField)).controller!;
+    final controller = tester
+        .widget<TextField>(find.byType(TextField))
+        .controller!;
     controller.selection = const TextSelection.collapsed(offset: 1);
     await tester.pump();
 

@@ -140,116 +140,111 @@ void main() {
       );
     });
 
-    test(
-      'recursive nested navigators return field-name FieldRefs wrappers',
-      () {
-        final admissionClass = ParsedClass(
-          name: 'AdmissionSchema',
-          schemaName: 'admissionSchema',
-          isListItem: true,
-          fields: [ParsedField(name: 'targetId', dartType: 'String?')],
-        );
-        final sectionClass = ParsedClass(
-          name: 'SectionSchema',
-          schemaName: 'sectionSchema',
-          isListItem: true,
-          fields: [
-            ParsedField(
-              name: 'admissions',
-              dartType: 'List<AdmissionSchema>',
-              isList: true,
-              nestedClass: admissionClass,
-            ),
-          ],
-        );
-        final groupClass = ParsedClass(
-          name: 'GroupSchema',
-          schemaName: 'groupSchema',
-          isListItem: true,
-          fields: [
-            ParsedField(
-              name: 'sections',
-              dartType: 'List<SectionSchema>',
-              isList: true,
-              nestedClass: sectionClass,
-            ),
-          ],
-        );
-        final dayClass = ParsedClass(
-          name: 'DaySchema',
-          schemaName: 'daySchema',
-          isListItem: true,
-          fields: [
-            ParsedField(name: 'name', dartType: 'String', defaultValue: "''"),
-            ParsedField(
-              name: 'groups',
-              dartType: 'List<GroupSchema>',
-              isList: true,
-              nestedClass: groupClass,
-            ),
-          ],
-        );
-        final rootClass = ParsedClass(
-          name: 'ItineraryBuilderSchema',
-          schemaName: 'itineraryBuilderSchema',
-          isListItem: false,
-          fields: [
-            ParsedField(
-              name: 'days',
-              dartType: 'List<DaySchema>',
-              isList: true,
-              nestedClass: dayClass,
-            ),
-          ],
-        );
-
-        final code = dataClassGen.generate(rootClass);
-
-        // Navigators keyed by field name, taking an inline ({String seg,…}) record.
-        expect(code, contains('static DayFieldRefs day(DayRef at) =>'));
-        expect(
-          code,
-          contains(
-            'DayFieldRefs(days.at(at.day, (x) => x.clientId == at.day))',
+    test('recursive nested navigators return field-name FieldRefs wrappers', () {
+      final admissionClass = ParsedClass(
+        name: 'AdmissionSchema',
+        schemaName: 'admissionSchema',
+        isListItem: true,
+        fields: [ParsedField(name: 'targetId', dartType: 'String?')],
+      );
+      final sectionClass = ParsedClass(
+        name: 'SectionSchema',
+        schemaName: 'sectionSchema',
+        isListItem: true,
+        fields: [
+          ParsedField(
+            name: 'admissions',
+            dartType: 'List<AdmissionSchema>',
+            isList: true,
+            nestedClass: admissionClass,
           ),
-        );
-        expect(code, contains('static GroupFieldRefs group(GroupRef at) =>'));
-        expect(
-          code,
-          contains('static SectionFieldRefs section(SectionRef at) =>'),
-        );
-        expect(
-          code,
-          contains('static AdmissionFieldRefs admission(AdmissionRef at) =>'),
-        );
+        ],
+      );
+      final groupClass = ParsedClass(
+        name: 'GroupSchema',
+        schemaName: 'groupSchema',
+        isListItem: true,
+        fields: [
+          ParsedField(
+            name: 'sections',
+            dartType: 'List<SectionSchema>',
+            isList: true,
+            nestedClass: sectionClass,
+          ),
+        ],
+      );
+      final dayClass = ParsedClass(
+        name: 'DaySchema',
+        schemaName: 'daySchema',
+        isListItem: true,
+        fields: [
+          ParsedField(name: 'name', dartType: 'String', defaultValue: "''"),
+          ParsedField(
+            name: 'groups',
+            dartType: 'List<GroupSchema>',
+            isList: true,
+            nestedClass: groupClass,
+          ),
+        ],
+      );
+      final rootClass = ParsedClass(
+        name: 'ItineraryBuilderSchema',
+        schemaName: 'itineraryBuilderSchema',
+        isListItem: false,
+        fields: [
+          ParsedField(
+            name: 'days',
+            dartType: 'List<DaySchema>',
+            isList: true,
+            nestedClass: dayClass,
+          ),
+        ],
+      );
 
-        // Leaf getters live on the wrapper.
-        expect(
-          code,
-          contains(
-            'FieldRef<ItineraryBuilderSchema, String> get name =>\n'
-            '      _self.then(DayFields.name);',
-          ),
-        );
-        expect(
-          code,
-          contains(
-            'FieldRef<ItineraryBuilderSchema, String?> get targetId =>\n'
-            '      _self.then(AdmissionFields.targetId);',
-          ),
-        );
+      final code = dataClassGen.generate(rootClass);
 
-        // No generated ClientId / Ref types anymore.
-        expect(code, contains('typedef DayRef = ({String day});'));
-        expect(
-          code,
-          contains(
-            'typedef AdmissionRef = ({String day, String group, String section, String admission});',
-          ),
-        );
-        expect(code, isNot(contains('extension type const')));
-      },
-    );
+      // Navigators keyed by field name, taking an inline ({String seg,…}) record.
+      expect(code, contains('static DayFieldRefs day(DayRef at) =>'));
+      expect(
+        code,
+        contains('DayFieldRefs(days.at(at.day, (x) => x.clientId == at.day))'),
+      );
+      expect(code, contains('static GroupFieldRefs group(GroupRef at) =>'));
+      expect(
+        code,
+        contains('static SectionFieldRefs section(SectionRef at) =>'),
+      );
+      expect(
+        code,
+        contains('static AdmissionFieldRefs admission(AdmissionRef at) =>'),
+      );
+
+      // Leaf getters live on the wrapper.
+      expect(
+        code,
+        contains(
+          'FieldRef<ItineraryBuilderSchema, String> get name =>\n'
+          '      _self.then(DayFields.name);',
+        ),
+      );
+      expect(
+        code,
+        contains(
+          'FieldRef<ItineraryBuilderSchema, String?> get targetId =>\n'
+          '      _self.then(AdmissionFields.targetId);',
+        ),
+      );
+
+      // No generated ClientId / Ref types anymore.
+      expect(code, contains('typedef DayRef = ({String day});'));
+      expect(
+        code,
+        contains(
+          'typedef AdmissionRef = ({String day, String group, String section, String admission});',
+        ),
+      );
+      expect(code, isNot(contains('extension type const')));
+    });
 
     test('union wrapper narrows through prisms into variant sub-wrappers', () {
       final transferDetailsClass = ParsedClass(
@@ -430,145 +425,157 @@ void main() {
       },
     );
 
-    test('a variant narrowing a nullable base field to non-nullable emits an override getter', () {
-      final base = ParsedClass(
-        name: 'ThingSchema',
-        schemaName: 'thingSchema',
-        isListItem: true,
-        isUnion: true,
-        unionDiscriminator: 'kind',
-        fields: [
-          ParsedField(name: 'note', dartType: 'String?', isNullable: true),
-        ],
-      );
-      final variant = ParsedClass(
-        name: 'ConcreteThingSchema',
-        schemaName: 'concreteThingSchema',
-        isListItem: true,
-        unionBaseClass: base,
-        unionDiscriminatorValue: 'concrete',
-        fields: [
-          ParsedField(name: 'note', dartType: 'String', defaultValue: "''"),
-        ],
-      );
+    test(
+      'a variant narrowing a nullable base field to non-nullable emits an override getter',
+      () {
+        final base = ParsedClass(
+          name: 'ThingSchema',
+          schemaName: 'thingSchema',
+          isListItem: true,
+          isUnion: true,
+          unionDiscriminator: 'kind',
+          fields: [
+            ParsedField(name: 'note', dartType: 'String?', isNullable: true),
+          ],
+        );
+        final variant = ParsedClass(
+          name: 'ConcreteThingSchema',
+          schemaName: 'concreteThingSchema',
+          isListItem: true,
+          unionBaseClass: base,
+          unionDiscriminatorValue: 'concrete',
+          fields: [
+            ParsedField(name: 'note', dartType: 'String', defaultValue: "''"),
+          ],
+        );
 
-      final code = dataClassGen.generate(variant);
+        final code = dataClassGen.generate(variant);
 
-      expect(code, contains('  @override\n  String get note => super.note!;'));
-    });
+        expect(
+          code,
+          contains('  @override\n  String get note => super.note!;'),
+        );
+      },
+    );
 
-    test('a variant with its own list and nested-object fields emits them in toMap', () {
-      final base = ParsedClass(
-        name: 'ThingSchema',
-        schemaName: 'thingSchema',
-        isListItem: true,
-        isUnion: true,
-        unionDiscriminator: 'kind',
-        fields: [],
-      );
-      final tagClass = ParsedClass(
-        name: 'TagSchema',
-        schemaName: 'tagSchema',
-        isListItem: true,
-        fields: [
-          ParsedField(name: 'label', dartType: 'String', defaultValue: "''"),
-        ],
-      );
-      final metaClass = ParsedClass(
-        name: 'MetaSchema',
-        schemaName: 'metaSchema',
-        fields: [
-          ParsedField(name: 'note', dartType: 'String', defaultValue: "''"),
-        ],
-      );
-      final variant = ParsedClass(
-        name: 'RichThingSchema',
-        schemaName: 'richThingSchema',
-        isListItem: true,
-        unionBaseClass: base,
-        unionDiscriminatorValue: 'rich',
-        fields: [
-          ParsedField(
-            name: 'tags',
-            dartType: 'List<TagSchema>',
-            isList: true,
-            nestedClass: tagClass,
-            defaultValue: 'const []',
+    test(
+      'a variant with its own list and nested-object fields emits them in toMap',
+      () {
+        final base = ParsedClass(
+          name: 'ThingSchema',
+          schemaName: 'thingSchema',
+          isListItem: true,
+          isUnion: true,
+          unionDiscriminator: 'kind',
+          fields: [],
+        );
+        final tagClass = ParsedClass(
+          name: 'TagSchema',
+          schemaName: 'tagSchema',
+          isListItem: true,
+          fields: [
+            ParsedField(name: 'label', dartType: 'String', defaultValue: "''"),
+          ],
+        );
+        final metaClass = ParsedClass(
+          name: 'MetaSchema',
+          schemaName: 'metaSchema',
+          fields: [
+            ParsedField(name: 'note', dartType: 'String', defaultValue: "''"),
+          ],
+        );
+        final variant = ParsedClass(
+          name: 'RichThingSchema',
+          schemaName: 'richThingSchema',
+          isListItem: true,
+          unionBaseClass: base,
+          unionDiscriminatorValue: 'rich',
+          fields: [
+            ParsedField(
+              name: 'tags',
+              dartType: 'List<TagSchema>',
+              isList: true,
+              nestedClass: tagClass,
+              defaultValue: 'const []',
+            ),
+            ParsedField(
+              name: 'meta',
+              dartType: 'MetaSchema',
+              isNestedObject: true,
+              nestedClass: metaClass,
+            ),
+          ],
+        );
+
+        final code = dataClassGen.generate(variant);
+
+        expect(code, contains("'tags': tags.map((e) => e.toMap()).toList(),"));
+        expect(code, contains("'meta': meta?.toMap(),"));
+      },
+    );
+
+    test(
+      'a list-of-unions item whose base has a nested-object common field recurses to emit that wrapper',
+      () {
+        final metaClass = ParsedClass(
+          name: 'MetaSchema',
+          schemaName: 'metaSchema',
+          fields: [
+            ParsedField(name: 'note', dartType: 'String', defaultValue: "''"),
+          ],
+        );
+        final variant = ParsedClass(
+          name: 'ConcreteThingSchema',
+          schemaName: 'concreteThingSchema',
+          isListItem: true,
+          unionDiscriminatorValue: 'concrete',
+          fields: [
+            ParsedField(
+              name: 'meta',
+              dartType: 'MetaSchema',
+              isNestedObject: true,
+              nestedClass: metaClass,
+            ),
+          ],
+        );
+        final unionClass = ParsedClass(
+          name: 'ThingSchema',
+          schemaName: 'thingSchema',
+          isListItem: true,
+          isUnion: true,
+          unionDiscriminator: 'kind',
+          unionVariants: {'concrete': variant},
+          fields: [
+            ParsedField(
+              name: 'meta',
+              dartType: 'MetaSchema',
+              isNestedObject: true,
+              nestedClass: metaClass,
+            ),
+          ],
+        );
+        final rootClass = ParsedClass(
+          name: 'RootSchema',
+          schemaName: 'rootSchema',
+          fields: [
+            ParsedField(
+              name: 'things',
+              dartType: 'List<ThingSchema>',
+              isList: true,
+              nestedClass: unionClass,
+            ),
+          ],
+        );
+
+        final code = dataClassGen.generate(rootClass);
+
+        expect(
+          code,
+          contains(
+            'final class MetaFieldRefs extends AffineLens<RootSchema, MetaSchema> {',
           ),
-          ParsedField(
-            name: 'meta',
-            dartType: 'MetaSchema',
-            isNestedObject: true,
-            nestedClass: metaClass,
-          ),
-        ],
-      );
-
-      final code = dataClassGen.generate(variant);
-
-      expect(code, contains("'tags': tags.map((e) => e.toMap()).toList(),"));
-      expect(code, contains("'meta': meta?.toMap(),"));
-    });
-
-    test('a list-of-unions item whose base has a nested-object common field recurses to emit that wrapper', () {
-      final metaClass = ParsedClass(
-        name: 'MetaSchema',
-        schemaName: 'metaSchema',
-        fields: [
-          ParsedField(name: 'note', dartType: 'String', defaultValue: "''"),
-        ],
-      );
-      final variant = ParsedClass(
-        name: 'ConcreteThingSchema',
-        schemaName: 'concreteThingSchema',
-        isListItem: true,
-        unionDiscriminatorValue: 'concrete',
-        fields: [
-          ParsedField(
-            name: 'meta',
-            dartType: 'MetaSchema',
-            isNestedObject: true,
-            nestedClass: metaClass,
-          ),
-        ],
-      );
-      final unionClass = ParsedClass(
-        name: 'ThingSchema',
-        schemaName: 'thingSchema',
-        isListItem: true,
-        isUnion: true,
-        unionDiscriminator: 'kind',
-        unionVariants: {'concrete': variant},
-        fields: [
-          ParsedField(
-            name: 'meta',
-            dartType: 'MetaSchema',
-            isNestedObject: true,
-            nestedClass: metaClass,
-          ),
-        ],
-      );
-      final rootClass = ParsedClass(
-        name: 'RootSchema',
-        schemaName: 'rootSchema',
-        fields: [
-          ParsedField(
-            name: 'things',
-            dartType: 'List<ThingSchema>',
-            isList: true,
-            nestedClass: unionClass,
-          ),
-        ],
-      );
-
-      final code = dataClassGen.generate(rootClass);
-
-      expect(
-        code,
-        contains(
-          'final class MetaFieldRefs extends AffineLens<RootSchema, MetaSchema> {',
-        ),
-      );
-    });
+        );
+      },
+    );
   });
 }

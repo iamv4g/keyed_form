@@ -84,23 +84,21 @@ abstract final class TripFields {
   static AffineLens<Trip, Stop> stop(String id) =>
       stops.at(id, (s) => s.clientId == id);
 
-  static AffineLens<Trip, String> stopLabel(String id) =>
-      stop(id).then(
-        Lens.of(
-          key: FieldKey.name('label'),
-          get: (s) => s.label,
-          set: (s, v) => s.copyWith(label: v),
-        ),
-      );
+  static AffineLens<Trip, String> stopLabel(String id) => stop(id).then(
+    Lens.of(
+      key: FieldKey.name('label'),
+      get: (s) => s.label,
+      set: (s, v) => s.copyWith(label: v),
+    ),
+  );
 
-  static AffineLens<Trip, int> stopNights(String id) =>
-      stop(id).then(
-        Lens.of(
-          key: FieldKey.name('nights'),
-          get: (s) => s.nights,
-          set: (s, v) => s.copyWith(nights: v),
-        ),
-      );
+  static AffineLens<Trip, int> stopNights(String id) => stop(id).then(
+    Lens.of(
+      key: FieldKey.name('nights'),
+      get: (s) => s.nights,
+      set: (s, v) => s.copyWith(nights: v),
+    ),
+  );
 }
 
 // --- resolvers -------------------------------------------------------------

@@ -10,7 +10,8 @@ class Pair {
   final String b;
   Pair copyWith({String? a, String? b}) => Pair(a: a ?? this.a, b: b ?? this.b);
   @override
-  bool operator ==(Object other) => other is Pair && other.a == a && other.b == b;
+  bool operator ==(Object other) =>
+      other is Pair && other.a == a && other.b == b;
   @override
   int get hashCode => Object.hash(a, b);
 }
@@ -54,17 +55,18 @@ Widget _field(
   },
 );
 
-Widget _host(KeyedFormController<Pair> form, Map<String, int> builds) => MaterialApp(
-  home: Scaffold(
-    body: KeyedFormScope<Pair>(
-      controller: form,
-      registry: KeyedFieldRegistry(),
-      child: Column(
-        children: [_field('a', _a, builds), _field('b', _b, builds)],
+Widget _host(KeyedFormController<Pair> form, Map<String, int> builds) =>
+    MaterialApp(
+      home: Scaffold(
+        body: KeyedFormScope<Pair>(
+          controller: form,
+          registry: KeyedFieldRegistry(),
+          child: Column(
+            children: [_field('a', _a, builds), _field('b', _b, builds)],
+          ),
+        ),
       ),
-    ),
-  ),
-);
+    );
 
 void main() {
   testWidgets('a write to one field does not rebuild the sibling', (
@@ -200,13 +202,15 @@ void main() {
       get: (_) => const [],
       set: (p, _) => p,
     );
-    final ghost = rows.at('gone', (r) => r.clientId == 'gone').then(
-      Lens<_Row, String>.of(
-        key: FieldKey.name('label'),
-        get: (r) => r.label,
-        set: (r, v) => r,
-      ),
-    );
+    final ghost = rows
+        .at('gone', (r) => r.clientId == 'gone')
+        .then(
+          Lens<_Row, String>.of(
+            key: FieldKey.name('label'),
+            get: (r) => r.label,
+            set: (r, v) => r,
+          ),
+        );
 
     final form = KeyedFormController<Pair>(
       initialValue: const Pair(),
