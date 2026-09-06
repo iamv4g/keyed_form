@@ -10,7 +10,7 @@ repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_g
 issue_tracker: https://github.com/iamv4g/keyed_form/issues
 
 environment:
-  sdk: ^3.13.0
+  sdk: ^3.10.0
 
 resolution: workspace
 
