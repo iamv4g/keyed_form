@@ -1,4 +1,6 @@
-/// Annotation placed at the file level (`@keyedSchema library;`) or on top-level schema declarations.
+/// File-level annotation (`@keyedSchema library;`) that marks a library whose
+/// top-level `ks.object(...)` schemas `keyed_form_gen` should generate models,
+/// field references and validators for.
 class KeyedSchema {
   /// Marks the annotated library for generation, appending [suffix] to
   /// generated class names.

@@ -10,7 +10,6 @@
 /// has zero dependencies.
 library;
 
-export 'src/field_errors.dart';
 export 'src/field_key.dart';
 export 'src/keyed_row.dart';
 export 'src/lens.dart';

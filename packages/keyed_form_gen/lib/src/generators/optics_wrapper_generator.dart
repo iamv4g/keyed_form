@@ -1,6 +1,6 @@
-/// Emits the keyed-optics wrapper subsystem for [DataClassGenerator]: per
+/// Emits the field-reference wrapper subsystem for [DataClassGenerator]: per
 /// nested-object `<Field>FieldRefs` wrappers, per-list-field navigators (and
-/// their `<Accessor>Ref` typedefs), and discriminated-union prism-narrowing
+/// their `<Accessor>Ref` typedefs), and discriminated-union variant-narrowing
 /// wrappers. Not exported from the package's public API — internal to the
 /// generator only.
 library;
@@ -8,9 +8,10 @@ library;
 import '../models/schema_model.dart' show ParsedClass, ParsedField;
 import '../naming.dart';
 
-/// Getter names on a wrapper must not shadow the [AffineLens]/`Object` API
-/// the wrapper inherits.
+/// Getter names on a wrapper must not shadow the `FieldRef` /
+/// `DelegatingFieldRef` / `Object` API the wrapper inherits.
 const _reservedWrapperNames = <String>{
+  'inner',
   'key',
   'find',
   'set',
@@ -50,10 +51,10 @@ String wrapperClassName(String accessorName) =>
 String _refTypeName(String accessorName) => '${capitalize(accessorName)}Ref';
 
 /// Emits one leaf getter per scalar / nested-object field of [fieldsName]
-/// onto a wrapper whose lens is `_self` (an `AffineLens<Root, Struct>`).
-/// Returns the nested-object sub-wrappers still to be emitted — the caller
-/// must emit them *after* closing the current class (Dart has no nested
-/// class declarations).
+/// onto a wrapper whose composed reference is `inner` (a `FieldRef<Root,
+/// Struct>`). Returns the nested-object sub-wrappers still to be emitted —
+/// the caller must emit them *after* closing the current class (Dart has no
+/// nested class declarations).
 List<(ParsedClass, String)> _emitLeafGetters(
   StringBuffer w,
   String rootClassName,
@@ -77,13 +78,13 @@ List<(ParsedClass, String)> _emitLeafGetters(
       w.writeln('  /// Field references for the nested `${f.name}` object.');
       w.writeln('  $nestedWrapper get ${f.name} =>');
       w.writeln(
-        '      $nestedWrapper(_self.then($fieldsName.${f.name})$refined);',
+        '      $nestedWrapper(inner.then($fieldsName.${f.name})$refined);',
       );
       pending.add((f.nestedClass!, nestedWrapper));
     } else {
       w.writeln('  /// `FieldRef` to `$fieldsName.${f.name}`.');
       w.writeln('  FieldRef<$rootClassName, ${f.dartType}> get ${f.name} =>');
-      w.writeln('      _self.then($fieldsName.${f.name});');
+      w.writeln('      inner.then($fieldsName.${f.name});');
     }
   }
   return pending;
@@ -98,29 +99,14 @@ void _emitWrapperHeader(
 ) {
   w.writeln('/// $doc');
   w.writeln(
-    'final class $wrapperName extends AffineLens<$rootClassName, $structName> {',
+    'final class $wrapperName '
+    'extends DelegatingFieldRef<$rootClassName, $structName> {',
   );
-  w.writeln('  $wrapperName(this._self);');
-  w.writeln();
-  w.writeln('  final AffineLens<$rootClassName, $structName> _self;');
-  w.writeln();
-  w.writeln('  @override');
-  w.writeln('  FieldKey get key => _self.key;');
-  w.writeln();
-  w.writeln('  @override');
-  w.writeln(
-    '  Opt<$structName> find($rootClassName root) => _self.find(root);',
-  );
-  w.writeln();
-  w.writeln('  @override');
-  w.writeln(
-    '  $rootClassName set($rootClassName root, $structName value) => '
-    '_self.set(root, value);',
-  );
+  w.writeln('  $wrapperName(super.inner);');
 }
 
-/// A plain (non-union) struct wrapper: `AffineLens<Root, Struct>` + one
-/// leaf getter per field. Recurses for nested-object fields.
+/// A plain (non-union) struct wrapper: a `DelegatingFieldRef<Root, Struct>`
+/// plus one leaf getter per field. Recurses for nested-object fields.
 void emitObjectWrapper(
   StringBuffer w,
   Set<String> emitted,
@@ -151,7 +137,7 @@ void emitObjectWrapper(
 }
 
 /// A discriminated-union wrapper: common-field getters plus `.asVariant`
-/// getters that narrow (via prism) into per-variant sub-wrappers.
+/// getters that narrow into per-variant sub-wrappers.
 void _emitUnionWrapper(
   StringBuffer w,
   Set<String> emitted,
@@ -161,7 +147,7 @@ void _emitUnionWrapper(
   String suffix,
 ) {
   if (!emitted.add(wrapperName)) return;
-  final prismsName = getPrismsClassName(unionClass.name, suffix);
+  final variantsName = getVariantsClassName(unionClass.name, suffix);
   _emitWrapperHeader(
     w,
     rootClassName,
@@ -190,7 +176,9 @@ void _emitUnionWrapper(
       '${unionClass.name} is a different variant.',
     );
     w.writeln('  $variantWrapper get as${capitalize(entry.key)} =>');
-    w.writeln('      $variantWrapper(_self.narrow($prismsName.${entry.key}));');
+    w.writeln(
+      '      $variantWrapper(inner.narrow($variantsName.${entry.key}));',
+    );
     variantWrappers.add((variantClass, variantWrapper));
   }
   w.writeln('}');
@@ -309,7 +297,7 @@ void generateNestedNavigators({
         'addresses.',
       );
       buffer.writeln(
-        '  static AffineLens<$rootClassName, List<${itemClass.name}>> '
+        '  static FieldRef<$rootClassName, List<${itemClass.name}>> '
         '$listAccessorName(${_refTypeName(parentSeg)} at) =>',
       );
       buffer.writeln(

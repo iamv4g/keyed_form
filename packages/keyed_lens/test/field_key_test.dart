@@ -69,26 +69,4 @@ void main() {
         .toList();
     expect(kinds, ['name:days', 'id:d1']);
   });
-
-  group('FieldErrors', () {
-    final nameLens = Lens<(String,), String>.of(
-      key: FieldKey.name('name'),
-      get: (r) => r.$1,
-      set: (r, v) => (v,),
-    );
-
-    test('looks an error up by lens, hiding FieldKey', () {
-      final errors = FieldErrors({nameLens.key: 'required'});
-      expect(errors(nameLens), 'required');
-      expect(errors.byKey(FieldKey.name('name')), 'required');
-      expect(errors.length, 1);
-      expect(errors.isNotEmpty, isTrue);
-    });
-
-    test('empty has no matches', () {
-      const errors = FieldErrors<String>.empty();
-      expect(errors(nameLens), isNull);
-      expect(errors.isEmpty, isTrue);
-    });
-  });
 }

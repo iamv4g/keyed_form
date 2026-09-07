@@ -1,9 +1,15 @@
 ## 0.1.0
 
-- Initial extracted snapshot: `build_runner` codegen from a `keyed_schema`
-  declaration to an immutable data class, `Fields`/`FieldRefs` keyed
-  optics, and sync/async validation methods.
-- Generated `copyWith` hardened to a typed public interface backed by a
-  private sentinel-based implementation (nullable fields use the sentinel,
-  non-nullable fields never do), fixing type-inference failures on bare
-  collection literals at call sites.
+Initial release.
+
+- `build_runner` generator for `@keyedSchema`-annotated libraries: turns each
+  `ks.object({...})` schema into an immutable data class (`const` constructor,
+  `.create()` factory with auto `clientId`, `copyWith`, `==`, `hashCode`,
+  `toMap`).
+- A `<Root>Fields` namespace of `keyed_form_core` field references —
+  `StrictFieldRef` for scalars, `<Field>FieldRefs` wrappers for nested objects
+  and list rows, `.asVariant` narrowers for discriminated unions.
+- `validate()` / `validateAsync()` and the `validateData` statics, returning
+  `FieldErrors`.
+- `copyWith` is a typed public interface backed by a private sentinel-based
+  implementation so bare `[]` / `{}` literals infer correctly at call sites.

@@ -1,6 +1,12 @@
 ## 0.1.0
 
-- Initial extracted snapshot: `KeyedFormScope`, `KeyedFormField` (with
-  `.text` text-field helper), `KeyedFieldList`, `KeyedTextBinding`
-  (caret-safe text binding), `KeyedFieldRegistry`/`KeyedFieldAnchor`
-  (scroll-to-first-error).
+Initial release.
+
+- `KeyedFormScope` — publishes a `KeyedFormController` and a
+  `KeyedFieldRegistry` down the widget tree.
+- `KeyedFormField` (and `KeyedFormField.text`) — binds one field reference and
+  rebuilds only when that field's value or visible error changes.
+- `KeyedFieldList` — binds one list field and rebuilds only when the row set
+  changes.
+- `KeyedTextBinding` — a caret- and IME-stable `TextEditingController` binding.
+- `KeyedFieldRegistry` / `KeyedFieldAnchor` — scroll-to-first-error.

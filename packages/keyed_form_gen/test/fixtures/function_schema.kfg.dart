@@ -121,21 +121,24 @@ class LoginSchema {
 }
 
 abstract final class LoginFields {
-  static Lens<LoginSchema, String> get username => Lens.of(
-    key: FieldKey.name('username'),
-    get: (x) => x.username,
-    set: (x, v) => x.copyWith(username: v),
-  );
+  static StrictFieldRef<LoginSchema, String> get username =>
+      StrictFieldRef<LoginSchema, String>.of(
+        key: FieldKey.name('username'),
+        get: (x) => x.username,
+        set: (x, v) => x.copyWith(username: v),
+      );
 
-  static Lens<LoginSchema, String> get password => Lens.of(
-    key: FieldKey.name('password'),
-    get: (x) => x.password,
-    set: (x, v) => x.copyWith(password: v),
-  );
+  static StrictFieldRef<LoginSchema, String> get password =>
+      StrictFieldRef<LoginSchema, String>.of(
+        key: FieldKey.name('password'),
+        get: (x) => x.password,
+        set: (x, v) => x.copyWith(password: v),
+      );
 
-  static Lens<LoginSchema, bool> get remember => Lens.of(
-    key: FieldKey.name('remember'),
-    get: (x) => x.remember,
-    set: (x, v) => x.copyWith(remember: v),
-  );
+  static StrictFieldRef<LoginSchema, bool> get remember =>
+      StrictFieldRef<LoginSchema, bool>.of(
+        key: FieldKey.name('remember'),
+        get: (x) => x.remember,
+        set: (x, v) => x.copyWith(remember: v),
+      );
 }

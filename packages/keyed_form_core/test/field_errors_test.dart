@@ -1,4 +1,4 @@
-import 'package:keyed_lens/keyed_lens.dart';
+import 'package:keyed_form_core/keyed_form_core.dart';
 import 'package:test/test.dart';
 
 // Keys shaped like real itinerary paths: days[id].(name | groups[id].name).
@@ -19,17 +19,20 @@ void main() {
       expect(errors.byKey(decoded), 'required');
     });
 
-    test('a lens whose key round-trips through toPath() still looks up', () {
-      final key = dayName('d1');
-      // A lens carrying a key rebuilt from the serialized path.
-      final lens = Lens<Object?, Object?>.of(
-        key: FieldKey.parse(key.toPath()),
-        get: (r) => r,
-        set: (r, _) => r,
-      );
-      final errors = FieldErrors<String>({key: 'too long'});
-      expect(errors(lens), 'too long');
-    });
+    test(
+      'a field ref whose key round-trips through toPath() still looks up',
+      () {
+        final key = dayName('d1');
+        // A field ref carrying a key rebuilt from the serialized path.
+        final ref = StrictFieldRef<Object?, Object?>.of(
+          key: FieldKey.parse(key.toPath()),
+          get: (r) => r,
+          set: (r, _) => r,
+        );
+        final errors = FieldErrors<String>({key: 'too long'});
+        expect(errors(ref), 'too long');
+      },
+    );
   });
 
   group('iteration preserves document (insertion) order', () {

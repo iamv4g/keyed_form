@@ -1,4 +1,4 @@
-import 'package:keyed_lens/keyed_lens.dart';
+import 'package:keyed_form_core/keyed_form_core.dart';
 import 'package:meta/meta.dart';
 
 /// An immutable, point-in-time copy of a [KeyedFormController]'s coarse state.

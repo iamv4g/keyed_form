@@ -1,12 +1,12 @@
-name: keyed_schema
+name: keyed_form_schema
 description: >-
   Declarative, schema-driven validation for immutable aggregates: compose field
-  validators into object schemas that yield keyed_lens FieldKey-addressed errors.
-  Pure Dart.
+  validators into object schemas that yield FieldKey-addressed FieldErrors.
+  Re-exports keyed_form_core. Pure Dart.
 version: 0.1.0
 
 homepage: https://github.com/iamv4g/keyed_form
-repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_schema
+repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_schema
 issue_tracker: https://github.com/iamv4g/keyed_form/issues
 
 environment:
@@ -15,7 +15,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  keyed_lens: ^0.1.0
+  keyed_form_core: ^0.1.0
   uuid: ^4.6.0
 
 dev_dependencies:

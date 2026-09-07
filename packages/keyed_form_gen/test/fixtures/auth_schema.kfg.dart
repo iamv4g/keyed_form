@@ -120,21 +120,24 @@ class AuthSchema {
 }
 
 abstract final class AuthFields {
-  static Lens<AuthSchema, String> get username => Lens.of(
-    key: FieldKey.name('username'),
-    get: (x) => x.username,
-    set: (x, v) => x.copyWith(username: v),
-  );
+  static StrictFieldRef<AuthSchema, String> get username =>
+      StrictFieldRef<AuthSchema, String>.of(
+        key: FieldKey.name('username'),
+        get: (x) => x.username,
+        set: (x, v) => x.copyWith(username: v),
+      );
 
-  static Lens<AuthSchema, String> get password => Lens.of(
-    key: FieldKey.name('password'),
-    get: (x) => x.password,
-    set: (x, v) => x.copyWith(password: v),
-  );
+  static StrictFieldRef<AuthSchema, String> get password =>
+      StrictFieldRef<AuthSchema, String>.of(
+        key: FieldKey.name('password'),
+        get: (x) => x.password,
+        set: (x, v) => x.copyWith(password: v),
+      );
 
-  static Lens<AuthSchema, bool> get remember => Lens.of(
-    key: FieldKey.name('remember'),
-    get: (x) => x.remember,
-    set: (x, v) => x.copyWith(remember: v),
-  );
+  static StrictFieldRef<AuthSchema, bool> get remember =>
+      StrictFieldRef<AuthSchema, bool>.of(
+        key: FieldKey.name('remember'),
+        get: (x) => x.remember,
+        set: (x, v) => x.copyWith(remember: v),
+      );
 }

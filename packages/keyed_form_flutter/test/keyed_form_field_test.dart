@@ -16,12 +16,12 @@ class Pair {
   int get hashCode => Object.hash(a, b);
 }
 
-final _a = Lens<Pair, String>.of(
+final _a = StrictFieldRef<Pair, String>.of(
   key: FieldKey.name('a'),
   get: (p) => p.a,
   set: (p, v) => p.copyWith(a: v),
 );
-final _b = Lens<Pair, String>.of(
+final _b = StrictFieldRef<Pair, String>.of(
   key: FieldKey.name('b'),
   get: (p) => p.b,
   set: (p, v) => p.copyWith(b: v),
@@ -197,7 +197,7 @@ void main() {
   testWidgets('a field whose path stops resolving renders nothing', (
     tester,
   ) async {
-    final rows = Lens<Pair, List<_Row>>.of(
+    final rows = StrictFieldRef<Pair, List<_Row>>.of(
       key: FieldKey.name('rows'),
       get: (_) => const [],
       set: (p, _) => p,
@@ -205,7 +205,7 @@ void main() {
     final ghost = rows
         .at('gone', (r) => r.clientId == 'gone')
         .then(
-          Lens<_Row, String>.of(
+          StrictFieldRef<_Row, String>.of(
             key: FieldKey.name('label'),
             get: (r) => r.label,
             set: (r, v) => r,

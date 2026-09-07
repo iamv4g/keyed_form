@@ -9,7 +9,7 @@ the form changes, not on every keystroke elsewhere in the tree.
 `KeyedTextBinding` and `KeyedFieldRegistry` cover caret-stable text input
 and scroll-to-first-error.
 
-Re-exports all of `keyed_form` (and thus `keyed_lens`), so a screen needs a
+Re-exports all of `keyed_form` (and thus `keyed_form_core`), so a screen needs a
 single import.
 
 ## Usage

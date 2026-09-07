@@ -71,17 +71,17 @@ void main() {
         code,
         contains('FieldErrors<String> validate() => switch (this) {'),
       );
-      expect(code, contains('abstract final class SectionPrisms {'));
+      expect(code, contains('abstract final class _SectionVariants {'));
       expect(
         code,
         contains(
-          'static final admission = Prism<SectionSchema, AdmissionSectionSchema>.type();',
+          'static final admission = VariantRef<SectionSchema, AdmissionSectionSchema>.type();',
         ),
       );
       expect(
         code,
         contains(
-          'static final transfer = Prism<SectionSchema, TransferSectionSchema>.type();',
+          'static final transfer = VariantRef<SectionSchema, TransferSectionSchema>.type();',
         ),
       );
       expect(code, contains('abstract final class SectionFields {'));
@@ -135,7 +135,7 @@ void main() {
       expect(
         code,
         contains(
-          'static Lens<AdmissionSectionSchema, String?> get targetId =>',
+          'static StrictFieldRef<AdmissionSectionSchema, String?> get targetId =>',
         ),
       );
     });
@@ -224,14 +224,14 @@ void main() {
         code,
         contains(
           'FieldRef<ItineraryBuilderSchema, String> get name =>\n'
-          '      _self.then(DayFields.name);',
+          '      inner.then(DayFields.name);',
         ),
       );
       expect(
         code,
         contains(
           'FieldRef<ItineraryBuilderSchema, String?> get targetId =>\n'
-          '      _self.then(AdmissionFields.targetId);',
+          '      inner.then(AdmissionFields.targetId);',
         ),
       );
 
@@ -327,28 +327,28 @@ void main() {
       expect(
         code,
         contains(
-          'final class SectionFieldRefs extends AffineLens<PlanSchema, SectionSchema> {',
+          'final class SectionFieldRefs extends DelegatingFieldRef<PlanSchema, SectionSchema> {',
         ),
       );
       expect(
         code,
         contains(
           'FieldRef<PlanSchema, int> get sortIndex =>\n'
-          '      _self.then(SectionFields.sortIndex);',
+          '      inner.then(SectionFields.sortIndex);',
         ),
       );
       expect(
         code,
         contains(
           'TransferSectionFieldRefs get asTransfer =>\n'
-          '      TransferSectionFieldRefs(_self.narrow(SectionPrisms.transfer));',
+          '      TransferSectionFieldRefs(inner.narrow(_SectionVariants.transfer));',
         ),
       );
       expect(
         code,
         contains(
           'AdmissionSectionFieldRefs get asAdmission =>\n'
-          '      AdmissionSectionFieldRefs(_self.narrow(SectionPrisms.admission));',
+          '      AdmissionSectionFieldRefs(inner.narrow(_SectionVariants.admission));',
         ),
       );
 
@@ -357,14 +357,14 @@ void main() {
       expect(
         code,
         contains(
-          'final class TransferSectionFieldRefs extends AffineLens<PlanSchema, TransferSectionSchema> {',
+          'final class TransferSectionFieldRefs extends DelegatingFieldRef<PlanSchema, TransferSectionSchema> {',
         ),
       );
       expect(
         code,
         contains(
           'DetailsFieldRefs get details =>\n'
-          '      DetailsFieldRefs(_self.then(TransferSectionFields.details)'
+          '      DetailsFieldRefs(inner.then(TransferSectionFields.details)'
           '.whenPresent());',
         ),
       );
@@ -372,7 +372,7 @@ void main() {
         code,
         contains(
           'FieldRef<PlanSchema, String> get vehicle =>\n'
-          '      _self.then(TransferDetailsFields.vehicle);',
+          '      inner.then(TransferDetailsFields.vehicle);',
         ),
       );
     });
@@ -572,7 +572,7 @@ void main() {
         expect(
           code,
           contains(
-            'final class MetaFieldRefs extends AffineLens<RootSchema, MetaSchema> {',
+            'final class MetaFieldRefs extends DelegatingFieldRef<RootSchema, MetaSchema> {',
           ),
         );
       },

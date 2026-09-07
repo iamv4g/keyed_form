@@ -17,11 +17,11 @@
 //
 // `package:build_test`'s `testBuilder` can't be used here: its virtual
 // single-package sandbox has no way to resolve a real dependency like
-// `package:keyed_schema/keyed_schema.dart` (its package graph is built only
+// `package:keyed_form_schema/keyed_form_schema.dart` (its package graph is built only
 // from the assets you hand it). `resolveSource`, by contrast, resolves
 // against this package's real, already-installed dependencies via
 // `PackageAssetReader.currentIsolate()` — so a source string that imports
-// `keyed_schema` resolves exactly as it would in a real build. What
+// `keyed_form_schema` resolves exactly as it would in a real build. What
 // `generateForAnnotatedElement` needs beyond a resolved `Element` is a
 // `BuildStep` (only for `buildStep.resolver` / `buildStep.inputId`, per its
 // `_getCompilationUnit` helper) — `_FakeBuildStep` below supplies just that,
@@ -48,7 +48,7 @@ class _FakeBuildStep implements BuildStep {
 }
 
 /// Resolves [source] under a synthetic asset id in *this* package (so
-/// `import 'package:keyed_schema/...'` resolves against the real
+/// `import 'package:keyed_form_schema/...'` resolves against the real
 /// dependency), finds the top-level element named [elementName], reads its
 /// first annotation, and runs it through [KeyedFormGenerator].
 Future<String> _generate(String source, String elementName) async {
@@ -79,7 +79,7 @@ void main() {
       'a single @keyedSchema top-level variable generates its data class',
       () async {
         final output = await _generate('''
-import 'package:keyed_schema/keyed_schema.dart';
+import 'package:keyed_form_schema/keyed_form_schema.dart';
 
 @keyedSchema
 final widgetSchema = ks.object({
@@ -102,7 +102,7 @@ final widgetSchema = ks.object({
 @keyedSchema
 library;
 
-import 'package:keyed_schema/keyed_schema.dart';
+import 'package:keyed_form_schema/keyed_form_schema.dart';
 
 final widgetSchema = ks.object({
   'name': ks.string(),
@@ -136,7 +136,7 @@ final gadgetSchema = ks.object({
       'a declaration with no ks.object(...) initializer yields the "no schema" comment',
       () async {
         final output = await _generate('''
-import 'package:keyed_schema/keyed_schema.dart';
+import 'package:keyed_form_schema/keyed_form_schema.dart';
 
 @keyedSchema
 final notASchema = 42;
@@ -150,7 +150,7 @@ final notASchema = 42;
       'a root-level function schema annotated directly generates its data class',
       () async {
         final output = await _generate('''
-import 'package:keyed_schema/keyed_schema.dart';
+import 'package:keyed_form_schema/keyed_form_schema.dart';
 
 @keyedSchema
 KSObject loginSchema() => ks.object({
@@ -173,7 +173,7 @@ KSObject loginSchema() => ks.object({
 @keyedSchema
 library;
 
-import 'package:keyed_schema/keyed_schema.dart';
+import 'package:keyed_form_schema/keyed_form_schema.dart';
 
 final widgetSchema = ks.object({
   'name': ks.string(),
@@ -212,7 +212,7 @@ KSObject loginSchema() => ks.object({
         );
         await resolveSource(
           '''
-import 'package:keyed_schema/keyed_schema.dart';
+import 'package:keyed_form_schema/keyed_form_schema.dart';
 
 @keyedSchema
 class NotASchemaDeclaration {}

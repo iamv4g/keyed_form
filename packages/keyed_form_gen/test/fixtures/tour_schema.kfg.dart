@@ -153,35 +153,40 @@ class TourSchema {
 }
 
 abstract final class TourFields {
-  static Lens<TourSchema, String> get title => Lens.of(
-    key: FieldKey.name('title'),
-    get: (x) => x.title,
-    set: (x, v) => x.copyWith(title: v),
-  );
+  static StrictFieldRef<TourSchema, String> get title =>
+      StrictFieldRef<TourSchema, String>.of(
+        key: FieldKey.name('title'),
+        get: (x) => x.title,
+        set: (x, v) => x.copyWith(title: v),
+      );
 
-  static Lens<TourSchema, List<HotelSchema>> get hotels => Lens.of(
-    key: FieldKey.name('hotels'),
-    get: (x) => x.hotels,
-    set: (x, v) => x.copyWith(hotels: v),
-  );
+  static StrictFieldRef<TourSchema, List<HotelSchema>> get hotels =>
+      StrictFieldRef<TourSchema, List<HotelSchema>>.of(
+        key: FieldKey.name('hotels'),
+        get: (x) => x.hotels,
+        set: (x, v) => x.copyWith(hotels: v),
+      );
 
-  static Lens<TourSchema, List<int>> get confirmedDays => Lens.of(
-    key: FieldKey.name('confirmedDays'),
-    get: (x) => x.confirmedDays,
-    set: (x, v) => x.copyWith(confirmedDays: v),
-  );
+  static StrictFieldRef<TourSchema, List<int>> get confirmedDays =>
+      StrictFieldRef<TourSchema, List<int>>.of(
+        key: FieldKey.name('confirmedDays'),
+        get: (x) => x.confirmedDays,
+        set: (x, v) => x.copyWith(confirmedDays: v),
+      );
 
-  static Lens<TourSchema, Map<String, int>> get dayNotes => Lens.of(
-    key: FieldKey.name('dayNotes'),
-    get: (x) => x.dayNotes,
-    set: (x, v) => x.copyWith(dayNotes: v),
-  );
+  static StrictFieldRef<TourSchema, Map<String, int>> get dayNotes =>
+      StrictFieldRef<TourSchema, Map<String, int>>.of(
+        key: FieldKey.name('dayNotes'),
+        get: (x) => x.dayNotes,
+        set: (x, v) => x.copyWith(dayNotes: v),
+      );
 
-  static Lens<TourSchema, String?> get ownerNote => Lens.of(
-    key: FieldKey.name('ownerNote'),
-    get: (x) => x.ownerNote,
-    set: (x, v) => x.copyWith(ownerNote: v),
-  );
+  static StrictFieldRef<TourSchema, String?> get ownerNote =>
+      StrictFieldRef<TourSchema, String?>.of(
+        key: FieldKey.name('ownerNote'),
+        get: (x) => x.ownerNote,
+        set: (x, v) => x.copyWith(ownerNote: v),
+      );
 
   /// Field references for the `hotels` row identified by [at].
   /// Affine — reads null / writes are a no-op if that row no longer exists.
@@ -194,31 +199,20 @@ abstract final class TourFields {
 typedef HotelRef = ({String hotel});
 
 /// Field references for a [HotelSchema] within [TourSchema].
-final class HotelFieldRefs extends AffineLens<TourSchema, HotelSchema> {
-  HotelFieldRefs(this._self);
-
-  final AffineLens<TourSchema, HotelSchema> _self;
-
-  @override
-  FieldKey get key => _self.key;
-
-  @override
-  Opt<HotelSchema> find(TourSchema root) => _self.find(root);
-
-  @override
-  TourSchema set(TourSchema root, HotelSchema value) => _self.set(root, value);
+final class HotelFieldRefs extends DelegatingFieldRef<TourSchema, HotelSchema> {
+  HotelFieldRefs(super.inner);
 
   /// `FieldRef` to `HotelFields.hotelName`.
   FieldRef<TourSchema, String> get hotelName =>
-      _self.then(HotelFields.hotelName);
+      inner.then(HotelFields.hotelName);
 
   /// `FieldRef` to `HotelFields.hotelPrice`.
   FieldRef<TourSchema, String?> get hotelPrice =>
-      _self.then(HotelFields.hotelPrice);
+      inner.then(HotelFields.hotelPrice);
 
   /// `FieldRef` to `HotelFields.prefectureId`.
   FieldRef<TourSchema, int?> get prefectureId =>
-      _self.then(HotelFields.prefectureId);
+      inner.then(HotelFields.prefectureId);
 }
 
 abstract interface class HotelSchemaCopyWith<T> {
@@ -307,21 +301,24 @@ class HotelSchema implements KeyedRow {
 }
 
 abstract final class HotelFields {
-  static Lens<HotelSchema, String> get hotelName => Lens.of(
-    key: FieldKey.name('hotelName'),
-    get: (x) => x.hotelName,
-    set: (x, v) => x.copyWith(hotelName: v),
-  );
+  static StrictFieldRef<HotelSchema, String> get hotelName =>
+      StrictFieldRef<HotelSchema, String>.of(
+        key: FieldKey.name('hotelName'),
+        get: (x) => x.hotelName,
+        set: (x, v) => x.copyWith(hotelName: v),
+      );
 
-  static Lens<HotelSchema, String?> get hotelPrice => Lens.of(
-    key: FieldKey.name('hotelPrice'),
-    get: (x) => x.hotelPrice,
-    set: (x, v) => x.copyWith(hotelPrice: v),
-  );
+  static StrictFieldRef<HotelSchema, String?> get hotelPrice =>
+      StrictFieldRef<HotelSchema, String?>.of(
+        key: FieldKey.name('hotelPrice'),
+        get: (x) => x.hotelPrice,
+        set: (x, v) => x.copyWith(hotelPrice: v),
+      );
 
-  static Lens<HotelSchema, int?> get prefectureId => Lens.of(
-    key: FieldKey.name('prefectureId'),
-    get: (x) => x.prefectureId,
-    set: (x, v) => x.copyWith(prefectureId: v),
-  );
+  static StrictFieldRef<HotelSchema, int?> get prefectureId =>
+      StrictFieldRef<HotelSchema, int?>.of(
+        key: FieldKey.name('prefectureId'),
+        get: (x) => x.prefectureId,
+        set: (x, v) => x.copyWith(prefectureId: v),
+      );
 }
