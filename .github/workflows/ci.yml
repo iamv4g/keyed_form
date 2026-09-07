@@ -35,8 +35,21 @@ jobs:
 
       - name: Guard — generated code must not leak raw optics vocabulary
         run: |
-          ! grep -REn '\bAffineLens\b|\bPrism\b|\bListItemLens\b|\bLens[<.]|\bOpt<' \
-            packages/keyed_form_gen/test/fixtures/*.kfg.dart
+          ! find packages -name '*.kfg.dart' \
+            -exec grep -Hn -E '\bAffineLens\b|\bPrism\b|\bListItemLens\b|\bLens[<.]|\bOpt<' {} +
+
+      # The examples ship their generated *.kfg.dart committed; CI checks they
+      # still compile and (for the Flutter one) that the widgets behave.
+      - name: Analyze (keyed_form_gen example)
+        run: dart analyze
+        working-directory: packages/keyed_form_gen/example
+
+      - name: Analyze + test (keyed_form_flutter showcase example)
+        run: |
+          set -e
+          flutter analyze
+          flutter test
+        working-directory: packages/keyed_form_flutter/examples/showcase
 
       - name: Test (pure Dart packages)
         run: |
