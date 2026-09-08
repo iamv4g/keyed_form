@@ -6,12 +6,12 @@ import 'keyed_form_controller.dart';
 /// `useFieldArray` of this family.
 ///
 /// Every mutation is applied immutably and pushed back through
-/// [KeyedFormController.updateField], so validation and change notification happen
+/// [KeyedFormController.mutateList], so validation and change notification happen
 /// exactly once per call. Rows are matched by [KeyedRow.clientId]; indices are
 /// accepted only where react-hook-form accepts them too (positional
 /// insert/move/swap).
 ///
-/// Obtain one with `form.list(SomeFields.rows(ref))`.
+/// Obtain one with `form.field(SomeFields.rows(ref)).list()`.
 class KeyedFormList<Root, Item extends KeyedRow> {
   KeyedFormList.forController(this._controller, this._field);
 

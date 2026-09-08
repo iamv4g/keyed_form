@@ -25,18 +25,25 @@ final form = KeyedFormController<InvoiceForm>(
   resolver: (draft, _) => InvoiceForm.validateData(draft),
 );
 
-form.setField(InvoiceFields.customerEmail, 'ada@example.com');
-form.visibleError(InvoiceFields.customerEmail.key); // null until touched / submitted
+form.field(InvoiceFields.customerEmail).set('ada@example.com');
+form.field(InvoiceFields.customerEmail).error; // null until touched / submitted
 
 form.validate(); // whole-draft validation, reveals every error
 ```
 
+`form.field(ref)` returns a `FieldHandle` — a statically-typed per-field
+facade (`set` / `update` / `value` / `error` / `dirty` / `touch()`, and
+`list()` for a list field). It is the everyday way in and out of a field;
+`.set(value)` rejects a wrongly-typed value at compile time.
+
 ## Pieces
 
 - `KeyedFormController<Root>` — the draft, `errors`, `touched`, `revealed`,
-  `submitted`/`submitting`, plus `setField`/`updateField`, `touch`,
-  `validate`/`validateScopes`, `seed`/`reset`, and server-error merging
-  (`setServerErrors`/`setServerErrorPaths`).
+  `submitted`/`submitting`, plus `field(ref)` (per-field read/write facade),
+  `touch`, `validate`/`validateScopes`, `seed`/`reset`, and server-error
+  merging (`setServerErrors`/`setServerErrorPaths`).
+- `FieldHandle<Root, V>` — what `form.field(ref)` returns: `set`/`update`,
+  `value`/`error`/`dirty`/`key`, `touch()`, and `list()` for a list field.
 - `KeyedFormMode` — when a field's error becomes *visible*
   (`onChange`/`onBlur`/`onTouched`/`onSubmit`/`all`), mirroring
   react-hook-form's modes. The controller never hides an error a submit
@@ -48,7 +55,7 @@ form.validate(); // whole-draft validation, reveals every error
 - `KeyedFormList<Root, Item>` — a by-id editor for one list field
   (`append`/`insert`/`removeById`/`move`/`updateById`, …), the
   `useFieldArray` of this family. Obtain one with
-  `form.list(InvoiceFields.lineItems)`.
+  `form.field(InvoiceFields.lineItems).list()`.
 - `KeyedFormSnapshot<Root>` — an immutable, `==`-comparable point-in-time
   copy of the controller's coarse state, for hosts (Riverpod `Notifier`,
   …) that want a value rather than a listenable.

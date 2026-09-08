@@ -118,7 +118,7 @@ void main() {
       ),
     );
 
-    form.setField(_a, '');
+    form.field(_a).set('');
     await tester.pump();
     expect(find.text('a required'), findsNothing, reason: 'not touched yet');
 
