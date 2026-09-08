@@ -1,0 +1,4 @@
+tags:
+  benchmark:
+    # Timing suites — noisy, slow, not run by default.
+    # `flutter test --tags benchmark`
