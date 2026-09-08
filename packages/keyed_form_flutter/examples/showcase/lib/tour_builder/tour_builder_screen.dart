@@ -91,7 +91,7 @@ class _TourBuilderScreenState extends State<TourBuilderScreen> {
   }
 
   KeyedFormList<TourSchema, StopSchema> get _stops =>
-      _form.list(TourFields.stops);
+      _form.field(TourFields.stops).list();
 
   Future<void> _save() async {
     if (_form.validate()) {

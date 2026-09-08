@@ -130,22 +130,24 @@ void main() {
     resolver: validateTour,
   );
 
-  // 1. Write a bad value. The error is in the map immediately, but not yet
-  //    *visible* under onTouched — the field hasn't been touched.
-  form.setField(TourFields.title, 'Ky');
+  // 1. `form.field(ref)` is the per-field facade — statically typed on the
+  //    field's value, so `title.set(1000)` would not compile.
+  final title = form.field(TourFields.title);
+
+  // Write a bad value. The error is in the map immediately, but not yet
+  // *visible* under onTouched — the field hasn't been touched.
+  title.set('Ky');
   print(form.errors(TourFields.title)); // Title needs at least 3 characters
-  print(form.visibleErrorFor(TourFields.title)); // null
+  print(title.error); // null
 
-  form.touch(TourFields.title.key);
-  print(
-    form.visibleErrorFor(TourFields.title),
-  ); // Title needs at least 3 characters
+  title.touch();
+  print(title.error); // Title needs at least 3 characters
 
-  form.setField(TourFields.title, 'Kyoto in early autumn');
-  print(form.visibleErrorFor(TourFields.title)); // null — fixed
+  title.set('Kyoto in early autumn');
+  print(title.error); // null — fixed
 
   // 2. Field-array editing, by id (the `useFieldArray` analogue).
-  final stops = form.list(TourFields.stops);
+  final stops = form.field(TourFields.stops).list();
   stops.append(const Stop(clientId: 'b', city: '', nights: 20));
   print(form.value.stops.length); // 2
 
@@ -154,8 +156,8 @@ void main() {
   for (final key in form.visibleErrorKeys) {
     print('  ${key.toPath()}: ${form.errors.byKey(key)}');
   }
-  //   stops: A tour can be at most 14 nights
   //   stops.['b'].city: City is required
+  //   stops: A tour can be at most 14 nights
 
   // 4. Fix the offending row and revalidate.
   stops.updateById('b', (s) => s.copyWith(city: 'Nara', nights: 2));
