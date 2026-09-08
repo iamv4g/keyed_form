@@ -1,0 +1,16 @@
+name: keyed_form_gen_example
+description: Schema-driven models, field references and validators from one ks.object.
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+
+resolution: workspace
+
+dependencies:
+  keyed_form_schema: ^0.1.0
+
+dev_dependencies:
+  build_runner: ^2.15.0
+  keyed_form_gen: ^0.1.0
+  lints: ^6.0.0

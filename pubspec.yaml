@@ -9,5 +9,7 @@ workspace:
   - packages/keyed_form_core
   - packages/keyed_form_schema
   - packages/keyed_form_gen
+  - packages/keyed_form_gen/example
   - packages/keyed_form
   - packages/keyed_form_flutter
+  - packages/keyed_form_flutter/examples/showcase
