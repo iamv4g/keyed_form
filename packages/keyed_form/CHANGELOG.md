@@ -1,3 +1,14 @@
+## Unreleased
+
+- `form.field(ref)` — a statically-typed per-field facade (`FieldHandle`):
+  `set` / `update` / `value` / `error` / `dirty` / `key` / `touch()`, plus
+  `list()` / `dirtyRows()` for a list field. `.set(value)` rejects a
+  wrongly-typed value at compile time, which `setField` could not.
+- `setField` / `updateField` / `list` / `mutateList` on `KeyedFormController`
+  are now `@internal` — the primitives behind `form.field(ref)`. They become
+  public again once Dart's `variance` feature lands (see the note in
+  `keyed_form_controller.dart`).
+
 ## 0.1.0
 
 Initial release.

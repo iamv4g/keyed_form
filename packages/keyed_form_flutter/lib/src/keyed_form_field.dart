@@ -169,7 +169,7 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
       context,
       KeyedFieldState<V>(
         value: _lastValue as V?,
-        onChanged: (v) => controller.setField(widget.field, v),
+        onChanged: (v) => controller.field(widget.field).set(v),
         onBlur: () => controller.touch(widget.field.key),
         errorText: _lastError,
         fieldKey: widget.field.key,

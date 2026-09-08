@@ -79,5 +79,5 @@ class _KeyedFieldListState<Root, Item extends KeyedRow>
 
   @override
   Widget build(BuildContext context) =>
-      widget.builder(context, _items(), _controller!.list<Item>(widget.field));
+      widget.builder(context, _items(), _controller!.field(widget.field).list());
 }

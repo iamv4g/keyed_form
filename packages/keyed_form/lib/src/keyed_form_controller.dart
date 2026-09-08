@@ -1,5 +1,6 @@
 import 'package:keyed_form_core/keyed_form_core.dart';
 import 'package:listen/listen.dart';
+import 'package:meta/meta.dart';
 
 import 'keyed_form_list.dart';
 import 'keyed_form_mode.dart';
@@ -16,14 +17,17 @@ import 'keyed_form_snapshot.dart';
 /// speak the `FieldRef` (lens) vocabulary, so UI code addresses a field the
 /// same way whether it is reading it, writing it, or asking for its error.
 ///
+/// Everyday field access goes through `form.field(ref)` — a `FieldHandle` whose
+/// `set` / `update` are statically typed to the field:
+///
 /// ```dart
 /// final form = KeyedFormController<InvoiceForm>(
 ///   initialValue: const InvoiceForm(),
 ///   mode: KeyedFormMode.onChange,
 ///   resolver: (draft, _) => InvoiceForm.validateData(draft),
 /// );
-/// form.setField(InvoiceFields.customerEmail, 'ada@example.com');
-/// form.visibleError(InvoiceFields.customerEmail.key); // null until touched / submitted
+/// form.field(InvoiceFields.customerEmail).set('ada@example.com');
+/// form.field(InvoiceFields.customerEmail).error; // null until touched / submitted
 /// ```
 ///
 /// [initialValue] doubles as the baseline for [isDirty] / [differs] / [reset];
@@ -155,20 +159,39 @@ class KeyedFormController<Root> extends ChangeNotifier {
 
   // --- writes ------------------------------------------------------------
 
+  // [setField] / [updateField] / [list] / [mutateList] below are `@internal`
+  // only as a workaround for a Dart type-inference hole:
+  // `setField<V>(FieldRef<Root, V>, V)` lets the compiler widen `V` to the
+  // least upper bound of the field's type and the argument's type (FieldRef is
+  // covariant in V by Dart's default), so `form.setField(stringField, 1)`
+  // type-checks and fails only at runtime with a covariant TypeError. The
+  // public, statically-checked path is `form.field(ref).set(value)` /
+  // `.update(fn)` / `.list()` (see field_handle.dart), which pins `V` from the
+  // ref alone.
+  //
+  // When the `variance` language feature stabilises, declare
+  // `AffineLens<Root, inout Value>` in keyed_lens instead: these methods then
+  // become statically safe as they stand — drop the `@internal` annotations
+  // and this comment, and re-document them as public. `FieldHandle` stays as
+  // the ergonomic facade.
+
   /// Writes [value] to [field] (no-op if the path no longer resolves or the
-  /// draft is unchanged).
+  /// draft is unchanged). Internal primitive behind `form.field(field).set`.
+  @internal
   void setField<V>(FieldRef<Root, V> field, V value) =>
       _commit(field.key, field.set(_value, value));
 
   /// Reads [field], applies [transform], writes it back — one revalidation,
-  /// one notification. Use for a bundle of related changes to a subtree.
+  /// one notification. Internal primitive behind `form.field(field).update`.
+  @internal
   void updateField<V>(
     FieldRef<Root, V> field,
     V Function(V current) transform,
   ) => _commit(field.key, field.update(_value, transform));
 
-  /// A by-id list editor over [field] — append/insert/remove/move/update,
-  /// each funnelled through [updateField].
+  /// A by-id list editor over [field] — append/insert/remove/move/update.
+  /// Internal primitive behind `form.field(field).list()`.
+  @internal
   KeyedFormList<Root, Item> list<Item extends KeyedRow>(
     FieldRef<Root, List<Item>> field,
   ) => KeyedFormList.forController(this, field);
@@ -185,6 +208,7 @@ class KeyedFormController<Root> extends ChangeNotifier {
   /// transform dropped, forgets that row's errors and reveal state before
   /// re-validating — so a removed row's error never outlives it even when the
   /// list's own key falls outside any validation scope. Used by [KeyedFormList].
+  @internal
   void mutateList<Item extends KeyedRow>(
     FieldRef<Root, List<Item>> field,
     List<Item> Function(List<Item> current) transform,
