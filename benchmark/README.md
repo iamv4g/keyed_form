@@ -89,19 +89,23 @@ The list-backed stand-in above uses a hand-written resolver. A real
 `toMap()` and the `ks.*` schema on **every** write — there is no scoped
 variant, a generated model cannot re-validate one subtree.
 
-| lib | build | setField (mid) | setField — before the perf branch |
-|---|--:|--:|--:|
-| keyed_form — list-backed + hand resolver (whole) | 4 | **9** | 9 |
-| keyed_form — list-backed + hand resolver (scoped) | 1 | 11 | 11 |
-| **keyed_form_gen — real `Bench100Schema` + `validateData`** | 3 | **~20** | 28 |
-| reactive_forms | 800 | 23 | 23 |
+Controlled before/after (same machine, back-to-back, only the two perf files
+reverted for "before"; reactive_forms is the drift check):
+
+| lib | build | setField median | setField min | before: median / min |
+|---|--:|--:|--:|--:|
+| keyed_form — list-backed + hand resolver (whole) | 4 | **9** | 9 | 9 / 9 |
+| keyed_form — list-backed + hand resolver (scoped) | 1 | 11 | 11 | 11 / 11 |
+| **keyed_form_gen — real `Bench100Schema` + `validateData`** | 3 | **18** | **14** | 28–30 / 27 |
+| reactive_forms | 800 | 23 | 22 | 23–25 / 23 |
 
 `keyed_form`'s per-write cost still depends on the validation strategy, but the
 gap has closed:
 
 * hand-written resolver → ~9 µs, ~2.5× faster than reactive_forms;
-* idiomatic `keyed_form_gen` `validateData` → **~20 µs** (was ~28), now on par
-  with reactive_forms.
+* idiomatic `keyed_form_gen` `validateData` → **~18 µs median / ~14 µs min**
+  (was ~28 / ~27), now a touch *faster* than reactive_forms. p90 is still
+  ~36 µs — GC spikes from copying the 100-field object each write.
 
 The `perf/fieldkey-hash-and-codegen-validate` branch cut the schema engine's
 per-validation work ~5× (`KSObject.validateMap` 15 µs → 3 µs at 100 fields) by
