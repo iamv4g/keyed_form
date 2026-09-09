@@ -91,11 +91,11 @@ class LoginSchema {
 
   /// Synchronously validates this [LoginSchema] against its schema.
   FieldErrors<String> validate() =>
-      loginSchema.validateReader(_validationValues);
+      loginSchema.validateValues(_validationValues);
 
   /// Asynchronously validates this [LoginSchema] against its schema.
   Future<FieldErrors<String>> validateAsync() =>
-      loginSchema.validateReaderAsync(_validationValues);
+      loginSchema.validateValuesAsync(_validationValues);
 
   /// Static validator function for [LoginSchema], suitable for Riverpod or callbacks.
   static FieldErrors<String> validateData(LoginSchema schema) =>

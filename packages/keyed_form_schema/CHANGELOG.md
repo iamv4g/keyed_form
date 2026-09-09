@@ -3,8 +3,8 @@
 - `KSObject` validation perf:
   - the per-field `FieldKey`s and the field list are computed once per schema
     instead of rebuilt on every `validateMap` call;
-  - new `validateReader(List<Object?> orderedValues)` /
-    `validateReaderAsync` — validates from a positional list of field values
+  - new `validateValues(List<Object?> orderedValues)` /
+    `validateValuesAsync` — validates from a positional list of field values
     (in schema field order) instead of a `Map`, so the generated `validate()`
     no longer builds a map per call. `validateMap` gains an internal
     `orderedValues` parameter and is otherwise unchanged.

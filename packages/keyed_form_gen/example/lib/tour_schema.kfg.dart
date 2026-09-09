@@ -75,11 +75,11 @@ class TourSchema {
 
   /// Synchronously validates this [TourSchema] against its schema.
   FieldErrors<String> validate() =>
-      tourSchema.validateReader(_validationValues);
+      tourSchema.validateValues(_validationValues);
 
   /// Asynchronously validates this [TourSchema] against its schema.
   Future<FieldErrors<String>> validateAsync() =>
-      tourSchema.validateReaderAsync(_validationValues);
+      tourSchema.validateValuesAsync(_validationValues);
 
   /// Static validator function for [TourSchema], suitable for Riverpod or callbacks.
   static FieldErrors<String> validateData(TourSchema schema) =>

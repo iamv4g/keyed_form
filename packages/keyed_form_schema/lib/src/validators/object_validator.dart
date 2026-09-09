@@ -137,13 +137,13 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
   /// building a `Map` (no per-key hashing, O(1) access). Nested objects /
   /// lists must already be mapped by the caller (as `toMap()` would).
   /// Refinements still receive a map, rebuilt lazily only if one runs.
-  FieldErrors<String> validateReader(
+  FieldErrors<String> validateValues(
     List<Object?> orderedValues, {
     FieldKey? prefix,
   }) {
     assert(
       orderedValues.length == _fieldList.length,
-      'validateReader expects ${_fieldList.length} values in field order, '
+      'validateValues expects ${_fieldList.length} values in field order, '
       'got ${orderedValues.length}',
     );
     return validateMap(null, prefix: prefix, orderedValues: orderedValues);
@@ -152,7 +152,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
   /// Synchronously validates [data] and returns [FieldErrors] keyed by [FieldKey].
   ///
   /// When [orderedValues] is given, fields are read from it positionally and
-  /// [data] is only the (optional) refinement map — see [validateReader].
+  /// [data] is only the (optional) refinement map — see [validateValues].
   FieldErrors<String> validateMap(
     Map<String, Object?>? data, {
     FieldKey? prefix,
@@ -300,8 +300,8 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
     return FieldErrors(errors);
   }
 
-  /// [validateReader] for [validateMapAsync].
-  Future<FieldErrors<String>> validateReaderAsync(
+  /// [validateValues] for [validateMapAsync].
+  Future<FieldErrors<String>> validateValuesAsync(
     List<Object?> orderedValues, {
     FieldKey? prefix,
   }) {

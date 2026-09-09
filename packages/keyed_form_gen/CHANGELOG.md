@@ -1,7 +1,7 @@
 ## Unreleased
 
 - Generated `validate()` / `validateAsync()` now pass a `_validationValues`
-  list to `KSObject.validateReader` instead of `validateMap(toMap())` — no map
+  list to `KSObject.validateValues` instead of `validateMap(toMap())` — no map
   is built per validation. `toMap()` is unchanged (still the serialization
   path). At 100 flat fields the generated per-keystroke `validateData` drops
   ~2.5× (see `benchmark/`); requires `keyed_form_schema` from this range.

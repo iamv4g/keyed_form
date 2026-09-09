@@ -7,7 +7,7 @@ class DataClassGenerator {
   const DataClassGenerator();
 
   /// Emits `_validationValues`, this class's field values in schema-declared
-  /// order — what `KSObject.validateReader` reads instead of a materialised
+  /// order — what `KSObject.validateValues` reads instead of a materialised
   /// `toMap()` (a list literal: no per-key hashing, O(1) access). Nested
   /// objects / lists are still mapped (the schema engine recurses on maps);
   /// scalars are passed directly, so a flat form allocates no map per
@@ -351,13 +351,13 @@ class DataClassGenerator {
       buffer.writeln('  @override');
       buffer.writeln(
         '  FieldErrors<String> validate() => '
-        '$schemaCall.validateReader(_validationValues);',
+        '$schemaCall.validateValues(_validationValues);',
       );
       buffer.writeln();
       buffer.writeln('  @override');
       buffer.writeln(
         '  Future<FieldErrors<String>> validateAsync() => '
-        '$schemaCall.validateReaderAsync(_validationValues);',
+        '$schemaCall.validateValuesAsync(_validationValues);',
       );
       buffer.writeln();
     }
@@ -519,7 +519,7 @@ class DataClassGenerator {
       );
       buffer.writeln(
         '  FieldErrors<String> validate() => '
-        '$schemaCall.validateReader(_validationValues);',
+        '$schemaCall.validateValues(_validationValues);',
       );
       buffer.writeln();
       buffer.writeln(
@@ -527,7 +527,7 @@ class DataClassGenerator {
       );
       buffer.writeln(
         '  Future<FieldErrors<String>> validateAsync() => '
-        '$schemaCall.validateReaderAsync(_validationValues);',
+        '$schemaCall.validateValuesAsync(_validationValues);',
       );
       buffer.writeln();
       buffer.writeln(

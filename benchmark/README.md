@@ -108,7 +108,7 @@ reactive_forms:
    (keyed_lens) and `KSObject`'s per-field keys + field list
    (keyed_form_schema). `validateMap` ~15 µs → ~3 µs (JIT).
 2. `perf/codegen-validate-nocopy` — the generated `validate()` passes a
-   **list** of field values (`_validationValues`) to `KSObject.validateReader`
+   **list** of field values (`_validationValues`) to `KSObject.validateValues`
    instead of building a `Map` via `toMap()`. No per-key hashing, O(1) access;
    nested objects / lists are still mapped.
 

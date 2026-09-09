@@ -976,11 +976,11 @@ class Bench100Schema {
 
   /// Synchronously validates this [Bench100Schema] against its schema.
   FieldErrors<String> validate() =>
-      benchSchema.validateReader(_validationValues);
+      benchSchema.validateValues(_validationValues);
 
   /// Asynchronously validates this [Bench100Schema] against its schema.
   Future<FieldErrors<String>> validateAsync() =>
-      benchSchema.validateReaderAsync(_validationValues);
+      benchSchema.validateValuesAsync(_validationValues);
 
   /// Static validator function for [Bench100Schema], suitable for Riverpod or callbacks.
   static FieldErrors<String> validateData(Bench100Schema schema) =>

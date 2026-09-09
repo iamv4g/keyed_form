@@ -100,14 +100,14 @@ void main() {
           code,
           contains(
             'FieldErrors<String> validate() => '
-            'loginSchema.validateReader(_validationValues);',
+            'loginSchema.validateValues(_validationValues);',
           ),
         );
         expect(
           code,
           contains(
             'Future<FieldErrors<String>> validateAsync() => '
-            'loginSchema.validateReaderAsync(_validationValues);',
+            'loginSchema.validateValuesAsync(_validationValues);',
           ),
         );
         expect(code, contains('List<Object?> get _validationValues => ['));
