@@ -43,6 +43,26 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
   /// Cross-field checks added with [refine], run after per-field validation.
   final List<ObjectRefinement> refinements;
 
+  /// [fields] as a fixed list, so validation does not re-materialise the
+  /// `entries` iterable on every call. A [KSObject] is built once (via
+  /// `ks.object(...)`) and reused for every keystroke.
+  late final List<MapEntry<String, KSValidator<Object?>>> _fieldList =
+      fields.entries.toList(growable: false);
+
+  /// The per-field [FieldKey]s relative to this object's root, computed once.
+  /// A `FieldKey` is immutable; without this the same N keys are rebuilt on
+  /// every validation.
+  late final Map<String, FieldKey> _fieldKeys = {
+    for (final name in fields.keys) name: FieldKey.name(name),
+  };
+
+  /// [rootPrefix] + the cached key for [fieldName], skipping the concat for
+  /// the common top-level (root prefix) case.
+  FieldKey _fieldKey(FieldKey rootPrefix, String fieldName) =>
+      rootPrefix.isRoot
+          ? _fieldKeys[fieldName]!
+          : rootPrefix + _fieldKeys[fieldName]!;
+
   @override
   final bool isOptional;
 
@@ -121,11 +141,11 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
     final errors = <FieldKey, String>{};
 
     // 1. Validate each field
-    for (final entry in fields.entries) {
+    for (final entry in _fieldList) {
       final fieldName = entry.key;
       final validator = entry.value;
       final fieldValue = data[fieldName];
-      final fieldKey = rootPrefix + .name(fieldName);
+      final fieldKey = _fieldKey(rootPrefix, fieldName);
 
       if (validator is KSObject) {
         final nestedErrors = validator.validateMap(
@@ -262,11 +282,11 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
     final errors = <FieldKey, String>{};
 
     // 1. Validate each field
-    for (final entry in fields.entries) {
+    for (final entry in _fieldList) {
       final fieldName = entry.key;
       final validator = entry.value;
       final fieldValue = data[fieldName];
-      final fieldKey = rootPrefix + .name(fieldName);
+      final fieldKey = _fieldKey(rootPrefix, fieldName);
 
       if (validator is KSObject) {
         final nestedErrors = await validator.validateMapAsync(

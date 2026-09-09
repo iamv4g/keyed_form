@@ -100,7 +100,9 @@ final class FieldKey {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    if (other is! FieldKey || other.segments.length != segments.length) {
+    if (other is! FieldKey ||
+        other.hashCode != hashCode ||
+        other.segments.length != segments.length) {
       return false;
     }
     for (var i = 0; i < segments.length; i++) {
@@ -109,8 +111,11 @@ final class FieldKey {
     return true;
   }
 
+  /// Cached: a [FieldKey] is immutable and is used as a `Map` / `Set` key on
+  /// every validation, touch check and error lookup, so the segment walk runs
+  /// once per instance instead of once per lookup.
   @override
-  int get hashCode => Object.hashAll(segments);
+  late final int hashCode = Object.hashAll(segments);
 
   /// Canonical, reversible serialization — the frozen wire format. The
   /// inverse of [parse]: `FieldKey.parse(k.toPath()) == k` for every key

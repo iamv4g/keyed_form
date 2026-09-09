@@ -1,3 +1,9 @@
+## Unreleased
+
+- `FieldKey.hashCode` is now cached (computed once per instance) — keys are
+  used as `Map` / `Set` keys on every validation, touch check and error
+  lookup. `==` also early-outs on a hash mismatch.
+
 ## 0.1.0
 
 Initial release.
