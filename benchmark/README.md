@@ -89,25 +89,38 @@ The list-backed stand-in above uses a hand-written resolver. A real
 `toMap()` and the `ks.*` schema on **every** write — there is no scoped
 variant, a generated model cannot re-validate one subtree.
 
-| lib | build | setField (mid) |
-|---|--:|--:|
-| keyed_form — list-backed + hand resolver (whole) | 4 | **9** |
-| keyed_form — list-backed + hand resolver (scoped) | 1 | 11 |
-| **keyed_form_gen — real `Bench100Schema` + `validateData`** | 3 | **28** |
-| reactive_forms | 800 | 23 |
+Controlled before/after (same machine, back-to-back, only the two perf files
+reverted for "before"; reactive_forms is the drift check):
 
-**This is the headline caveat.** `keyed_form`'s per-write advantage depends
-entirely on the validation strategy:
+| lib | build | setField median | setField min | before: median / min |
+|---|--:|--:|--:|--:|
+| keyed_form — list-backed + hand resolver (whole) | 4 | **9** | 9 | 9 / 9 |
+| keyed_form — list-backed + hand resolver (scoped) | 1 | 11 | 11 | 11 / 11 |
+| **keyed_form_gen — real `Bench100Schema` + `validateData`** | 3 | **18** | **14** | 28–30 / 27 |
+| reactive_forms | 800 | 23 | 22 | 23–25 / 23 |
+
+`keyed_form`'s per-write cost still depends on the validation strategy, but the
+gap has closed:
 
 * hand-written resolver → ~9 µs, ~2.5× faster than reactive_forms;
-* idiomatic `keyed_form_gen` `validateData` → ~28 µs, i.e. **slower than
-  reactive_forms** at 100 fields, and O(fields) per keystroke (`toMap()`
-  allocates an N-entry map, then N validators run).
+* idiomatic `keyed_form_gen` `validateData` → **~18 µs median / ~14 µs min**
+  (was ~28 / ~27), now a touch *faster* than reactive_forms. p90 is still
+  ~36 µs — GC spikes from copying the 100-field object each write.
 
-`build` stays cheap either way (generated `create()` is ~3 µs vs
-reactive_forms ~800 µs). If you use codegen and forms get large, either wire a
-hand-written `resolver` (keep the generated model for the data class only) or
-add `scopeOf` support upstream.
+The `perf/fieldkey-hash-and-codegen-validate` branch cut the schema engine's
+per-validation work ~5× (`KSObject.validateMap` 15 µs → 3 µs at 100 fields) by
+caching the per-field `FieldKey`s in the validator and caching
+`FieldKey.hashCode`. What remains on the codegen path:
+
+* `toMap()` still allocates an N-entry map per write (~4–5 µs of the ~20) —
+  the next target is a zero-copy accessor so `validateData` reads the object
+  directly;
+* a generated model still cannot **scope** its validation — a keystroke
+  re-runs every field's validators. `scopeOf` needs generator support, or wire
+  a hand-written `resolver` and keep the generated class as the data class.
+
+`build` stays cheap either way (generated `create()` ~3 µs vs reactive_forms
+~800 µs).
 
 ### Widget layer — one keystroke, `test/rebuild_benchmark_test.dart`
 
