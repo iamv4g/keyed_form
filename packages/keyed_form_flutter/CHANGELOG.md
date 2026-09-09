@@ -1,9 +1,3 @@
-## Unreleased
-
-- Field widgets now write through `controller.field(ref).set(...)` /
-  `.list()` (the `keyed_form` per-field facade) instead of the now-`@internal`
-  `setField` / `list`. No public API change.
-
 ## 0.1.0
 
 Initial release.

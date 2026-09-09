@@ -1,12 +1,3 @@
-## Unreleased
-
-- Generated `validate()` / `validateAsync()` now pass a `_validationValues`
-  list to `KSObject.validateValues` instead of `validateMap(toMap())` — no map
-  is built per validation. `toMap()` is unchanged (still the serialization
-  path). At 100 flat fields the generated per-keystroke `validateData` drops
-  ~2.5× (see `benchmark/`); requires `keyed_form_schema` from this range.
-  Re-run the generator to pick it up.
-
 ## 0.1.0
 
 Initial release.
@@ -19,6 +10,8 @@ Initial release.
   `StrictFieldRef` for scalars, `<Field>FieldRefs` wrappers for nested objects
   and list rows, `.asVariant` narrowers for discriminated unions.
 - `validate()` / `validateAsync()` and the `validateData` statics, returning
-  `FieldErrors`.
+  `FieldErrors`. They pass a `_validationValues` list (the object's field
+  values in schema order) to `KSObject.validateValues`, so no `Map` is built
+  per validation; `toMap()` stays the serialization path.
 - `copyWith` is a typed public interface backed by a private sentinel-based
   implementation so bare `[]` / `{}` literals infer correctly at call sites.

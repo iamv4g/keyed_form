@@ -89,38 +89,35 @@ The list-backed stand-in above uses a hand-written resolver. A real
 object's fields on **every** write — there is still no scoped variant, a
 generated model cannot re-validate one subtree.
 
-Two perf branches have landed. Controlled before/after (same machine,
-back-to-back, only the schema/generator files reverted for each "before";
-reactive_forms is the drift check):
+| lib | build | setField median | setField min |
+|---|--:|--:|--:|
+| keyed_form — list-backed + hand resolver (whole) | 4 | **9** | 9 |
+| keyed_form — list-backed + hand resolver (scoped) | 1 | 11 | 11 |
+| **keyed_form_gen — real `Bench100Schema` + `validateData`** | 3 | **11** | **9** |
+| reactive_forms | 800 | 23 | 22 |
 
-| lib | build | setField median | setField min | pre-perf median / min |
-|---|--:|--:|--:|--:|
-| keyed_form — list-backed + hand resolver (whole) | 4 | **9** | 9 | 9 / 9 |
-| keyed_form — list-backed + hand resolver (scoped) | 1 | 11 | 11 | 11 / 11 |
-| **keyed_form_gen — real `Bench100Schema` + `validateData`** | 3 | **11** | **9** | 28–30 / 27 |
-| reactive_forms | 800 | 23 | 22 | 23–25 / 23 |
+The idiomatic `keyed_form_gen` write is level with a hand-written resolver and
+~2× faster than reactive_forms. Two changes got it there (controlled
+before/after — reverting just the schema/generator files — measured it at
+~28 µs before):
 
-The idiomatic `keyed_form_gen` write dropped **28 µs → 11 µs (JIT)** across the
-two branches — now level with a hand-written resolver and ~2× faster than
-reactive_forms:
-
-1. `perf/fieldkey-hash-and-codegen-validate` — cache `FieldKey.hashCode`
-   (keyed_lens) and `KSObject`'s per-field keys + field list
-   (keyed_form_schema). `validateMap` ~15 µs → ~3 µs (JIT).
-2. `perf/codegen-validate-nocopy` — the generated `validate()` passes a
-   **list** of field values (`_validationValues`) to `KSObject.validateValues`
-   instead of building a `Map` via `toMap()`. No per-key hashing, O(1) access;
-   nested objects / lists are still mapped.
+1. `FieldKey.hashCode` is cached (keyed_lens) and `KSObject` caches its
+   per-field keys + field list (keyed_form_schema): `validateMap` ~15 µs →
+   ~3 µs (JIT).
+2. The generated `validate()` passes a **list** of field values
+   (`_validationValues`) to `KSObject.validateValues` instead of building a
+   `Map` via `toMap()` — no per-key hashing, O(1) access; nested objects /
+   lists are still mapped.
 
 #### AOT attribution of the keyed_form write path
 
 `bin/attribution.dart` (`dart compile exe`, no asserts ≈ release) breaks down
 one `form.field(ref).set(v)` at 100 flat fields. **Total ~3.9 µs** (was ~8.6 µs
-before branch 2; JIT `flutter test` inflates ~2–3×):
+with the `toMap()` path; JIT `flutter test` inflates ~2–3×):
 
-| bucket | µs (after) | µs (before branch 2) |
+| bucket | µs (list path) | µs (`toMap()` path) |
 |---|--:|--:|
-| `validateData` (branch 2: list + walk / before: `toMap()` + walk) | **3.6** | 8.1 |
+| `validateData` (list + walk / vs `toMap()` + walk) | **3.6** | 8.1 |
 | `ref.set` → `copyWith` (construct the 100-field object) | 0.25 | 0.25 |
 | `next == _value` guard (100-field compare) | 0.06 | 0.06 |
 | `form.field(ref)` — `FieldHandle` allocation | 0.005 | 0.005 |
