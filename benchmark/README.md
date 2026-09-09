@@ -35,10 +35,15 @@ validator cost.
 ¹ pinned `<11.0.0`: 11.x moved off `package:flutter/material` onto
 `package:material_ui`, which most apps have not adopted.
 
-Two `keyed_form` variants are run: **whole** (the simplest wiring — resolver
-re-checks everything on every write) and **scoped** (`scopeOf`, so a flat-field
-write only re-validates that field — the apples-to-apples match for
-reactive_forms' per-control model).
+Three `keyed_form` wirings are run:
+
+* **whole** — hand-written resolver re-checks everything on every write;
+* **scoped** — hand-written resolver + `scopeOf`, so a flat-field write only
+  re-validates that field (the apples-to-apples match for reactive_forms'
+  per-control model);
+* **keyed_form_gen** — a real generated `Bench100Schema` whose `validateData`
+  round-trips through `toMap()` + the `ks.*` schema (calibration test only,
+  fixed at 100 flat fields; a generated model cannot scope its validation).
 
 `flutter_form_builder` has **no model layer** — it does nothing without a
 widget tree — so it appears only in the widget benchmark.
@@ -55,13 +60,15 @@ sequence. Run it before trusting any number.
 
 ### Model layer — `flutter test test/model_benchmark_test.dart` (median µs)
 
+`keyed_form` here is the list-backed stand-in with a **hand-written resolver**.
+
 | op | lib | 10f | 50f | 100f | 250f |
 |---|---|--:|--:|--:|--:|
-| **build** | keyed_form | 7 | 4 | 8 | 20 |
-| | reactive_forms | 201 | 390 | 719 | 1757 |
-| **setField** (1 write + revalidate) | keyed_form (whole) | 14 | 5 | 7 | 17 |
-| | keyed_form (scoped) | 13 | 5 | 8 | 17 |
-| | reactive_forms | 22 | 18 | 22 | 35 |
+| **build** | keyed_form | ~1 | ~1 | ~1 | 3 |
+| | reactive_forms | 200 | 390 | 750 | 1750 |
+| **setField** (1 write + revalidate) | keyed_form (whole) | 11 | 5 | 8 | 21 |
+| | keyed_form (scoped) | 10 | 5 | 8 | 22 |
+| | reactive_forms | 22 | 18 | 23 | 35 |
 | **isDirty** | keyed_form (`==` whole draft) | 0.02 | 0.03 | 0.02 | 0.02 |
 | | reactive_forms (flag) | ~0 | ~0 | ~0 | ~0 |
 | **isValid** | either | ~0 | ~0 | ~0 | ~0 |
@@ -69,11 +76,38 @@ sequence. Run it before trusting any number.
 Row churn (`addRow + removeRow`, 20f+20r): keyed_form ~17–23 µs,
 reactive_forms ~65 µs.
 
-Takeaways: `keyed_form` builds a form ~50–100× cheaper (no per-field
-control/stream objects) and writes ~2–4× cheaper. The "immutability tax" on
-`isDirty` — a full-draft `==` every check — is **not** measurable at these
-sizes. `scoped` vs `whole` barely differ here because the ruleset is tiny; the
-gap widens with expensive validators.
+Takeaways: `keyed_form` builds a form ~100–500× cheaper (no per-field
+control/stream objects). With a hand-written resolver it also writes ~2–3×
+cheaper. The "immutability tax" on `isDirty` — a full-draft `==` every check —
+is **not** measurable at these sizes. `scoped` vs `whole` barely differ here
+because the ruleset is tiny.
+
+### Codegen calibration — `test/codegen_calibration_test.dart` (100 flat fields, median µs)
+
+The list-backed stand-in above uses a hand-written resolver. A real
+`keyed_form_gen` model validates by round-tripping the whole object through
+`toMap()` and the `ks.*` schema on **every** write — there is no scoped
+variant, a generated model cannot re-validate one subtree.
+
+| lib | build | setField (mid) |
+|---|--:|--:|
+| keyed_form — list-backed + hand resolver (whole) | 4 | **9** |
+| keyed_form — list-backed + hand resolver (scoped) | 1 | 11 |
+| **keyed_form_gen — real `Bench100Schema` + `validateData`** | 3 | **28** |
+| reactive_forms | 800 | 23 |
+
+**This is the headline caveat.** `keyed_form`'s per-write advantage depends
+entirely on the validation strategy:
+
+* hand-written resolver → ~9 µs, ~2.5× faster than reactive_forms;
+* idiomatic `keyed_form_gen` `validateData` → ~28 µs, i.e. **slower than
+  reactive_forms** at 100 fields, and O(fields) per keystroke (`toMap()`
+  allocates an N-entry map, then N validators run).
+
+`build` stays cheap either way (generated `create()` is ~3 µs vs
+reactive_forms ~800 µs). If you use codegen and forms get large, either wire a
+hand-written `resolver` (keep the generated model for the data class only) or
+add `scopeOf` support upstream.
 
 ### Widget layer — one keystroke, `test/rebuild_benchmark_test.dart`
 
@@ -126,20 +160,28 @@ implement one task, timed, with friction notes.
 
 ```
 lib/scenario.dart            the one form shape + size sweep
-lib/kf_form.dart             the keyed_form model/refs/resolver (shared)
+lib/kf_form.dart             the list-backed keyed_form model/refs/resolver (any N)
+lib/codegen/bench_schema.dart  100-field @keyedSchema; .kfg.dart is generated & committed
+lib/codegen/bench_refs.dart    the 100 generated refs, indexable  (+ tool/gen_bench_schema.py)
 lib/src/measure.dart         warmup + percentile timing helper + JSON report
 lib/model/*_harness.dart     ModelHarness: build / setField / addRow / isValid / isDirty
 lib/widget/*_harness.dart    WidgetHarness: the form as real widgets, findable fields
-test/parity_test.dart        fairness gate
+test/parity_test.dart          fairness gate
 test/model_benchmark_test.dart
+test/codegen_calibration_test.dart
 test/rebuild_benchmark_test.dart
 ```
 
+To change the codegen schema size: `python3 tool/gen_bench_schema.py <N>` then
+`dart run build_runner build`.
+
 ## Caveats
 
-* The `keyed_form` model here is `Map`-backed; a generated model is a class
-  with N typed fields whose `copyWith` also rebuilds the whole object, so the
-  per-write allocation is representative but not identical.
+* The parameterised `keyed_form` model is an indexed `List<String>` with a
+  hand-written resolver — read O(1), write one list copy, close to a generated
+  class. The **real** codegen path (class + `toMap()`-based `validateData`) is
+  measured separately in the calibration test and is ~3× slower per write; see
+  that section.
 * `reactive_forms` `updateValue` leaves a control pristine; the harness calls
   `markAsDirty()` after, mirroring what its widgets do.
 * Debug-mode `flutter test` timings carry fake-async and assertion overhead —

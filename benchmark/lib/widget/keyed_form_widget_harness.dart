@@ -29,7 +29,7 @@ class KeyedFormWidgetHarness extends WidgetHarness {
             for (var i = 0; i < scenario.fieldCount; i++)
               KeyedFormField.text<KfDraft>(
                 key: ValueKey('bench_row_$i'),
-                field: kfFieldRef(Scenario.fieldName(i)),
+                field: kfFieldRef(i),
                 anchor: false,
                 builder: (context, state, textController) => TextField(
                   key: ValueKey('bench_field_$i'),

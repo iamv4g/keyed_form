@@ -2,31 +2,32 @@ import 'package:keyed_form/keyed_form.dart';
 
 import 'scenario.dart';
 
-/// The `keyed_form` draft used by both the model and widget harnesses: a map
-/// of flat fields plus a list of rows. A generated `keyed_form` model is a
-/// class with N typed fields whose `copyWith` also rebuilds the whole object,
-/// so the map copy here is representative of the per-write allocation.
+/// The `keyed_form` draft used by the parameterised (any-N) harnesses: a
+/// fixed-length `List<String>` of flat fields plus a list of rows.
+///
+/// A `keyed_form_gen` model is a class with N named fields; its `copyWith`
+/// reads N fields and allocates one object. Backing the flat fields with an
+/// indexed `List<String>` here (read = O(1) no hash, write = one list copy)
+/// is the closest parameterisable analog — see
+/// `codegen_calibration_test.dart` for the measured gap to a real generated
+/// model.
 class KfDraft {
-  const KfDraft(this.fields, this.rows);
-  final Map<String, String> fields;
+  const KfDraft(this.values, this.rows);
+  final List<String> values;
   final List<KfRow> rows;
 
-  KfDraft withField(String k, String v) => KfDraft({...fields, k: v}, rows);
-  KfDraft withRows(List<KfRow> r) => KfDraft(fields, r);
+  KfDraft withFieldAt(int i, String v) =>
+      KfDraft([...values]..[i] = v, rows);
+  KfDraft withRows(List<KfRow> r) => KfDraft(values, r);
 
   @override
   bool operator ==(Object other) =>
       other is KfDraft &&
-      _mapEq(other.fields, fields) &&
-      _listEq(other.rows, rows);
+      _seqEq(other.values, values) &&
+      _seqEq(other.rows, rows);
 
   @override
-  int get hashCode => Object.hash(
-        Object.hashAllUnordered(
-          [for (final e in fields.entries) Object.hash(e.key, e.value)],
-        ),
-        Object.hashAll(rows),
-      );
+  int get hashCode => Object.hash(Object.hashAll(values), Object.hashAll(rows));
 }
 
 class KfRow implements KeyedRow {
@@ -53,15 +54,7 @@ class KfRow implements KeyedRow {
   int get hashCode => Object.hash(clientId, city, nights);
 }
 
-bool _mapEq(Map<String, String> a, Map<String, String> b) {
-  if (a.length != b.length) return false;
-  for (final e in a.entries) {
-    if (b[e.key] != e.value) return false;
-  }
-  return true;
-}
-
-bool _listEq(List<KfRow> a, List<KfRow> b) {
+bool _seqEq<T>(List<T> a, List<T> b) {
   if (a.length != b.length) return false;
   for (var i = 0; i < a.length; i++) {
     if (a[i] != b[i]) return false;
@@ -69,11 +62,13 @@ bool _listEq(List<KfRow> a, List<KfRow> b) {
   return true;
 }
 
-StrictFieldRef<KfDraft, String> kfFieldRef(String name) =>
+/// A `FieldRef` to flat field [index]. Like a generated `Fields.fieldN`
+/// getter, this allocates a fresh `StrictFieldRef` per call.
+StrictFieldRef<KfDraft, String> kfFieldRef(int index) =>
     StrictFieldRef<KfDraft, String>.of(
-      key: FieldKey.name(name),
-      get: (d) => d.fields[name] ?? '',
-      set: (d, v) => d.withField(name, v),
+      key: FieldKey.name(Scenario.fieldName(index)),
+      get: (d) => d.values[index],
+      set: (d, v) => d.withFieldAt(index, v),
     );
 
 final StrictFieldRef<KfDraft, List<KfRow>> kfRowsRef =
@@ -86,7 +81,7 @@ final StrictFieldRef<KfDraft, List<KfRow>> kfRowsRef =
 KfDraft kfSeed(Scenario scenario) {
   final seeded = seedRows(scenario.rowCount);
   return KfDraft(
-    {for (var i = 0; i < scenario.fieldCount; i++) Scenario.fieldName(i): 'val'},
+    [for (var i = 0; i < scenario.fieldCount; i++) 'val'],
     [
       for (var i = 0; i < seeded.length; i++)
         KfRow(clientId: 'r$i', city: seeded[i].city, nights: seeded[i].nights),
@@ -99,11 +94,11 @@ KfDraft kfSeed(Scenario scenario) {
 /// re-checks the written subtree.
 FieldErrors<String> kfResolve(KfDraft d, FieldKey? scope, int maxNights) {
   final errors = <FieldKey, String>{};
-  d.fields.forEach((name, value) {
-    final key = FieldKey.name(name);
-    if (scope != null && !scope.contains(key)) return;
-    if (value.trim().length < 3) errors[key] = 'min3';
-  });
+  for (var i = 0; i < d.values.length; i++) {
+    final key = FieldKey.name(Scenario.fieldName(i));
+    if (scope != null && !scope.contains(key)) continue;
+    if (d.values[i].trim().length < 3) errors[key] = 'min3';
+  }
   final rowsKey = kfRowsRef.key;
   if (scope == null || scope.contains(rowsKey)) {
     var total = 0;

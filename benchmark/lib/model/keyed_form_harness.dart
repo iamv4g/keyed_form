@@ -24,7 +24,7 @@ class KeyedFormHarness extends ModelHarness {
 
   @override
   void setField(int index, String value) =>
-      _form.field(kfFieldRef(Scenario.fieldName(index))).set(value);
+      _form.field(kfFieldRef(index)).set(value);
 
   @override
   void addRow(RowData row) => _form.field(kfRowsRef).list().append(
@@ -50,7 +50,7 @@ class KeyedFormHarness extends ModelHarness {
 
   @override
   String fieldValue(int index) =>
-      _form.field(kfFieldRef(Scenario.fieldName(index))).value ?? '';
+      _form.field(kfFieldRef(index)).value ?? '';
 
   @override
   int get rowCount => (kfRowsRef.getOrNull(_form.value) ?? const []).length;

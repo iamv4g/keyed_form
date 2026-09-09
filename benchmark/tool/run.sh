@@ -15,6 +15,9 @@ flutter test test/parity_test.dart
 echo "==> model layer"
 flutter test test/model_benchmark_test.dart --tags benchmark
 
+echo "==> codegen calibration (list-backed stand-in vs a real keyed_form_gen model)"
+flutter test test/codegen_calibration_test.dart --tags benchmark
+
 echo "==> widget layer — one keystroke"
 flutter test test/rebuild_benchmark_test.dart --tags benchmark
 
