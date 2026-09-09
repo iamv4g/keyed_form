@@ -68,12 +68,18 @@ class TourSchema {
     'stops': stops.map((e) => e.toMap()).toList(),
   };
 
+  List<Object?> get _validationValues => [
+    title,
+    stops.map((e) => e.toMap()).toList(),
+  ];
+
   /// Synchronously validates this [TourSchema] against its schema.
-  FieldErrors<String> validate() => tourSchema.validateMap(toMap());
+  FieldErrors<String> validate() =>
+      tourSchema.validateValues(_validationValues);
 
   /// Asynchronously validates this [TourSchema] against its schema.
   Future<FieldErrors<String>> validateAsync() =>
-      tourSchema.validateMapAsync(toMap());
+      tourSchema.validateValuesAsync(_validationValues);
 
   /// Static validator function for [TourSchema], suitable for Riverpod or callbacks.
   static FieldErrors<String> validateData(TourSchema schema) =>

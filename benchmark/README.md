@@ -85,42 +85,57 @@ because the ruleset is tiny.
 ### Codegen calibration — `test/codegen_calibration_test.dart` (100 flat fields, median µs)
 
 The list-backed stand-in above uses a hand-written resolver. A real
-`keyed_form_gen` model validates by round-tripping the whole object through
-`toMap()` and the `ks.*` schema on **every** write — there is no scoped
-variant, a generated model cannot re-validate one subtree.
+`keyed_form_gen` model validates by re-running the `ks.*` schema over the
+object's fields on **every** write — there is still no scoped variant, a
+generated model cannot re-validate one subtree.
 
-Controlled before/after (same machine, back-to-back, only the two perf files
-reverted for "before"; reactive_forms is the drift check):
+| lib | build | setField median | setField min |
+|---|--:|--:|--:|
+| keyed_form — list-backed + hand resolver (whole) | 4 | **9** | 9 |
+| keyed_form — list-backed + hand resolver (scoped) | 1 | 11 | 11 |
+| **keyed_form_gen — real `Bench100Schema` + `validateData`** | 3 | **11** | **9** |
+| reactive_forms | 800 | 23 | 22 |
 
-| lib | build | setField median | setField min | before: median / min |
-|---|--:|--:|--:|--:|
-| keyed_form — list-backed + hand resolver (whole) | 4 | **9** | 9 | 9 / 9 |
-| keyed_form — list-backed + hand resolver (scoped) | 1 | 11 | 11 | 11 / 11 |
-| **keyed_form_gen — real `Bench100Schema` + `validateData`** | 3 | **18** | **14** | 28–30 / 27 |
-| reactive_forms | 800 | 23 | 22 | 23–25 / 23 |
+The idiomatic `keyed_form_gen` write is level with a hand-written resolver and
+~2× faster than reactive_forms. Two changes got it there (controlled
+before/after — reverting just the schema/generator files — measured it at
+~28 µs before):
 
-`keyed_form`'s per-write cost still depends on the validation strategy, but the
-gap has closed:
+1. `FieldKey.hashCode` is cached (keyed_lens) and `KSObject` caches its
+   per-field keys + field list (keyed_form_schema): `validateMap` ~15 µs →
+   ~3 µs (JIT).
+2. The generated `validate()` passes a **list** of field values
+   (`_validationValues`) to `KSObject.validateValues` instead of building a
+   `Map` via `toMap()` — no per-key hashing, O(1) access; nested objects /
+   lists are still mapped.
 
-* hand-written resolver → ~9 µs, ~2.5× faster than reactive_forms;
-* idiomatic `keyed_form_gen` `validateData` → **~18 µs median / ~14 µs min**
-  (was ~28 / ~27), now a touch *faster* than reactive_forms. p90 is still
-  ~36 µs — GC spikes from copying the 100-field object each write.
+#### AOT attribution of the keyed_form write path
 
-The `perf/fieldkey-hash-and-codegen-validate` branch cut the schema engine's
-per-validation work ~5× (`KSObject.validateMap` 15 µs → 3 µs at 100 fields) by
-caching the per-field `FieldKey`s in the validator and caching
-`FieldKey.hashCode`. What remains on the codegen path:
+`bin/attribution.dart` (`dart compile exe`, no asserts ≈ release) breaks down
+one `form.field(ref).set(v)` at 100 flat fields. **Total ~3.9 µs** (was ~8.6 µs
+with the `toMap()` path; JIT `flutter test` inflates ~2–3×):
 
-* `toMap()` still allocates an N-entry map per write (~4–5 µs of the ~20) —
-  the next target is a zero-copy accessor so `validateData` reads the object
-  directly;
-* a generated model still cannot **scope** its validation — a keystroke
-  re-runs every field's validators. `scopeOf` needs generator support, or wire
-  a hand-written `resolver` and keep the generated class as the data class.
+| bucket | µs (list path) | µs (`toMap()` path) |
+|---|--:|--:|
+| `validateData` (list + walk / vs `toMap()` + walk) | **3.6** | 8.1 |
+| `ref.set` → `copyWith` (construct the 100-field object) | 0.25 | 0.25 |
+| `next == _value` guard (100-field compare) | 0.06 | 0.06 |
+| `form.field(ref)` — `FieldHandle` allocation | 0.005 | 0.005 |
+
+The whole write cost is now `validateData`; the immutable copy and the `==`
+guard are free in AOT — earlier JIT-based guesses that pinned ~10 µs on the
+object copy were wrong. Remaining: a generated model still cannot **scope**
+its validation (`scopeOf` needs generator support), and the ~3.6 µs walk is
+100 × `KSString.validate` (`required` + `minLength`) — squeezable but harder.
 
 `build` stays cheap either way (generated `create()` ~3 µs vs reactive_forms
 ~800 µs).
+
+> The µs tables here are **JIT `flutter test`** except where marked AOT. A
+> uniform AOT comparison of all three libraries needs a Flutter **profile-mode**
+> run on a device/emulator (`reactive_forms` imports `package:flutter/
+> foundation`, `flutter_form_builder` is widget-only — neither can
+> `dart compile exe`). See `integration_test/`.
 
 ### Widget layer — one keystroke, `test/rebuild_benchmark_test.dart`
 
@@ -179,10 +194,12 @@ lib/codegen/bench_refs.dart    the 100 generated refs, indexable  (+ tool/gen_be
 lib/src/measure.dart         warmup + percentile timing helper + JSON report
 lib/model/*_harness.dart     ModelHarness: build / setField / addRow / isValid / isDirty
 lib/widget/*_harness.dart    WidgetHarness: the form as real widgets, findable fields
+bin/attribution.dart         AOT breakdown of the keyed_form write path (dart compile exe)
 test/parity_test.dart          fairness gate
-test/model_benchmark_test.dart
-test/codegen_calibration_test.dart
-test/rebuild_benchmark_test.dart
+test/model_benchmark_test.dart          JIT, the size sweep
+test/codegen_calibration_test.dart      JIT, list-backed vs a real generated model
+test/rebuild_benchmark_test.dart        JIT, widget rebuilds per keystroke
+integration_test/aot_benchmark_test.dart  the 3-way comparison in --profile (needs a device)
 ```
 
 To change the codegen schema size: `python3 tool/gen_bench_schema.py <N>` then

@@ -10,6 +10,8 @@ Initial release.
   `StrictFieldRef` for scalars, `<Field>FieldRefs` wrappers for nested objects
   and list rows, `.asVariant` narrowers for discriminated unions.
 - `validate()` / `validateAsync()` and the `validateData` statics, returning
-  `FieldErrors`.
+  `FieldErrors`. They pass a `_validationValues` list (the object's field
+  values in schema order) to `KSObject.validateValues`, so no `Map` is built
+  per validation; `toMap()` stays the serialization path.
 - `copyWith` is a typed public interface backed by a private sentinel-based
   implementation so bare `[]` / `{}` literals infer correctly at call sites.

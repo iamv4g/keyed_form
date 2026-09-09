@@ -99,15 +99,18 @@ void main() {
         expect(
           code,
           contains(
-            'FieldErrors<String> validate() => loginSchema.validateMap(toMap());',
+            'FieldErrors<String> validate() => '
+            'loginSchema.validateValues(_validationValues);',
           ),
         );
         expect(
           code,
           contains(
-            'Future<FieldErrors<String>> validateAsync() => loginSchema.validateMapAsync(toMap());',
+            'Future<FieldErrors<String>> validateAsync() => '
+            'loginSchema.validateValuesAsync(_validationValues);',
           ),
         );
+        expect(code, contains('List<Object?> get _validationValues => ['));
         expect(
           code,
           contains(
