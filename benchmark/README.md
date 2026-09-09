@@ -104,23 +104,42 @@ gap has closed:
 
 * hand-written resolver → ~9 µs, ~2.5× faster than reactive_forms;
 * idiomatic `keyed_form_gen` `validateData` → **~18 µs median / ~14 µs min**
-  (was ~28 / ~27), now a touch *faster* than reactive_forms. p90 is still
-  ~36 µs — GC spikes from copying the 100-field object each write.
+  (was ~28 / ~27), now a touch *faster* than reactive_forms.
 
 The `perf/fieldkey-hash-and-codegen-validate` branch cut the schema engine's
-per-validation work ~5× (`KSObject.validateMap` 15 µs → 3 µs at 100 fields) by
-caching the per-field `FieldKey`s in the validator and caching
-`FieldKey.hashCode`. What remains on the codegen path:
+per-validation work ~5× (`KSObject.validateMap` 15 µs → 3 µs at 100 fields, JIT)
+by caching the per-field `FieldKey`s in the validator and caching
+`FieldKey.hashCode`.
 
-* `toMap()` still allocates an N-entry map per write (~4–5 µs of the ~20) —
-  the next target is a zero-copy accessor so `validateData` reads the object
-  directly;
-* a generated model still cannot **scope** its validation — a keystroke
-  re-runs every field's validators. `scopeOf` needs generator support, or wire
-  a hand-written `resolver` and keep the generated class as the data class.
+#### AOT attribution of the keyed_form write path
+
+`bin/attribution.dart` (`dart compile exe`, no asserts ≈ release) breaks down
+one `form.field(ref).set(v)` at 100 flat fields — total **~8.6 µs** (JIT
+`flutter test` inflates this ~2×):
+
+| bucket | µs | share |
+|---|--:|--:|
+| `obj.toMap()` — N-entry map allocation | **4.0** | ~46 % |
+| `schema.validateMap(map)` — the field walk | **4.4** | ~52 % |
+| `ref.set` → `copyWith` (construct the 100-field object) | 0.25 | 3 % |
+| `next == _value` guard (100-field compare) | 0.06 | <1 % |
+| `form.field(ref)` — `FieldHandle` allocation | 0.005 | ~0 % |
+
+So in AOT the whole cost is `validateData`; the immutable copy and the
+`==` guard are free. `toMap()` is the single biggest slice — the next target
+(`perf/codegen-validate-nocopy`) is a zero-copy accessor so `validateData`
+reads the object directly. A generated model also still cannot **scope** its
+validation: `scopeOf` needs generator support, or wire a hand-written
+`resolver` and keep the generated class as the data class.
 
 `build` stays cheap either way (generated `create()` ~3 µs vs reactive_forms
 ~800 µs).
+
+> The µs tables here are **JIT `flutter test`** except where marked AOT. A
+> uniform AOT comparison of all three libraries needs a Flutter **profile-mode**
+> run on a device/emulator (`reactive_forms` imports `package:flutter/
+> foundation`, `flutter_form_builder` is widget-only — neither can
+> `dart compile exe`). See `integration_test/`.
 
 ### Widget layer — one keystroke, `test/rebuild_benchmark_test.dart`
 
@@ -179,10 +198,12 @@ lib/codegen/bench_refs.dart    the 100 generated refs, indexable  (+ tool/gen_be
 lib/src/measure.dart         warmup + percentile timing helper + JSON report
 lib/model/*_harness.dart     ModelHarness: build / setField / addRow / isValid / isDirty
 lib/widget/*_harness.dart    WidgetHarness: the form as real widgets, findable fields
+bin/attribution.dart         AOT breakdown of the keyed_form write path (dart compile exe)
 test/parity_test.dart          fairness gate
-test/model_benchmark_test.dart
-test/codegen_calibration_test.dart
-test/rebuild_benchmark_test.dart
+test/model_benchmark_test.dart          JIT, the size sweep
+test/codegen_calibration_test.dart      JIT, list-backed vs a real generated model
+test/rebuild_benchmark_test.dart        JIT, widget rebuilds per keystroke
+integration_test/aot_benchmark_test.dart  the 3-way comparison in --profile (needs a device)
 ```
 
 To change the codegen schema size: `python3 tool/gen_bench_schema.py <N>` then
