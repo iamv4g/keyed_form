@@ -91,12 +91,15 @@ class AuthSchema {
     'remember': remember,
   };
 
+  List<Object?> get _validationValues => [username, password, remember];
+
   /// Synchronously validates this [AuthSchema] against its schema.
-  FieldErrors<String> validate() => authSchema.validateMap(toMap());
+  FieldErrors<String> validate() =>
+      authSchema.validateReader(_validationValues);
 
   /// Asynchronously validates this [AuthSchema] against its schema.
   Future<FieldErrors<String>> validateAsync() =>
-      authSchema.validateMapAsync(toMap());
+      authSchema.validateReaderAsync(_validationValues);
 
   /// Static validator function for [AuthSchema], suitable for Riverpod or callbacks.
   static FieldErrors<String> validateData(AuthSchema schema) =>

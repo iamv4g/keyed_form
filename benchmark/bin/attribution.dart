@@ -64,13 +64,14 @@ void main() {
   final toMap = bench('obj.toMap()              [N-entry map alloc]',
       () => seed.toMap());
   final m = seed.toMap();
-  final vmap = bench('schema.validateMap(map)  [field walk]',
+  final vmap = bench('schema.validateMap(map)   [old: map + walk]',
       () => benchSchema.validateMap(m));
-  final vdata = bench('Bench100Schema.validateData(obj)',
+  final vdata = bench('Bench100Schema.validateData(obj)  [new: list + walk]',
       () => Bench100Schema.validateData(seed));
 
   print(
-    '\n  validateData ${vdata.toStringAsFixed(2)} = toMap ${toMap.toStringAsFixed(2)}'
-    ' + validateMap ${vmap.toStringAsFixed(2)}   (${(100 * vdata / whole).round()}% of the full write)',
+    '\n  validateData (new path) ${vdata.toStringAsFixed(2)} µs is '
+    '${(100 * vdata / whole).round()}% of the full write; '
+    'old path was toMap ${toMap.toStringAsFixed(2)} + validateMap ${vmap.toStringAsFixed(2)}.',
   );
 }

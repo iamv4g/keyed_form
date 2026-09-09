@@ -6,6 +6,28 @@ import 'value_semantics_writer.dart';
 class DataClassGenerator {
   const DataClassGenerator();
 
+  /// Emits `_validationValues`, this class's field values in schema-declared
+  /// order — what `KSObject.validateReader` reads instead of a materialised
+  /// `toMap()` (a list literal: no per-key hashing, O(1) access). Nested
+  /// objects / lists are still mapped (the schema engine recurses on maps);
+  /// scalars are passed directly, so a flat form allocates no map per
+  /// keystroke. Order must match the schema's `fields` iteration order — both
+  /// come from the same `ks.object({...})` literal.
+  void _writeValidationValues(StringBuffer buffer, ParsedClass parsedClass) {
+    buffer.writeln('  List<Object?> get _validationValues => [');
+    for (final f in parsedClass.fields) {
+      if (f.isList && f.nestedClass != null) {
+        buffer.writeln('    ${f.name}.map((e) => e.toMap()).toList(),');
+      } else if (f.isNestedObject && f.nestedClass != null) {
+        buffer.writeln('    ${f.name}?.toMap(),');
+      } else {
+        buffer.writeln('    ${f.name},');
+      }
+    }
+    buffer.writeln('  ];');
+    buffer.writeln();
+  }
+
   String generate(
     ParsedClass parsedClass, {
     List<ParsedClass> allClasses = const [],
@@ -325,14 +347,17 @@ class DataClassGenerator {
 
     // Validation methods
     if (schemaName.isNotEmpty) {
+      _writeValidationValues(buffer, parsedClass);
       buffer.writeln('  @override');
       buffer.writeln(
-        '  FieldErrors<String> validate() => $schemaCall.validateMap(toMap());',
+        '  FieldErrors<String> validate() => '
+        '$schemaCall.validateReader(_validationValues);',
       );
       buffer.writeln();
       buffer.writeln('  @override');
       buffer.writeln(
-        '  Future<FieldErrors<String>> validateAsync() => $schemaCall.validateMapAsync(toMap());',
+        '  Future<FieldErrors<String>> validateAsync() => '
+        '$schemaCall.validateReaderAsync(_validationValues);',
       );
       buffer.writeln();
     }
@@ -488,18 +513,21 @@ class DataClassGenerator {
 
     // 5. Validation methods (for classes with a schema)
     if (schemaName.isNotEmpty) {
+      _writeValidationValues(buffer, parsedClass);
       buffer.writeln(
         '  /// Synchronously validates this [$name] against its schema.',
       );
       buffer.writeln(
-        '  FieldErrors<String> validate() => $schemaCall.validateMap(toMap());',
+        '  FieldErrors<String> validate() => '
+        '$schemaCall.validateReader(_validationValues);',
       );
       buffer.writeln();
       buffer.writeln(
         '  /// Asynchronously validates this [$name] against its schema.',
       );
       buffer.writeln(
-        '  Future<FieldErrors<String>> validateAsync() => $schemaCall.validateMapAsync(toMap());',
+        '  Future<FieldErrors<String>> validateAsync() => '
+        '$schemaCall.validateReaderAsync(_validationValues);',
       );
       buffer.writeln();
       buffer.writeln(

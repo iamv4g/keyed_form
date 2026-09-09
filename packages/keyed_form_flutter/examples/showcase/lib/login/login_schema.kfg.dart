@@ -1,7 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'login_schema.dart';
-
 // ignore_for_file: type=lint, unused_element, sort_constructors_first, avoid_equals_and_hash_code_on_mutable_classes, specify_nonobvious_property_types
 
 bool _listEquals<T>(List<T>? a, List<T>? b) {
@@ -88,12 +87,15 @@ class LoginSchema {
     'remember': remember,
   };
 
+  List<Object?> get _validationValues => [email, password, remember];
+
   /// Synchronously validates this [LoginSchema] against its schema.
-  FieldErrors<String> validate() => loginSchema.validateMap(toMap());
+  FieldErrors<String> validate() =>
+      loginSchema.validateReader(_validationValues);
 
   /// Asynchronously validates this [LoginSchema] against its schema.
   Future<FieldErrors<String>> validateAsync() =>
-      loginSchema.validateMapAsync(toMap());
+      loginSchema.validateReaderAsync(_validationValues);
 
   /// Static validator function for [LoginSchema], suitable for Riverpod or callbacks.
   static FieldErrors<String> validateData(LoginSchema schema) =>

@@ -63,6 +63,16 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
           ? _fieldKeys[fieldName]!
           : rootPrefix + _fieldKeys[fieldName]!;
 
+  /// Zips positional [orderedValues] back to a `{name: value}` map — only for
+  /// the refinement callbacks, which want the whole object.
+  Map<String, Object?> _orderedMap(List<Object?> orderedValues) {
+    final out = <String, Object?>{};
+    for (var i = 0; i < _fieldList.length; i++) {
+      out[_fieldList[i].key] = orderedValues[i];
+    }
+    return out;
+  }
+
   @override
   final bool isOptional;
 
@@ -121,13 +131,35 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
     return copyWith(refinements: next);
   }
 
+  /// Validates a present object whose field values are supplied positionally,
+  /// **in this object's declared field order** ([fields] iteration order) —
+  /// for the generated `validate()`, which passes a list literal instead of
+  /// building a `Map` (no per-key hashing, O(1) access). Nested objects /
+  /// lists must already be mapped by the caller (as `toMap()` would).
+  /// Refinements still receive a map, rebuilt lazily only if one runs.
+  FieldErrors<String> validateReader(
+    List<Object?> orderedValues, {
+    FieldKey? prefix,
+  }) {
+    assert(
+      orderedValues.length == _fieldList.length,
+      'validateReader expects ${_fieldList.length} values in field order, '
+      'got ${orderedValues.length}',
+    );
+    return validateMap(null, prefix: prefix, orderedValues: orderedValues);
+  }
+
   /// Synchronously validates [data] and returns [FieldErrors] keyed by [FieldKey].
+  ///
+  /// When [orderedValues] is given, fields are read from it positionally and
+  /// [data] is only the (optional) refinement map — see [validateReader].
   FieldErrors<String> validateMap(
     Map<String, Object?>? data, {
     FieldKey? prefix,
+    List<Object?>? orderedValues,
   }) {
     final rootPrefix = prefix ?? FieldKey.root;
-    if (data == null) {
+    if (data == null && orderedValues == null) {
       if (isOptional || isNullable) return const FieldErrors.empty();
       final issue = const KSInvalidTypeIssue(
         expected: 'object',
@@ -141,10 +173,12 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
     final errors = <FieldKey, String>{};
 
     // 1. Validate each field
-    for (final entry in _fieldList) {
+    for (var i = 0; i < _fieldList.length; i++) {
+      final entry = _fieldList[i];
       final fieldName = entry.key;
       final validator = entry.value;
-      final fieldValue = data[fieldName];
+      final fieldValue =
+          orderedValues != null ? orderedValues[i] : data![fieldName];
       final fieldKey = _fieldKey(rootPrefix, fieldName);
 
       if (validator is KSObject) {
@@ -230,13 +264,17 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
       }
     }
 
-    // 2. Run object refinements
+    // 2. Run object refinements — they take the whole map, so materialise one
+    // (from [orderedValues]) only if there is a refinement to run.
     var isAborted = false;
+    final refineData = refinements.isEmpty
+        ? const <String, Object?>{}
+        : (data ?? _orderedMap(orderedValues!));
     for (final ref in refinements) {
       if (isAborted) break;
-      if (ref.when != null && !ref.when!(data)) continue;
+      if (ref.when != null && !ref.when!(refineData)) continue;
 
-      final testResult = ref.test(data);
+      final testResult = ref.test(refineData);
       if (testResult is Future) {
         throw const KSAsyncValidationError();
       }
@@ -262,13 +300,23 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
     return FieldErrors(errors);
   }
 
+  /// [validateReader] for [validateMapAsync].
+  Future<FieldErrors<String>> validateReaderAsync(
+    List<Object?> orderedValues, {
+    FieldKey? prefix,
+  }) {
+    assert(orderedValues.length == _fieldList.length);
+    return validateMapAsync(null, prefix: prefix, orderedValues: orderedValues);
+  }
+
   /// Asynchronously validates [data] and returns [FieldErrors] keyed by [FieldKey].
   Future<FieldErrors<String>> validateMapAsync(
     Map<String, Object?>? data, {
     FieldKey? prefix,
+    List<Object?>? orderedValues,
   }) async {
     final rootPrefix = prefix ?? FieldKey.root;
-    if (data == null) {
+    if (data == null && orderedValues == null) {
       if (isOptional || isNullable) return const FieldErrors.empty();
       final issue = const KSInvalidTypeIssue(
         expected: 'object',
@@ -282,10 +330,12 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
     final errors = <FieldKey, String>{};
 
     // 1. Validate each field
-    for (final entry in _fieldList) {
+    for (var i = 0; i < _fieldList.length; i++) {
+      final entry = _fieldList[i];
       final fieldName = entry.key;
       final validator = entry.value;
-      final fieldValue = data[fieldName];
+      final fieldValue =
+          orderedValues != null ? orderedValues[i] : data![fieldName];
       final fieldKey = _fieldKey(rootPrefix, fieldName);
 
       if (validator is KSObject) {
@@ -371,13 +421,17 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
       }
     }
 
-    // 2. Run object refinements
+    // 2. Run object refinements — materialise a map from [orderedValues] only
+    // if a refinement will use it.
     var isAborted = false;
+    final refineData = refinements.isEmpty
+        ? const <String, Object?>{}
+        : (data ?? _orderedMap(orderedValues!));
     for (final ref in refinements) {
       if (isAborted) break;
-      if (ref.when != null && !ref.when!(data)) continue;
+      if (ref.when != null && !ref.when!(refineData)) continue;
 
-      final isValid = await ref.test(data);
+      final isValid = await ref.test(refineData);
       if (!isValid) {
         final targetKey = ref.key != null
             ? rootPrefix + ref.key!

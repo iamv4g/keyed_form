@@ -1,7 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'tour_schema.dart';
-
 // ignore_for_file: type=lint, unused_element, sort_constructors_first, avoid_equals_and_hash_code_on_mutable_classes, specify_nonobvious_property_types
 
 bool _listEquals<T>(List<T>? a, List<T>? b) {
@@ -118,12 +117,22 @@ class TourSchema {
     'notes': notes,
   };
 
+  List<Object?> get _validationValues => [
+    title,
+    category,
+    maxGuests,
+    isPublic,
+    stops.map((e) => e.toMap()).toList(),
+    notes,
+  ];
+
   /// Synchronously validates this [TourSchema] against its schema.
-  FieldErrors<String> validate() => tourSchema.validateMap(toMap());
+  FieldErrors<String> validate() =>
+      tourSchema.validateReader(_validationValues);
 
   /// Asynchronously validates this [TourSchema] against its schema.
   Future<FieldErrors<String>> validateAsync() =>
-      tourSchema.validateMapAsync(toMap());
+      tourSchema.validateReaderAsync(_validationValues);
 
   /// Static validator function for [TourSchema], suitable for Riverpod or callbacks.
   static FieldErrors<String> validateData(TourSchema schema) =>
