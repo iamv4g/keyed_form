@@ -14,18 +14,20 @@ import 'model_harness.dart';
 /// resolver) against the shape and validation path real users get from
 /// codegen.
 ///
-/// Note there is no scoped variant: `validateData` round-trips the whole
-/// object through `toMap()` and the `ks.*` schema on **every** write — a
-/// generated model cannot re-validate just one subtree, so per-write cost is
-/// inherently O(fields). Scoped validation means dropping to a hand-written
-/// resolver.
+/// [scoped] toggles the generated `Bench100Schema.scopeOf` — a scoped
+/// controller re-validates only the written field instead of walking all 100.
 class KeyedFormCodegenHarness extends ModelHarness {
+  KeyedFormCodegenHarness({this.scoped = false});
+
+  /// When true, wire the generated `scopeOf` so a write re-validates only its
+  /// own field instead of the whole 100-field schema.
+  final bool scoped;
   late KeyedFormController<Bench100Schema> _form;
 
   static const supported = Scenario(fieldCount: 100);
 
   @override
-  String get name => 'keyed_form_gen';
+  String get name => scoped ? 'keyed_form_gen (scoped)' : 'keyed_form_gen';
 
   @override
   void build(Scenario scenario) {
@@ -36,7 +38,8 @@ class KeyedFormCodegenHarness extends ModelHarness {
     _form = KeyedFormController<Bench100Schema>(
       initialValue: benchSeed(),
       mode: KeyedFormMode.onChange,
-      resolver: (draft, _) => Bench100Schema.validateData(draft),
+      resolver: Bench100Schema.validateData,
+      scopeOf: scoped ? Bench100Schema.scopeOf : null,
     );
   }
 

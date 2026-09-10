@@ -43,7 +43,7 @@ class _TourBuilderScreenState extends State<TourBuilderScreen> {
       KeyedFormController<TourSchema>(
         initialValue: seed,
         mode: _mode,
-        resolver: (draft, _) => TourSchema.validateData(draft),
+        resolver: TourSchema.validateData,
       );
 
   @override

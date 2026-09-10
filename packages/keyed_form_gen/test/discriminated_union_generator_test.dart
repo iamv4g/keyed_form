@@ -69,7 +69,9 @@ void main() {
       expect(code, contains('Map<String, Object?> toMap() => switch (this) {'));
       expect(
         code,
-        contains('FieldErrors<String> validate() => switch (this) {'),
+        contains(
+          'FieldErrors<String> validate([FieldKey? scope]) => switch (this) {',
+        ),
       );
       expect(code, contains('abstract final class _SectionVariants {'));
       expect(

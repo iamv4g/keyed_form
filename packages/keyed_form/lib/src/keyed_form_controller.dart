@@ -24,7 +24,7 @@ import 'keyed_form_snapshot.dart';
 /// final form = KeyedFormController<InvoiceForm>(
 ///   initialValue: const InvoiceForm(),
 ///   mode: KeyedFormMode.onChange,
-///   resolver: (draft, _) => InvoiceForm.validateData(draft),
+///   resolver: InvoiceForm.validateData, // generated; honours `scopeOf`
 /// );
 /// form.field(InvoiceFields.customerEmail).set('ada@example.com');
 /// form.field(InvoiceFields.customerEmail).error; // null until touched / submitted

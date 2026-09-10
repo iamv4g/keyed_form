@@ -17,7 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final form = KeyedFormController<LoginSchema>(
     initialValue: LoginSchema.create(),
     mode: KeyedFormMode.onTouched,
-    resolver: (draft, _) => LoginSchema.validateData(draft),
+    resolver: LoginSchema.validateData,
   );
 
   @override

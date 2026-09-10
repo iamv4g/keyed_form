@@ -73,6 +73,30 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
     return out;
   }
 
+  // --- scoped validation --------------------------------------------------
+  // A scoped call (`scope != null`) re-validates only the subtree at that
+  // absolute key and must return errors *only* under it (asserted by the
+  // controller). See `keyed_form/lib/src/keyed_form_resolver.dart`.
+
+  /// Validation for [candidate] is wanted under [scope] when the two keys lie
+  /// on one path — either contains the other. `scope == null` wants everything.
+  static bool _inScope(FieldKey? scope, FieldKey candidate) =>
+      scope == null || scope.contains(candidate) || candidate.contains(scope);
+
+  /// Scope to hand to a nested validator: `null` (validate all of it) once
+  /// [candidate] sits fully inside [scope]; otherwise [scope] unchanged so it
+  /// keeps narrowing as the recursion descends.
+  static FieldKey? _narrow(FieldKey? scope, FieldKey candidate) =>
+      (scope == null || scope.contains(candidate)) ? null : scope;
+
+  /// The absolute key a refinement's error lands on, relative to [rootPrefix].
+  static FieldKey _refineKey(FieldKey rootPrefix, ObjectRefinement ref) =>
+      ref.key != null
+          ? rootPrefix + ref.key!
+          : (ref.path != null
+                ? rootPrefix + FieldKey.name(ref.path!)
+                : rootPrefix);
+
   @override
   final bool isOptional;
 
@@ -140,23 +164,35 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
   FieldErrors<String> validateValues(
     List<Object?> orderedValues, {
     FieldKey? prefix,
+    FieldKey? scope,
   }) {
     assert(
       orderedValues.length == _fieldList.length,
       'validateValues expects ${_fieldList.length} values in field order, '
       'got ${orderedValues.length}',
     );
-    return validateMap(null, prefix: prefix, orderedValues: orderedValues);
+    return validateMap(
+      null,
+      prefix: prefix,
+      orderedValues: orderedValues,
+      scope: scope,
+    );
   }
 
   /// Synchronously validates [data] and returns [FieldErrors] keyed by [FieldKey].
   ///
   /// When [orderedValues] is given, fields are read from it positionally and
   /// [data] is only the (optional) refinement map — see [validateValues].
+  ///
+  /// [scope] (an absolute key) restricts the walk to that subtree — only
+  /// fields / rows on its path are checked, and a refinement runs only when
+  /// its target key is at or under [scope]. Every returned key is then at or
+  /// under [scope].
   FieldErrors<String> validateMap(
     Map<String, Object?>? data, {
     FieldKey? prefix,
     List<Object?>? orderedValues,
+    FieldKey? scope,
   }) {
     final rootPrefix = prefix ?? FieldKey.root;
     if (data == null && orderedValues == null) {
@@ -180,6 +216,8 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
       final fieldValue =
           orderedValues != null ? orderedValues[i] : data![fieldName];
       final fieldKey = _fieldKey(rootPrefix, fieldName);
+      if (!_inScope(scope, fieldKey)) continue;
+      final fieldScope = _narrow(scope, fieldKey);
 
       if (validator is KSObject) {
         final nestedErrors = validator.validateMap(
@@ -189,6 +227,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
                     ? Map<String, Object?>.from(fieldValue)
                     : null),
           prefix: fieldKey,
+          scope: fieldScope,
         );
         for (final k in nestedErrors.keys) {
           final err = nestedErrors.byKey(k);
@@ -202,6 +241,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
                     ? Map<String, Object?>.from(fieldValue)
                     : null),
           prefix: fieldKey,
+          scope: fieldScope,
         );
         for (final k in nestedErrors.keys) {
           final err = nestedErrors.byKey(k);
@@ -211,47 +251,37 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
         final listError = validator.validate(
           fieldValue is List ? fieldValue : null,
         );
-        if (listError != null) {
+        if (listError != null && (scope == null || scope.contains(fieldKey))) {
           errors[fieldKey] = listError;
         }
         if (fieldValue is List) {
           final elemValidator = validator.elementValidator;
-          if (elemValidator is KSObject) {
-            for (var i = 0; i < fieldValue.length; i++) {
-              final item = fieldValue[i];
-              if (item is Map) {
-                final typedItem = item is Map<String, Object?>
-                    ? item
-                    : Map<String, Object?>.from(item);
-                final idVal = typedItem['clientId'] ?? typedItem['id'] ?? i;
-                final itemKey = fieldKey + .id(idVal);
-                final itemErrors = elemValidator.validateMap(
-                  typedItem,
-                  prefix: itemKey,
-                );
-                for (final k in itemErrors.keys) {
-                  final err = itemErrors.byKey(k);
-                  if (err != null) errors[k] = err;
-                }
-              }
-            }
-          } else if (elemValidator is KSDiscriminatedUnion) {
-            for (var i = 0; i < fieldValue.length; i++) {
-              final item = fieldValue[i];
-              if (item is Map) {
-                final typedItem = item is Map<String, Object?>
-                    ? item
-                    : Map<String, Object?>.from(item);
-                final idVal = typedItem['clientId'] ?? typedItem['id'] ?? i;
-                final itemKey = fieldKey + .id(idVal);
-                final itemErrors = elemValidator.validateMap(
-                  typedItem,
-                  prefix: itemKey,
-                );
-                for (final k in itemErrors.keys) {
-                  final err = itemErrors.byKey(k);
-                  if (err != null) errors[k] = err;
-                }
+          if (elemValidator is KSObject ||
+              elemValidator is KSDiscriminatedUnion) {
+            for (var j = 0; j < fieldValue.length; j++) {
+              final item = fieldValue[j];
+              if (item is! Map) continue;
+              final typedItem = item is Map<String, Object?>
+                  ? item
+                  : Map<String, Object?>.from(item);
+              final idVal = typedItem['clientId'] ?? typedItem['id'] ?? j;
+              final itemKey = fieldKey + .id(idVal);
+              if (!_inScope(scope, itemKey)) continue;
+              final itemScope = _narrow(scope, itemKey);
+              final itemErrors = elemValidator is KSObject
+                  ? elemValidator.validateMap(
+                      typedItem,
+                      prefix: itemKey,
+                      scope: itemScope,
+                    )
+                  : (elemValidator as KSDiscriminatedUnion).validateMap(
+                      typedItem,
+                      prefix: itemKey,
+                      scope: itemScope,
+                    );
+              for (final k in itemErrors.keys) {
+                final err = itemErrors.byKey(k);
+                if (err != null) errors[k] = err;
               }
             }
           }
@@ -265,13 +295,20 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
     }
 
     // 2. Run object refinements — they take the whole map, so materialise one
-    // (from [orderedValues]) only if there is a refinement to run.
+    // (from [orderedValues]) only if a refinement will actually run: skip any
+    // whose target key is outside [scope].
     var isAborted = false;
-    final refineData = refinements.isEmpty
+    final anyRefinement = refinements.any(
+      (r) => scope == null || scope.contains(_refineKey(rootPrefix, r)),
+    );
+    final refineData = !anyRefinement
         ? const <String, Object?>{}
         : (data ?? _orderedMap(orderedValues!));
     for (final ref in refinements) {
       if (isAborted) break;
+      if (scope != null && !scope.contains(_refineKey(rootPrefix, ref))) {
+        continue;
+      }
       if (ref.when != null && !ref.when!(refineData)) continue;
 
       final testResult = ref.test(refineData);
@@ -304,16 +341,24 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
   Future<FieldErrors<String>> validateValuesAsync(
     List<Object?> orderedValues, {
     FieldKey? prefix,
+    FieldKey? scope,
   }) {
     assert(orderedValues.length == _fieldList.length);
-    return validateMapAsync(null, prefix: prefix, orderedValues: orderedValues);
+    return validateMapAsync(
+      null,
+      prefix: prefix,
+      orderedValues: orderedValues,
+      scope: scope,
+    );
   }
 
   /// Asynchronously validates [data] and returns [FieldErrors] keyed by [FieldKey].
+  /// See [validateMap] for what [scope] does.
   Future<FieldErrors<String>> validateMapAsync(
     Map<String, Object?>? data, {
     FieldKey? prefix,
     List<Object?>? orderedValues,
+    FieldKey? scope,
   }) async {
     final rootPrefix = prefix ?? FieldKey.root;
     if (data == null && orderedValues == null) {
@@ -337,6 +382,8 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
       final fieldValue =
           orderedValues != null ? orderedValues[i] : data![fieldName];
       final fieldKey = _fieldKey(rootPrefix, fieldName);
+      if (!_inScope(scope, fieldKey)) continue;
+      final fieldScope = _narrow(scope, fieldKey);
 
       if (validator is KSObject) {
         final nestedErrors = await validator.validateMapAsync(
@@ -346,6 +393,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
                     ? Map<String, Object?>.from(fieldValue)
                     : null),
           prefix: fieldKey,
+          scope: fieldScope,
         );
         for (final k in nestedErrors.keys) {
           final err = nestedErrors.byKey(k);
@@ -359,6 +407,7 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
                     ? Map<String, Object?>.from(fieldValue)
                     : null),
           prefix: fieldKey,
+          scope: fieldScope,
         );
         for (final k in nestedErrors.keys) {
           final err = nestedErrors.byKey(k);
@@ -368,47 +417,37 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
         final listError = await validator.validateAsync(
           fieldValue is List ? fieldValue : null,
         );
-        if (listError != null) {
+        if (listError != null && (scope == null || scope.contains(fieldKey))) {
           errors[fieldKey] = listError;
         }
         if (fieldValue is List) {
           final elemValidator = validator.elementValidator;
-          if (elemValidator is KSObject) {
-            for (var i = 0; i < fieldValue.length; i++) {
-              final item = fieldValue[i];
-              if (item is Map) {
-                final typedItem = item is Map<String, Object?>
-                    ? item
-                    : Map<String, Object?>.from(item);
-                final idVal = typedItem['clientId'] ?? typedItem['id'] ?? i;
-                final itemKey = fieldKey + .id(idVal);
-                final itemErrors = await elemValidator.validateMapAsync(
-                  typedItem,
-                  prefix: itemKey,
-                );
-                for (final k in itemErrors.keys) {
-                  final err = itemErrors.byKey(k);
-                  if (err != null) errors[k] = err;
-                }
-              }
-            }
-          } else if (elemValidator is KSDiscriminatedUnion) {
-            for (var i = 0; i < fieldValue.length; i++) {
-              final item = fieldValue[i];
-              if (item is Map) {
-                final typedItem = item is Map<String, Object?>
-                    ? item
-                    : Map<String, Object?>.from(item);
-                final idVal = typedItem['clientId'] ?? typedItem['id'] ?? i;
-                final itemKey = fieldKey + .id(idVal);
-                final itemErrors = elemValidator.validateMap(
-                  typedItem,
-                  prefix: itemKey,
-                );
-                for (final k in itemErrors.keys) {
-                  final err = itemErrors.byKey(k);
-                  if (err != null) errors[k] = err;
-                }
+          if (elemValidator is KSObject ||
+              elemValidator is KSDiscriminatedUnion) {
+            for (var j = 0; j < fieldValue.length; j++) {
+              final item = fieldValue[j];
+              if (item is! Map) continue;
+              final typedItem = item is Map<String, Object?>
+                  ? item
+                  : Map<String, Object?>.from(item);
+              final idVal = typedItem['clientId'] ?? typedItem['id'] ?? j;
+              final itemKey = fieldKey + .id(idVal);
+              if (!_inScope(scope, itemKey)) continue;
+              final itemScope = _narrow(scope, itemKey);
+              final itemErrors = elemValidator is KSObject
+                  ? await elemValidator.validateMapAsync(
+                      typedItem,
+                      prefix: itemKey,
+                      scope: itemScope,
+                    )
+                  : (elemValidator as KSDiscriminatedUnion).validateMap(
+                      typedItem,
+                      prefix: itemKey,
+                      scope: itemScope,
+                    );
+              for (final k in itemErrors.keys) {
+                final err = itemErrors.byKey(k);
+                if (err != null) errors[k] = err;
               }
             }
           }
@@ -422,13 +461,20 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
     }
 
     // 2. Run object refinements — materialise a map from [orderedValues] only
-    // if a refinement will use it.
+    // if a refinement will actually run (skip any whose target is outside
+    // [scope]).
     var isAborted = false;
-    final refineData = refinements.isEmpty
+    final anyRefinement = refinements.any(
+      (r) => scope == null || scope.contains(_refineKey(rootPrefix, r)),
+    );
+    final refineData = !anyRefinement
         ? const <String, Object?>{}
         : (data ?? _orderedMap(orderedValues!));
     for (final ref in refinements) {
       if (isAborted) break;
+      if (scope != null && !scope.contains(_refineKey(rootPrefix, ref))) {
+        continue;
+      }
       if (ref.when != null && !ref.when!(refineData)) continue;
 
       final isValid = await ref.test(refineData);

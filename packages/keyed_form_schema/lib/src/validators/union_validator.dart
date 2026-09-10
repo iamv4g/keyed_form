@@ -60,9 +60,12 @@ class KSDiscriminatedUnion<T> extends KSValidator<Map<String, Object?>?> {
   KSDiscriminatedUnion<T> nullable() => copyWith(isNullable: true);
 
   /// Synchronously validates [data] against the matched variant schema.
+  /// [scope] (an absolute key) narrows the walk to that subtree — see
+  /// [KSObject.validateMap].
   FieldErrors<String> validateMap(
     Map<String, Object?>? data, {
     FieldKey? prefix,
+    FieldKey? scope,
   }) {
     final rootPrefix = prefix ?? FieldKey.root;
     if (data == null) {
@@ -80,6 +83,9 @@ class KSDiscriminatedUnion<T> extends KSValidator<Map<String, Object?>?> {
     if (discriminatorValue == null ||
         !variants.containsKey(discriminatorValue)) {
       final targetKey = rootPrefix + .name(discriminatorKey);
+      if (scope != null && !scope.contains(targetKey)) {
+        return const FieldErrors.empty();
+      }
       final issue = KSCustomIssue(
         path: [discriminatorKey],
         message: 'Invalid or missing discriminator "$discriminatorKey"',
@@ -91,13 +97,14 @@ class KSDiscriminatedUnion<T> extends KSValidator<Map<String, Object?>?> {
     }
 
     final variantValidator = variants[discriminatorValue]!;
-    return variantValidator.validateMap(data, prefix: prefix);
+    return variantValidator.validateMap(data, prefix: prefix, scope: scope);
   }
 
   /// Asynchronously validates [data] against the matched variant schema.
   Future<FieldErrors<String>> validateMapAsync(
     Map<String, Object?>? data, {
     FieldKey? prefix,
+    FieldKey? scope,
   }) async {
     final rootPrefix = prefix ?? FieldKey.root;
     if (data == null) {
@@ -115,6 +122,9 @@ class KSDiscriminatedUnion<T> extends KSValidator<Map<String, Object?>?> {
     if (discriminatorValue == null ||
         !variants.containsKey(discriminatorValue)) {
       final targetKey = rootPrefix + .name(discriminatorKey);
+      if (scope != null && !scope.contains(targetKey)) {
+        return const FieldErrors.empty();
+      }
       final issue = KSCustomIssue(
         path: [discriminatorKey],
         message: 'Invalid or missing discriminator "$discriminatorKey"',
@@ -126,7 +136,11 @@ class KSDiscriminatedUnion<T> extends KSValidator<Map<String, Object?>?> {
     }
 
     final variantValidator = variants[discriminatorValue]!;
-    return variantValidator.validateMapAsync(data, prefix: prefix);
+    return variantValidator.validateMapAsync(
+      data,
+      prefix: prefix,
+      scope: scope,
+    );
   }
 
   @override

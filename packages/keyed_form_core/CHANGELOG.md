@@ -9,4 +9,6 @@ Initial release. Shared vocabulary for the `keyed_form` family:
 - `.whenPresent()` / `.narrow()` / `.at()` extensions on `FieldRef`.
 - `FieldErrors<E>` — a `FieldKey`-keyed sidecar map, looked up by field
   reference.
+- `rowScopeOf` — the default `KeyedFormController.scopeOf`: a write inside a
+  by-id list row re-validates just that row, otherwise its top-level field.
 - `@keyedSchema` / `KeyedSchema` — the annotation `keyed_form_gen` reads.
