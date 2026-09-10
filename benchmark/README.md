@@ -178,14 +178,23 @@ every `FormBuilderField` (`AnimatedBuilder` / `Actions` / `_ActionsScope` …)
 rebuilds on every keystroke because they all listen to the shared
 `FormBuilderState`.
 
-The `keyed_form` design point to keep watching: **every** `KeyedFormField`
+The `keyed_form` design point that was flagged: **every** `KeyedFormField`
 adds a listener to the whole controller, so a write fires N listener callbacks
-(each reads its value + diffs, then almost always no-ops). That is not a
-rebuild, so it does not show above — it shows in the post-keystroke `pump`
-time. Through 250 fields it stayed even with reactive_forms (~8–10 ms in
-debug); `integration_test/aot_benchmark_test.dart` sweeps 100 → 1000 fields
-in **profile mode** so the curve (does `pump` bend upward with N?) is
-visible — run it before deciding the fan-out needs a fix.
+(each re-reads its value + visible error and diffs). `reactive_forms` is O(1)
+here (per-control streams); `keyed_form` is O(N).
+
+**`bin/fanout.dart` (AOT) settles it — O(N) but the constant is tiny:**
+
+| fields | 50 | 100 | 250 | 500 | 1000 | 2000 |
+|---|--:|--:|--:|--:|--:|--:|
+| µs / keystroke | 2.4 | 3.8 | 9.3 | 19 | 38 | 77 |
+
+~38 ns per listener (flat), ~9× a bare `notifyListeners()` — so the per-field
+*work* dominates, not the `ChangeNotifier` walk. At 1000 fields that is ~38 µs,
+**~0.2 % of a 16.6 ms frame**; you would need tens of thousands of fields for
+it to matter. **Not worth fixing** — real forms sit well under 200 fields
+(<8 µs). If a pathological form ever needs it, the fix is a per-key
+`Listenable` on the controller so a write notifies only the fields it touched.
 
 ## DX comparison
 
@@ -220,6 +229,7 @@ lib/src/measure.dart         warmup + percentile timing helper + JSON report
 lib/model/*_harness.dart     ModelHarness: build / setField / addRow / isValid / isDirty
 lib/widget/*_harness.dart    WidgetHarness: the form as real widgets, findable fields
 bin/attribution.dart         AOT breakdown of the keyed_form write path (dart compile exe)
+bin/fanout.dart              AOT sweep of the KeyedFormField listener fan-out cost
 test/parity_test.dart          fairness gate
 test/model_benchmark_test.dart          JIT, the size sweep
 test/codegen_calibration_test.dart      JIT, list-backed vs a real generated model
