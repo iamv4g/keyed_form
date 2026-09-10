@@ -47,6 +47,21 @@ void main() {
     () => form.field(ref).set('v${n++ & 1023}'),
   );
 
+  final scopedForm = KeyedFormController<Bench100Schema>(
+    initialValue: benchSeed(),
+    mode: KeyedFormMode.onChange,
+    resolver: Bench100Schema.validateData,
+    scopeOf: Bench100Schema.scopeOf,
+  );
+  bench(
+    'form.field(ref).set(v)   [scoped write path]',
+    () => scopedForm.field(ref).set('v${n++ & 1023}'),
+  );
+  bench(
+    'validateData(obj, scope) [scoped, 1 of 100 fields]',
+    () => Bench100Schema.validateData(seed, ref.key),
+  );
+
   print('\n  attribution:');
   bench('form.field(ref)          [FieldHandle alloc]', () => form.field(ref));
 

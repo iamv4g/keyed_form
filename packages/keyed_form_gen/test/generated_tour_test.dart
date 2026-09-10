@@ -61,6 +61,37 @@ void main() {
       final errors = tour.validate();
       expect(errors.isNotEmpty, true);
     });
+
+    test('validate(scope) re-checks only that subtree', () {
+      final badHotel = HotelSchema.create(hotelName: ''); // empty -> invalid
+      final tour = TourSchema.create(
+        title: 'Hi', // also too short
+        hotels: [badHotel],
+      );
+
+      final whole = tour.validate();
+      final hotelKey = FieldKey.name('hotels') + FieldKey.id(badHotel.clientId);
+      final scoped = tour.validate(hotelKey);
+
+      expect(whole.byKey(FieldKey.name('title')), isNotNull);
+      expect(scoped.byKey(FieldKey.name('title')), isNull,
+          reason: 'title is outside the hotel scope');
+      for (final k in scoped.keys) {
+        expect(hotelKey.contains(k), isTrue);
+      }
+      expect(scoped.isNotEmpty, isTrue);
+    });
+
+    test('TourSchema.scopeOf routes a hotel-field write to the hotel row', () {
+      final hotelFieldKey = FieldKey.name('hotels') +
+          FieldKey.id('h1') +
+          FieldKey.name('hotelName');
+      expect(
+        TourSchema.scopeOf(hotelFieldKey),
+        FieldKey.name('hotels') + FieldKey.id('h1'),
+      );
+      expect(TourSchema.scopeOf(FieldKey.name('title')), FieldKey.name('title'));
+    });
   });
 
   // Regression coverage for the copyWith callable-interface redesign: the

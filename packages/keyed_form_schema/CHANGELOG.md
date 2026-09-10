@@ -12,6 +12,10 @@ Initial release.
   `keyed_form_gen` `validate()` calls on every keystroke; `KSObject` caches
   its per-field `FieldKey`s and field list so a validation run does no
   per-field key/iterator allocation.
+- All four entry points take an optional `scope` (a `FieldKey`): only fields /
+  rows on its path are checked, and a refinement runs only when its target
+  key is at or under `scope`. Every returned key is then at or under `scope`
+  — the contract `KeyedFormController` splices scoped results with.
 - Cross-field `.refine(...)` with sync / async predicates (the refinement
   callbacks still receive the whole map, rebuilt lazily only when one runs).
 - i18n-friendly lazy message resolution (`error: .text(...)` /

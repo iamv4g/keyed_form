@@ -20,6 +20,7 @@ void main() {
     () => KeyedFormHarness(scoped: false),
     () => KeyedFormHarness(scoped: true),
     KeyedFormCodegenHarness.new,
+    () => KeyedFormCodegenHarness(scoped: true),
     ReactiveFormsHarness.new,
   ];
 
@@ -39,6 +40,17 @@ void main() {
     a.setField(50, 'fixed');
     expect(b.isValid, a.isValid);
     expect(b.isDirty, isTrue);
+
+    // The scoped codegen wiring (generated scopeOf + validateData tear-off)
+    // reaches the same verdict.
+    final s = KeyedFormCodegenHarness(scoped: true)..build(scenario);
+    addTearDown(s.dispose);
+    s.setField(50, 'no');
+    expect(s.isValid, isFalse);
+    s.setField(50, 'fixed');
+    expect(s.isValid, isTrue);
+    s.setField(12, 'no');
+    expect(s.isValid, isFalse, reason: 'a second field is also seen');
 
     final report = Report('codegen calibration · ${scenario.label}');
     for (final make in builders) {

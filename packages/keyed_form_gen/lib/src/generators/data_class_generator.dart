@@ -137,10 +137,12 @@ class DataClassGenerator {
     buffer.writeln();
 
     // validate
-    buffer.writeln('  FieldErrors<String> validate() => switch (this) {');
+    buffer.writeln(
+      '  FieldErrors<String> validate([FieldKey? scope]) => switch (this) {',
+    );
     if (parsedClass.unionVariants != null) {
       for (final v in parsedClass.unionVariants!.values) {
-        buffer.writeln('    ${v.name} x => x.validate(),');
+        buffer.writeln('    ${v.name} x => x.validate(scope),');
       }
     }
     buffer.writeln('  };');
@@ -148,11 +150,12 @@ class DataClassGenerator {
 
     // validateAsync
     buffer.writeln(
-      '  Future<FieldErrors<String>> validateAsync() => switch (this) {',
+      '  Future<FieldErrors<String>> validateAsync([FieldKey? scope]) => '
+      'switch (this) {',
     );
     if (parsedClass.unionVariants != null) {
       for (final v in parsedClass.unionVariants!.values) {
-        buffer.writeln('    ${v.name} x => x.validateAsync(),');
+        buffer.writeln('    ${v.name} x => x.validateAsync(scope),');
       }
     }
     buffer.writeln('  };');
@@ -350,14 +353,14 @@ class DataClassGenerator {
       _writeValidationValues(buffer, parsedClass);
       buffer.writeln('  @override');
       buffer.writeln(
-        '  FieldErrors<String> validate() => '
-        '$schemaCall.validateValues(_validationValues);',
+        '  FieldErrors<String> validate([FieldKey? scope]) => '
+        '$schemaCall.validateValues(_validationValues, scope: scope);',
       );
       buffer.writeln();
       buffer.writeln('  @override');
       buffer.writeln(
-        '  Future<FieldErrors<String>> validateAsync() => '
-        '$schemaCall.validateValuesAsync(_validationValues);',
+        '  Future<FieldErrors<String>> validateAsync([FieldKey? scope]) => '
+        '$schemaCall.validateValuesAsync(_validationValues, scope: scope);',
       );
       buffer.writeln();
     }
@@ -515,31 +518,47 @@ class DataClassGenerator {
     if (schemaName.isNotEmpty) {
       _writeValidationValues(buffer, parsedClass);
       buffer.writeln(
-        '  /// Synchronously validates this [$name] against its schema.',
+        '  /// Validates this [$name] against its schema. Pass [scope] (a '
+        '`FieldKey`)\n'
+        '  /// to re-check only that subtree — see `KeyedFormController.scopeOf`.',
       );
       buffer.writeln(
-        '  FieldErrors<String> validate() => '
-        '$schemaCall.validateValues(_validationValues);',
+        '  FieldErrors<String> validate([FieldKey? scope]) => '
+        '$schemaCall.validateValues(_validationValues, scope: scope);',
       );
       buffer.writeln();
       buffer.writeln(
         '  /// Asynchronously validates this [$name] against its schema.',
       );
       buffer.writeln(
-        '  Future<FieldErrors<String>> validateAsync() => '
-        '$schemaCall.validateValuesAsync(_validationValues);',
+        '  Future<FieldErrors<String>> validateAsync([FieldKey? scope]) => '
+        '$schemaCall.validateValuesAsync(_validationValues, scope: scope);',
       );
       buffer.writeln();
       buffer.writeln(
-        '  /// Static validator function for [$name], suitable for Riverpod or callbacks.',
+        '  /// Static validator — assignable straight to '
+        '`KeyedFormController.resolver`.',
       );
       buffer.writeln(
-        '  static FieldErrors<String> validateData($name schema) => schema.validate();',
+        '  static FieldErrors<String> validateData($name schema, '
+        '[FieldKey? scope]) => schema.validate(scope);',
       );
       buffer.writeln();
-      buffer.writeln('  /// Static async validator function for [$name].');
+      buffer.writeln('  /// Static async validator for [$name].');
       buffer.writeln(
-        '  static Future<FieldErrors<String>> validateDataAsync($name schema) => schema.validateAsync();',
+        '  static Future<FieldErrors<String>> validateDataAsync($name schema, '
+        '[FieldKey? scope]) => schema.validateAsync(scope);',
+      );
+      buffer.writeln();
+      buffer.writeln(
+        '  /// The default `KeyedFormController.scopeOf` for [$name] — a write '
+        'inside a\n'
+        '  /// list row re-validates just that row, otherwise its top-level '
+        'field.',
+      );
+      buffer.writeln(
+        '  static FieldKey? scopeOf(FieldKey writtenKey) => '
+        'rowScopeOf(writtenKey);',
       );
       buffer.writeln();
     }

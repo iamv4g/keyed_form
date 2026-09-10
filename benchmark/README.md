@@ -86,15 +86,24 @@ because the ruleset is tiny.
 
 The list-backed stand-in above uses a hand-written resolver. A real
 `keyed_form_gen` model validates by re-running the `ks.*` schema over the
-object's fields on **every** write — there is still no scoped variant, a
-generated model cannot re-validate one subtree.
+object's fields on every write; `scoped` wires the generated
+`Bench100Schema.scopeOf` so a write re-checks only its own field.
 
 | lib | build | setField median | setField min |
 |---|--:|--:|--:|
 | keyed_form — list-backed + hand resolver (whole) | 4 | **9** | 9 |
 | keyed_form — list-backed + hand resolver (scoped) | 1 | 11 | 11 |
 | **keyed_form_gen — real `Bench100Schema` + `validateData`** | 3 | **11** | **9** |
+| **keyed_form_gen (scoped)** | 3 | **10** | **9** |
 | reactive_forms | 800 | 23 | 22 |
+
+Scoping barely moves the needle **here** — a flat form still costs one O(N)
+pass to find the one in-scope field (the hand-written scoped resolver has the
+same shape: it too builds and checks all 100 keys). Where `scopeOf` actually
+pays off is a **nested / large-list** form: scoping a write to one row skips
+every *other* row's nested-object validation, turning `O(rows × fieldsPerRow)`
+into `O(fieldsPerRow)`. AOT: the flat scoped write is ~3.4 µs vs ~4.0 µs
+unscoped.
 
 The idiomatic `keyed_form_gen` write is level with a hand-written resolver and
 ~2× faster than reactive_forms. Two changes got it there (controlled
@@ -124,9 +133,11 @@ with the `toMap()` path; JIT `flutter test` inflates ~2–3×):
 
 The whole write cost is now `validateData`; the immutable copy and the `==`
 guard are free in AOT — earlier JIT-based guesses that pinned ~10 µs on the
-object copy were wrong. Remaining: a generated model still cannot **scope**
-its validation (`scopeOf` needs generator support), and the ~3.6 µs walk is
-100 × `KSString.validate` (`required` + `minLength`) — squeezable but harder.
+object copy were wrong. Remaining on a flat form: the ~3.6 µs walk is
+`_validationValues` (100 field reads + list) + 100 × `KSString.validate`.
+`validateData(obj, scope)` trims that to ~3.0 µs — the list build and the
+100-iteration filter loop are the floor for a flat schema; a nested/list
+schema saves far more.
 
 `build` stays cheap either way (generated `create()` ~3 µs vs reactive_forms
 ~800 µs).

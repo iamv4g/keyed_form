@@ -18,3 +18,4 @@ export 'package:keyed_lens/keyed_lens.dart'
 export 'src/annotation.dart';
 export 'src/field_errors.dart';
 export 'src/field_ref.dart';
+export 'src/scope.dart';

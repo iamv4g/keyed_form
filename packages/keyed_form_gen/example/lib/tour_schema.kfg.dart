@@ -73,21 +73,30 @@ class TourSchema {
     stops.map((e) => e.toMap()).toList(),
   ];
 
-  /// Synchronously validates this [TourSchema] against its schema.
-  FieldErrors<String> validate() =>
-      tourSchema.validateValues(_validationValues);
+  /// Validates this [TourSchema] against its schema. Pass [scope] (a `FieldKey`)
+  /// to re-check only that subtree — see `KeyedFormController.scopeOf`.
+  FieldErrors<String> validate([FieldKey? scope]) =>
+      tourSchema.validateValues(_validationValues, scope: scope);
 
   /// Asynchronously validates this [TourSchema] against its schema.
-  Future<FieldErrors<String>> validateAsync() =>
-      tourSchema.validateValuesAsync(_validationValues);
+  Future<FieldErrors<String>> validateAsync([FieldKey? scope]) =>
+      tourSchema.validateValuesAsync(_validationValues, scope: scope);
 
-  /// Static validator function for [TourSchema], suitable for Riverpod or callbacks.
-  static FieldErrors<String> validateData(TourSchema schema) =>
-      schema.validate();
+  /// Static validator — assignable straight to `KeyedFormController.resolver`.
+  static FieldErrors<String> validateData(
+    TourSchema schema, [
+    FieldKey? scope,
+  ]) => schema.validate(scope);
 
-  /// Static async validator function for [TourSchema].
-  static Future<FieldErrors<String>> validateDataAsync(TourSchema schema) =>
-      schema.validateAsync();
+  /// Static async validator for [TourSchema].
+  static Future<FieldErrors<String>> validateDataAsync(
+    TourSchema schema, [
+    FieldKey? scope,
+  ]) => schema.validateAsync(scope);
+
+  /// The default `KeyedFormController.scopeOf` for [TourSchema] — a write inside a
+  /// list row re-validates just that row, otherwise its top-level field.
+  static FieldKey? scopeOf(FieldKey writtenKey) => rowScopeOf(writtenKey);
 
   @override
   bool operator ==(Object other) {

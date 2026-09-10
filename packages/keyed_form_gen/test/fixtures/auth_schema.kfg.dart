@@ -93,21 +93,30 @@ class AuthSchema {
 
   List<Object?> get _validationValues => [username, password, remember];
 
-  /// Synchronously validates this [AuthSchema] against its schema.
-  FieldErrors<String> validate() =>
-      authSchema.validateValues(_validationValues);
+  /// Validates this [AuthSchema] against its schema. Pass [scope] (a `FieldKey`)
+  /// to re-check only that subtree — see `KeyedFormController.scopeOf`.
+  FieldErrors<String> validate([FieldKey? scope]) =>
+      authSchema.validateValues(_validationValues, scope: scope);
 
   /// Asynchronously validates this [AuthSchema] against its schema.
-  Future<FieldErrors<String>> validateAsync() =>
-      authSchema.validateValuesAsync(_validationValues);
+  Future<FieldErrors<String>> validateAsync([FieldKey? scope]) =>
+      authSchema.validateValuesAsync(_validationValues, scope: scope);
 
-  /// Static validator function for [AuthSchema], suitable for Riverpod or callbacks.
-  static FieldErrors<String> validateData(AuthSchema schema) =>
-      schema.validate();
+  /// Static validator — assignable straight to `KeyedFormController.resolver`.
+  static FieldErrors<String> validateData(
+    AuthSchema schema, [
+    FieldKey? scope,
+  ]) => schema.validate(scope);
 
-  /// Static async validator function for [AuthSchema].
-  static Future<FieldErrors<String>> validateDataAsync(AuthSchema schema) =>
-      schema.validateAsync();
+  /// Static async validator for [AuthSchema].
+  static Future<FieldErrors<String>> validateDataAsync(
+    AuthSchema schema, [
+    FieldKey? scope,
+  ]) => schema.validateAsync(scope);
+
+  /// The default `KeyedFormController.scopeOf` for [AuthSchema] — a write inside a
+  /// list row re-validates just that row, otherwise its top-level field.
+  static FieldKey? scopeOf(FieldKey writtenKey) => rowScopeOf(writtenKey);
 
   @override
   bool operator ==(Object other) {

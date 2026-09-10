@@ -99,22 +99,30 @@ void main() {
         expect(
           code,
           contains(
-            'FieldErrors<String> validate() => '
-            'loginSchema.validateValues(_validationValues);',
+            'FieldErrors<String> validate([FieldKey? scope]) => '
+            'loginSchema.validateValues(_validationValues, scope: scope);',
           ),
         );
         expect(
           code,
           contains(
-            'Future<FieldErrors<String>> validateAsync() => '
-            'loginSchema.validateValuesAsync(_validationValues);',
+            'Future<FieldErrors<String>> validateAsync([FieldKey? scope]) => '
+            'loginSchema.validateValuesAsync(_validationValues, scope: scope);',
           ),
         );
         expect(code, contains('List<Object?> get _validationValues => ['));
         expect(
           code,
           contains(
-            'static FieldErrors<String> validateData(LoginSchema schema) => schema.validate();',
+            'static FieldErrors<String> validateData(LoginSchema schema, '
+            '[FieldKey? scope]) => schema.validate(scope);',
+          ),
+        );
+        expect(
+          code,
+          contains(
+            'static FieldKey? scopeOf(FieldKey writtenKey) => '
+            'rowScopeOf(writtenKey);',
           ),
         );
       },
