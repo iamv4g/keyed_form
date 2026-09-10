@@ -14,6 +14,18 @@ flutter test test/model_benchmark_test.dart  --tags benchmark
 flutter test test/rebuild_benchmark_test.dart --tags benchmark
 ```
 
+Those run under **JIT** on the host — ~2–3× slower and noisier than a real
+app. For release-representative numbers swept to large N (the only place the
+`keyed_form_flutter` listener fan-out could bite), run the AOT suite on a
+device:
+
+```
+flutter create --platforms=macos .            # once; runner is git-ignored
+flutter test integration_test/aot_benchmark_test.dart --profile -d macos
+```
+
+(`--platforms=ios`/`android` + `-d <id>` for a device/emulator.)
+
 ## What is measured against what
 
 One form shape (`lib/scenario.dart`), swept by size:
@@ -171,7 +183,9 @@ adds a listener to the whole controller, so a write fires N listener callbacks
 (each reads its value + diffs, then almost always no-ops). That is not a
 rebuild, so it does not show above — it shows in the post-keystroke `pump`
 time. Through 250 fields it stayed even with reactive_forms (~8–10 ms in
-debug); probe higher N in profile mode if you target very large forms.
+debug); `integration_test/aot_benchmark_test.dart` sweeps 100 → 1000 fields
+in **profile mode** so the curve (does `pump` bend upward with N?) is
+visible — run it before deciding the fan-out needs a fix.
 
 ## DX comparison
 
@@ -210,7 +224,7 @@ test/parity_test.dart          fairness gate
 test/model_benchmark_test.dart          JIT, the size sweep
 test/codegen_calibration_test.dart      JIT, list-backed vs a real generated model
 test/rebuild_benchmark_test.dart        JIT, widget rebuilds per keystroke
-integration_test/aot_benchmark_test.dart  the 3-way comparison in --profile (needs a device)
+integration_test/aot_benchmark_test.dart  --profile, 3-way, swept to 1000f (needs a scaffolded device)
 ```
 
 To change the codegen schema size: `python3 tool/gen_bench_schema.py <N>` then

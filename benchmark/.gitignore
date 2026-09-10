@@ -1,2 +1,15 @@
 benchmark_results/
 .dart_tool/
+
+# `integration_test --profile` needs a real target — scaffold it once with
+#   flutter create --platforms=macos .
+# The generated runner is boilerplate and stays out of the repo.
+.metadata
+.flutter-plugins-dependencies
+*.iml
+/macos/
+/ios/
+/android/
+/web/
+/windows/
+/linux/
