@@ -23,62 +23,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import 'package:keyed_form_benchmark/model/keyed_form_codegen_harness.dart';
-import 'package:keyed_form_benchmark/model/keyed_form_harness.dart';
-import 'package:keyed_form_benchmark/model/model_harness.dart';
-import 'package:keyed_form_benchmark/model/reactive_forms_harness.dart';
 import 'package:keyed_form_benchmark/scenario.dart';
-import 'package:keyed_form_benchmark/src/measure.dart';
 import 'package:keyed_form_benchmark/widget/form_builder_widget_harness.dart';
 import 'package:keyed_form_benchmark/widget/keyed_form_widget_harness.dart';
 import 'package:keyed_form_benchmark/widget/reactive_forms_widget_harness.dart';
 import 'package:keyed_form_benchmark/widget/widget_harness.dart';
 
+// This suite is the **widget** sweep only. Model-layer AOT numbers come from
+// `dart compile exe bin/attribution.dart` / `bin/fanout.dart` (pure Dart, no
+// harness swallowing `print`); `reactive_forms`' model layer is JIT-only in
+// `test/model_benchmark_test.dart`.
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   const widgetSizes = [100, 250, 500, 1000];
-  const modelSizes = [100, 500, 1000, 2000];
-
-  // ── model layer — build + one setField, swept ──────────────────────────
-  test('AOT · model · setField vs form size', () {
-    final report = Report('AOT · model · setField(mid) µs by field count');
-    for (final n in modelSizes) {
-      final scenario = Scenario(fieldCount: n);
-      final builders = <ModelHarness Function()>[
-        () => KeyedFormHarness(scoped: false),
-        () => KeyedFormHarness(scoped: true),
-        ReactiveFormsHarness.new,
-      ];
-      for (final make in builders) {
-        final h = make()..build(scenario);
-        var k = 0;
-        report.add(measure(
-          '${make().name} · ${n}f',
-          () => h.setField(n ~/ 2, 'v${k++ & 1023}'),
-          warmup: 2000,
-          iterations: 20000,
-        ));
-        h.dispose();
-      }
-    }
-    // codegen model is fixed at 100 fields (Bench100Schema)
-    for (final scoped in [false, true]) {
-      final h = KeyedFormCodegenHarness(scoped: scoped)
-        ..build(KeyedFormCodegenHarness.supported);
-      var k = 0;
-      report.add(measure(
-        '${h.name} · 100f',
-        () => h.setField(50, 'v${k++ & 1023}'),
-        warmup: 2000,
-        iterations: 20000,
-      ));
-      h.dispose();
-    }
-    // ignore: avoid_print
-    print(report.table());
-    report.writeJson('benchmark_results/aot_model_sweep.json');
-  });
 
   // ── widget layer — one keystroke, swept ────────────────────────────────
   final widgetHarnesses = <WidgetHarness Function()>[

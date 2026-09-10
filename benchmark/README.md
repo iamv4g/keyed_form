@@ -160,23 +160,30 @@ schema saves far more.
 > foundation`, `flutter_form_builder` is widget-only — neither can
 > `dart compile exe`). See `integration_test/`.
 
-### Widget layer — one keystroke, `test/rebuild_benchmark_test.dart`
+### Widget layer — one keystroke
 
 Widget rebuilds triggered in the whole tree by typing into **one** field
-(focus already settled), by form size:
+(focus already settled), and the `pump` time it takes, by form size
+(`integration_test/aot_benchmark_test.dart`, macOS debug — rebuild counts are
+exact, pump times are debug-inflated but the *shape* holds):
 
-| library | 10f | 50f | 100f | 250f |
-|---|--:|--:|--:|--:|
-| `keyed_form_flutter` | 43 | 43 | 43 | 43 |
-| `reactive_forms` | 45 | 45 | 45 | 45 |
-| `flutter_form_builder` | 261 | 1221 | 2421 | 6021 |
+| library | rebuilds (any N) | pump 100f | 250f | 500f | 1000f |
+|---|--:|--:|--:|--:|--:|
+| `keyed_form_flutter` | **41** | 17.0 ms | 17.2 | 17.4 | 30.9 |
+| `reactive_forms` | **43** | 16.7 ms | 16.9 | 17.0 | 28.8 |
+| `flutter_form_builder` | **~24·N** | 70 ms | 116 | 228 | 485 (then hangs) |
 
-`keyed_form` and `reactive_forms` are **O(1)** — only the edited field's
-subtree rebuilds (the ~44 constant is `EditableText` + overlay/gesture
-framework internals for that one field). `flutter_form_builder` is **O(N)**:
-every `FormBuilderField` (`AnimatedBuilder` / `Actions` / `_ActionsScope` …)
-rebuilds on every keystroke because they all listen to the shared
-`FormBuilderState`.
+`keyed_form` and `reactive_forms` rebuild **O(1)** — only the edited field's
+subtree (the ~42 constant is `EditableText` + overlay/gesture internals for
+that one field) — and their `pump` times **track each other exactly** at every
+N. keyed_form's O(N) listener fan-out (~38 ns/field, above) is real but
+invisible: swamped by the framework's per-keystroke cost; the jump at 1000f is
+laying out 1000 `TextField`s, not the form library.
+
+`flutter_form_builder` is **O(N)**: every `FormBuilderField` (`AnimatedBuilder`
+/ `Actions` / `_ActionsScope` …) rebuilds on every keystroke because they all
+listen to the shared `FormBuilderState` — ~24·N rebuilds, quadratic-looking
+`pump`, and it **times out** (>90 s) around 1000 fields.
 
 The `keyed_form` design point that was flagged: **every** `KeyedFormField`
 adds a listener to the whole controller, so a write fires N listener callbacks
