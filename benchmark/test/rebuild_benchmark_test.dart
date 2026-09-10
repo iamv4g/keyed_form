@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:keyed_form_benchmark/scenario.dart';
 import 'package:keyed_form_benchmark/src/measure.dart';
 import 'package:keyed_form_benchmark/widget/form_builder_widget_harness.dart';
+import 'package:keyed_form_benchmark/widget/formz_widget_harness.dart';
 import 'package:keyed_form_benchmark/widget/keyed_form_widget_harness.dart';
 import 'package:keyed_form_benchmark/widget/reactive_forms_widget_harness.dart';
 import 'package:keyed_form_benchmark/widget/widget_harness.dart';
@@ -24,6 +25,7 @@ void main() {
     KeyedFormWidgetHarness.new,
     ReactiveFormsWidgetHarness.new,
     FormBuilderWidgetHarness.new,
+    FormzWidgetHarness.new,
   ];
 
   final flatSizes = [

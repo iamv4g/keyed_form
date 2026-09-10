@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:keyed_form_benchmark/model/formz_harness.dart';
 import 'package:keyed_form_benchmark/model/keyed_form_codegen_harness.dart';
 import 'package:keyed_form_benchmark/model/keyed_form_harness.dart';
 import 'package:keyed_form_benchmark/model/model_harness.dart';
@@ -22,6 +23,7 @@ void main() {
     KeyedFormCodegenHarness.new,
     () => KeyedFormCodegenHarness(scoped: true),
     ReactiveFormsHarness.new,
+    FormzHarness.new,
   ];
 
   test('codegen calibration — ${scenario.label}', () {

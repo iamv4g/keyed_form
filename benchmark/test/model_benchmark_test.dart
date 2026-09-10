@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:keyed_form_benchmark/model/formz_harness.dart';
 import 'package:keyed_form_benchmark/model/keyed_form_harness.dart';
 import 'package:keyed_form_benchmark/model/model_harness.dart';
 import 'package:keyed_form_benchmark/model/reactive_forms_harness.dart';
@@ -19,6 +20,7 @@ void main() {
     () => KeyedFormHarness(scoped: false),
     () => KeyedFormHarness(scoped: true),
     ReactiveFormsHarness.new,
+    FormzHarness.new,
   ];
 
   for (final scenario in Scenario.sweep) {

@@ -1,7 +1,7 @@
 name: keyed_form_benchmark
 description: >-
-  DX and performance comparison harness — keyed_form vs reactive_forms vs
-  flutter_form_builder. Not published.
+  DX and performance comparison harness — keyed_form vs reactive_forms,
+  flutter_form_builder and formz. Not published.
 publish_to: none
 version: 0.0.0
 
@@ -24,6 +24,11 @@ dependencies:
   # package:material_ui, which most projects have not adopted yet.
   flutter_form_builder: ">=10.3.0 <11.0.0"
   form_builder_validators: ^11.3.0
+  # Model-only (no widget layer): the typed, Bloc-native competitor. On the
+  # model benchmark + DX table directly; on the widget sweep via flutter_bloc
+  # (formz's own example pairing) — see lib/widget/formz_widget_harness.dart.
+  formz: ^0.8.1
+  flutter_bloc: ^9.1.1
 
 dev_dependencies:
   integration_test:

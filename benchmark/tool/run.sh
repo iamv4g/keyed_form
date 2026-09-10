@@ -21,9 +21,10 @@ flutter test test/codegen_calibration_test.dart --tags benchmark
 echo "==> widget layer — one keystroke"
 flutter test test/rebuild_benchmark_test.dart --tags benchmark
 
-echo "==> AOT: keyed_form write path + listener fan-out (pure Dart)"
+echo "==> AOT: keyed_form write path + listener fan-out + formz (pure Dart)"
 dart compile exe bin/attribution.dart -o /tmp/kf_attr && /tmp/kf_attr
 dart compile exe bin/fanout.dart -o /tmp/kf_fanout && /tmp/kf_fanout
+dart compile exe bin/formz_aot.dart -o /tmp/kf_formz && /tmp/kf_formz
 
 echo
 echo "JSON written to: benchmark/benchmark_results/"

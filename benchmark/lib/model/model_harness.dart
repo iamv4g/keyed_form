@@ -5,7 +5,8 @@ import '../scenario.dart';
 /// diff / notify work.
 ///
 /// `flutter_form_builder` has no model layer (it is widget-only), so it does
-/// not implement this — see `widget/` for its comparison.
+/// not implement this — see `widget/` for its comparison. `formz` is the
+/// opposite: model-only, so it implements this but not the widget harness.
 abstract class ModelHarness {
   String get name;
 
