@@ -3,11 +3,12 @@
 The Flutter binding for [`keyed_form`](../keyed_form).
 
 Wrap an editor subtree in a `KeyedFormScope` to publish its
-`KeyedFormController`, then address individual fields with `KeyedFormField`
-and lists with `KeyedFieldList` — each rebuilds only when its own slice of
-the form changes, not on every keystroke elsewhere in the tree.
-`KeyedTextBinding` and `KeyedFieldRegistry` cover caret-stable text input
-and scroll-to-first-error.
+`KeyedFormController`, then address individual fields with `KeyedFormField`,
+lists with `KeyedFieldList`, and any other slice (a dirty badge, a summary
+line) with `context.watchField` / `context.selectForm` — each rebuilds only
+when its own slice of the form changes, not on every keystroke elsewhere in
+the tree. `KeyedTextBinding` and `KeyedFieldRegistry` cover caret-stable text
+input and scroll-to-first-error.
 
 Re-exports all of `keyed_form` (and thus `keyed_form_core`), so a screen needs a
 single import.
@@ -60,6 +61,20 @@ KeyedFormScope<InvoiceForm>(
   when the row set changes (add/remove/reorder); edits *within* a row are
   the job of the `KeyedFormField`s inside it. The analogue of
   react-hook-form's `useFieldArray`.
+- `context.watchField(ref)` / `context.watchForm<Root>()` /
+  `context.selectForm((f) => slice)` — read a form slice in a widget's
+  `build()`, get the value back, and rebuild that widget only when the slice
+  changes. `watchField` is react-hook-form's `watch("name")` (returns the
+  value; its error/dirty are on the controller); `watchForm` is `watch()`;
+  `selectForm` is bloc's `context.select`. Non-reactive reads
+  (`form.field(x).value`, `form.isDirty` in an event handler) are the
+  `getValues` side — plain getters, no subscription.
+- `KeyedFormSelector<Root, T>` — the `context.selectForm` above wrapped in a
+  widget, to scope the rebuild to a subtree (with a non-rebuilt `child`) —
+  `provider`'s `Selector` alongside its `context.select`.
+- `KeyedFormBuilder<Root>` — rebuilds on *every* controller change; the
+  escape hatch for a widget that genuinely needs the whole state (a live
+  inspector).
 - `KeyedTextBinding` — a `TextEditingController` two-way bound to an
   external string value, keeping the caret and IME composing region stable
   as the value round-trips through the form controller. Design-system

@@ -218,22 +218,23 @@ class _StopCard extends StatelessWidget {
 }
 
 /// The list-level error (`stops` key) — not covered by a `KeyedFormField`,
-/// so it watches the whole controller.
+/// so it selects that one error off the controller.
 class _ListError extends StatelessWidget {
   const _ListError();
 
   @override
-  Widget build(BuildContext context) => KeyedFormBuilder<TourSchema>(
-    builder: (context, form) {
-      final error = form.visibleError(TourFields.stops.key);
-      if (error == null) return const SizedBox.shrink();
-      return Padding(
-        padding: const EdgeInsets.only(left: 12, top: 4),
-        child: Text(
-          error,
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
-        ),
-      );
-    },
-  );
+  Widget build(BuildContext context) {
+    final error = context.selectForm(
+      (KeyedFormController<TourSchema> form) =>
+          form.visibleError(TourFields.stops.key),
+    );
+    if (error == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, top: 4),
+      child: Text(
+        error,
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      ),
+    );
+  }
 }

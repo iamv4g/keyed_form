@@ -3,17 +3,20 @@
 // on wide viewports.
 
 import 'package:flutter/material.dart';
+import 'package:keyed_form_flutter/keyed_form_flutter.dart';
 
-import '../fields.dart';
 import 'tour_schema.dart';
 
 class DirtyBadge extends StatelessWidget {
   const DirtyBadge({super.key});
 
   @override
-  Widget build(BuildContext context) => KeyedFormBuilder<TourSchema>(
-    builder: (context, form) => AnimatedOpacity(
-      opacity: form.isDirty ? 1 : 0,
+  Widget build(BuildContext context) {
+    final dirty = context.selectForm(
+      (KeyedFormController<TourSchema> form) => form.isDirty,
+    );
+    return AnimatedOpacity(
+      opacity: dirty ? 1 : 0,
       duration: const Duration(milliseconds: 150),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -23,8 +26,8 @@ class DirtyBadge extends StatelessWidget {
           backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class StateInspector extends StatelessWidget {

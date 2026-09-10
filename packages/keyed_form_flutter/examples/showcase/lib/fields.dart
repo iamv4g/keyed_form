@@ -1,51 +1,11 @@
 // Design-system-agnostic helpers over `keyed_form_flutter`. The `Keyed*`
 // widgets are thin wrappers over [KeyedFormField] — `keyed_form_flutter` binds
-// *state*, these decide *presentation*. [KeyedFormBuilder] is the bridge for
-// widgets that need the whole controller, not one field.
+// *state*, these decide *presentation*. For widgets that observe the form but
+// aren't one field, use `keyed_form_flutter`'s [KeyedFormSelector] (a slice)
+// or [KeyedFormBuilder] (the whole controller).
 
 import 'package:flutter/material.dart';
 import 'package:keyed_form_flutter/keyed_form_flutter.dart';
-
-/// Rebuilds [builder] whenever the ambient [KeyedFormController] for [R]
-/// notifies — for widgets outside a [KeyedFormField] (a list-level error, a
-/// dirty badge, a state panel). `keyed_form`'s controller is a plain
-/// `ChangeNotifier`, so this is just an `addListener` / `setState`.
-class KeyedFormBuilder<R> extends StatefulWidget {
-  const KeyedFormBuilder({required this.builder, super.key});
-
-  final Widget Function(BuildContext context, KeyedFormController<R> form)
-  builder;
-
-  @override
-  State<KeyedFormBuilder<R>> createState() => _KeyedFormBuilderState<R>();
-}
-
-class _KeyedFormBuilderState<R> extends State<KeyedFormBuilder<R>> {
-  KeyedFormController<R>? _form;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final form = KeyedFormScope.controllerOf<R>(context);
-    if (!identical(form, _form)) {
-      _form?.removeListener(_rebuild);
-      _form = form..addListener(_rebuild);
-    }
-  }
-
-  void _rebuild() {
-    if (mounted) setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _form?.removeListener(_rebuild);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.builder(context, _form!);
-}
 
 class KeyedText<R> extends StatelessWidget {
   const KeyedText({

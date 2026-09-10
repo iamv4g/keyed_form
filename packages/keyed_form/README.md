@@ -36,6 +36,11 @@ facade (`set` / `update` / `value` / `error` / `dirty` / `touch()`, and
 `list()` for a list field). It is the everyday way in and out of a field;
 `.set(value)` rejects a wrongly-typed value at compile time.
 
+Reading the controller's getters (`form.value`, `form.field(x).value`,
+`form.isDirty`) is non-reactive — the `getValues` of this family, for event
+handlers. To *watch* a slice in a widget's `build`, use `keyed_form_flutter`'s
+`context.watchField` / `context.watchForm` / `context.selectForm`.
+
 ## Pieces
 
 - `KeyedFormController<Root>` — the draft, `errors`, `touched`, `revealed`,

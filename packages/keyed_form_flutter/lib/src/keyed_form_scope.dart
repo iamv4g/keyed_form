@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:keyed_form/keyed_form.dart';
 
 import 'keyed_field_registry.dart';
+import 'keyed_form_context.dart';
 
 /// Turns a stored error string into display text for the given context — the
 /// app's i18n switch. Return the input unchanged for schemas that already
@@ -11,24 +12,27 @@ typedef KeyedErrorTranslator =
 
 String _identity(BuildContext _, String error) => error;
 
-/// Publishes a [KeyedFormController], a [KeyedFieldRegistry] and an [KeyedErrorTranslator]
-/// down the tree for [KeyedFormField] / [KeyedFieldList] to find.
+/// Publishes a [KeyedFormController], a [KeyedFieldRegistry] and a
+/// [KeyedErrorTranslator] down the tree for [KeyedFormField] / [KeyedFieldList]
+/// to find, and installs the hidden reactive scope that backs
+/// `context.watchField` / `context.watchForm` / `context.selectForm`.
 ///
 /// This is an [InheritedWidget], not an [InheritedNotifier]: the controller is
 /// a `package:listen` `ChangeNotifier`, so widgets subscribe to it directly
-/// and rebuild selectively rather than all together.
+/// (via the field widgets or the `context.*` selectors) and rebuild
+/// selectively rather than all together.
 ///
 /// [translateError] must be a stable reference (a top-level or static
 /// function) — it is read non-reactively and a change to it does not
 /// re-propagate.
 class KeyedFormScope<Root> extends InheritedWidget {
-  const KeyedFormScope({
+  KeyedFormScope({
     required this.controller,
     required this.registry,
-    required super.child,
+    required Widget child,
     this.translateError = _identity,
     super.key,
-  });
+  }) : super(child: wrapWithReactiveScope<Root>(controller, child));
 
   final KeyedFormController<Root> controller;
   final KeyedFieldRegistry registry;
