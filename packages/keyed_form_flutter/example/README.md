@@ -9,15 +9,25 @@ rebuilds only when its own value or visible error changes.
 // from a `ks.object({...})` schema.
 KeyedForm<LoginSchema>(
   controller: form,       // a KeyedFormController<LoginSchema>
-  child: KeyedFormField.text<LoginSchema>(
-    field: LoginFields.email,       // a FieldRef<LoginSchema, String>
-    builder: (context, f, controller) => TextField(
-      controller: controller,
-      onTapOutside: (_) => f.onBlur(),    // touch-on-blur → error becomes visible
-      decoration: InputDecoration(
-        labelText: 'Email',
-        errorText: f.errorText,           // the visible, translated error, or null
-      ),
+  child: Builder(
+    builder: (context) => Column(
+      children: [
+        KeyedFormField.text<LoginSchema>(
+          field: LoginFields.email,       // a FieldRef<LoginSchema, String>
+          builder: (context, f, controller) => TextField(
+            controller: controller,
+            onTapOutside: (_) => f.onBlur(),  // touch-on-blur → error becomes visible
+            decoration: InputDecoration(
+              labelText: 'Email',
+              errorText: f.errorText,         // the visible, translated error, or null
+            ),
+          ),
+        ),
+        // on submit — validates and reveals the first error for you on failure:
+        SaveButton(
+          onPressed: () => form.handleSubmit(context, (value) => api.save(value)),
+        ),
+      ],
     ),
   ),
 )

@@ -23,3 +23,8 @@ Initial release.
   controller change).
 - `KeyedTextBinding` — a caret- and IME-stable `TextEditingController` binding.
 - `KeyedFieldRegistry` / `KeyedFieldAnchor` — scroll-to-first-error.
+- `form.handleSubmit(context, onValid, {onInvalid})` — the react-hook-form
+  `handleSubmit` of this family: wraps `KeyedFormController.submit` with a
+  default `onInvalid` that reveals the first visible error via the ambient
+  `KeyedFieldRegistry`; pass `onInvalid` to override for custom
+  invalid-handling (e.g. scrolling a lazily-built section list first).

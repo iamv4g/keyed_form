@@ -7,8 +7,9 @@ Wrap an editor subtree in a `KeyedForm` to publish its
 lists with `KeyedFieldList`, and any other slice (a dirty badge, a summary
 line) with `context.watchField` / `context.selectForm` — each rebuilds only
 when its own slice of the form changes, not on every keystroke elsewhere in
-the tree. `KeyedTextBinding` and `KeyedFieldRegistry` cover caret-stable text
-input and scroll-to-first-error.
+the tree. `KeyedTextBinding` covers caret-stable text input;
+`form.handleSubmit(context, onValid)` validates and reveals the first error
+for you on failure.
 
 Re-exports all of `keyed_form` (and thus `keyed_form_core`), so a screen needs a
 single import.
@@ -38,10 +39,20 @@ KeyedForm<InvoiceForm>(
           AddButton(onPressed: () => list.append(LineItem.create())),
         ]),
       ),
+      Builder(
+        builder: (context) => SaveButton(
+          onPressed: () => form.handleSubmit(context, (value) => api.save(value)),
+        ),
+      ),
     ],
   ),
 )
 ```
+
+`context` for `handleSubmit` must come from inside the `KeyedForm` subtree —
+the `context` a builder callback hands you (as above), not the `context` of
+the `State` that *created* the `KeyedForm` (that one sits above it in the
+tree). Same rule as Flutter's own `Form.of(context)`.
 
 ## Pieces
 
@@ -80,11 +91,16 @@ KeyedForm<InvoiceForm>(
   external string value, keeping the caret and IME composing region stable
   as the value round-trips through the form controller. Design-system
   agnostic: plug the controller it hands you into any text field.
+- `form.handleSubmit(context, onValid, {onInvalid})` — the react-hook-form
+  `handleSubmit` of this family: validates, and on success runs `onValid`
+  with the draft while toggling `submitting`; on failure its default
+  `onInvalid` reveals the first visible error via the ambient
+  `KeyedFieldRegistry`. Pass `onInvalid` to override for custom
+  invalid-handling (e.g. scrolling a lazily-built section list first).
 - `KeyedFieldRegistry` / `KeyedFieldAnchor` — maps `FieldKey`s to live
   field positions so a form can scroll to (and focus) a field it only
-  knows by identity —
-  `KeyedForm.registryOf<Root>(context).revealFirst(form.visibleErrorKeys)`
-  after a failed submit.
+  knows by identity; `handleSubmit` uses this for you — reach for it
+  directly only for a custom `onInvalid`.
 
 ## Scope
 
