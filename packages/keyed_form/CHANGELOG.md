@@ -23,3 +23,10 @@ Initial release.
   failure runs `onInvalid` with the visible error keys, if given. Returns
   whether `onValid` ran. `keyed_form_flutter`'s `handleSubmit` wraps this
   with a Flutter-aware default `onInvalid` (scroll to the first error).
+- `form.field(ref).isValidating` / `.validateAsync(check)` — per-field async
+  validation (e.g. "is this email already taken?"), for the case a
+  synchronous `resolver` can't cover. `validateAsync` toggles `isValidating`
+  around `check`, merges a non-null result in as a server error on that
+  field, and is safe against overlapping calls on the same field — a stale
+  response can't clobber a newer one's result or reopen the spinner. The raw
+  primitive underneath is `KeyedFormController.setFieldValidating`.

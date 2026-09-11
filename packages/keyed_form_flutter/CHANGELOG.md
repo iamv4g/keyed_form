@@ -8,7 +8,10 @@ Initial release.
   `translateErrorOf` read it back from a *descendant* context (the `context`
   a builder callback hands you — same rule as `Form.of(context)`).
 - `KeyedFormField` (and `KeyedFormField.text`) — binds one field reference and
-  rebuilds only when that field's value or visible error changes.
+  rebuilds only when that field's value, visible error, or `isValidating`
+  changes. `KeyedFieldState.isValidating` mirrors
+  `KeyedFormController.isValidating` — render a spinner from it while a
+  field's own async validation (`form.field(ref).validateAsync`) is running.
 - `KeyedFieldList` — binds one list field and rebuilds only when the row set
   changes.
 - `context.watchField(ref)` / `context.watchForm<Root>()` /
