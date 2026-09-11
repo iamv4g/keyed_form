@@ -29,6 +29,11 @@ form.field(InvoiceFields.customerEmail).set('ada@example.com');
 form.field(InvoiceFields.customerEmail).error; // null until touched / submitted
 
 form.validate(); // whole-draft validation, reveals every error
+
+await form.submit(
+  (value) => api.save(value), // runs only if valid; toggles `submitting`
+  onInvalid: (errorKeys) => print('rejected: $errorKeys'),
+);
 ```
 
 `form.field(ref)` returns a `FieldHandle` — a statically-typed per-field
@@ -45,8 +50,9 @@ handlers. To *watch* a slice in a widget's `build`, use `keyed_form_flutter`'s
 
 - `KeyedFormController<Root>` — the draft, `errors`, `touched`, `revealed`,
   `submitted`/`submitting`, plus `field(ref)` (per-field read/write facade),
-  `touch`, `validate`/`validateScopes`, `seed`/`reset`, and server-error
-  merging (`setServerErrors`/`setServerErrorPaths`).
+  `touch`, `validate`/`validateScopes`, `submit(onValid, {onInvalid})`,
+  `seed`/`reset`, and server-error merging
+  (`setServerErrors`/`setServerErrorPaths`).
 - `FieldHandle<Root, V>` — what `form.field(ref)` returns: `set`/`update`,
   `value`/`error`/`dirty`/`key`, `touch()`, and `list()` for a list field.
 - `KeyedFormMode` — when a field's error becomes *visible*

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:keyed_form_core/keyed_form_core.dart';
 import 'package:listen/listen.dart';
 import 'package:meta/meta.dart';
@@ -270,6 +272,31 @@ class KeyedFormController<Root> extends ChangeNotifier {
   void reveal(Iterable<FieldKey> scopes) {
     _revealed.addAll(scopes);
     notifyListeners();
+  }
+
+  /// Validates the draft. If valid, runs [onValid] with the current [value],
+  /// toggling [submitting] around it. If invalid, runs [onInvalid] (if given)
+  /// with [visibleErrorKeys] — [validate] has already made every error
+  /// visible. Returns whether [onValid] ran.
+  ///
+  /// In `keyed_form_flutter`, `form.handleSubmit(context, onValid)` is the
+  /// Flutter-aware wrapper: same shape, but its default [onInvalid] scrolls
+  /// to the first error via the ambient `KeyedFieldRegistry`.
+  Future<bool> submit(
+    FutureOr<void> Function(Root value) onValid, {
+    FutureOr<void> Function(Iterable<FieldKey> errorKeys)? onInvalid,
+  }) async {
+    if (!validate()) {
+      if (onInvalid != null) await onInvalid(visibleErrorKeys);
+      return false;
+    }
+    setSubmitting(true);
+    try {
+      await onValid(value);
+      return true;
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   void _revalidateForWrite(FieldKey writtenKey) =>

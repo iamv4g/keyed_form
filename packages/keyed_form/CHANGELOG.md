@@ -18,3 +18,8 @@ Initial release.
 - `KeyedFormList` — by-id list editing (append / insert / remove / move /
   update).
 - `KeyedFormSnapshot` — an immutable copy of the coarse state.
+- `form.submit(onValid, {onInvalid})` — validates, and on success runs
+  `onValid` with the current value while toggling `submitting` around it; on
+  failure runs `onInvalid` with the visible error keys, if given. Returns
+  whether `onValid` ran. `keyed_form_flutter`'s `handleSubmit` wraps this
+  with a Flutter-aware default `onInvalid` (scroll to the first error).

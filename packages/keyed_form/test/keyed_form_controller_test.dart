@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:keyed_form/keyed_form.dart';
 import 'package:test/test.dart';
 
@@ -130,6 +132,81 @@ void main() {
         ..setField(TripFields.name, 'ok')
         ..setField(TripFields.name, '');
       expect(form.visibleErrorFor(TripFields.name), 'name.required');
+    });
+  });
+
+  group('submit', () {
+    test('runs onValid with the current value and returns true when valid', () async {
+      final form = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+      Trip? received;
+
+      final ok = await form.submit((value) {
+        received = value;
+      });
+
+      expect(ok, isTrue);
+      expect(received, const Trip(name: 'Kyoto', days: 3));
+    });
+
+    test(
+      'does not run onValid, runs onInvalid with the visible error keys, '
+      'when invalid',
+      () async {
+        final form = flatForm(
+          mode: KeyedFormMode.onSubmit,
+          initial: const Trip(),
+        );
+        var onValidCalled = false;
+        Iterable<FieldKey>? keysSeen;
+
+        final ok = await form.submit(
+          (value) {
+            onValidCalled = true;
+          },
+          onInvalid: (keys) {
+            keysSeen = keys;
+          },
+        );
+
+        expect(ok, isFalse);
+        expect(onValidCalled, isFalse);
+        expect(
+          keysSeen?.map((k) => k.toPath()),
+          containsAll(<String>['name', 'days']),
+        );
+        // onInvalid gets exactly what validate() already made visible.
+        expect(keysSeen, form.visibleErrorKeys);
+      },
+    );
+
+    test('onInvalid is optional — an invalid draft just returns false', () async {
+      final form = flatForm(
+        mode: KeyedFormMode.onSubmit,
+        initial: const Trip(),
+      );
+      final ok = await form.submit((value) {});
+      expect(ok, isFalse);
+    });
+
+    test('toggles submitting around an async onValid, even on error', () async {
+      final valid = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+      final gate = Completer<void>();
+
+      final pending = valid.submit((value) async {
+        expect(valid.submitting, isTrue);
+        await gate.future;
+      });
+      expect(valid.submitting, isTrue);
+      gate.complete();
+      await pending;
+      expect(valid.submitting, isFalse);
+
+      final failing = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+      await expectLater(
+        failing.submit((value) => throw StateError('boom')),
+        throwsStateError,
+      );
+      expect(failing.submitting, isFalse);
     });
   });
 
