@@ -64,11 +64,13 @@ tree). Same rule as Flutter's own `Form.of(context)`.
   `translateErrorOf` read the ambient scope back from a *descendant*
   context, same rule as `Form.of(context)`.
 - `KeyedFormField<Root, V>` — binds one `FieldRef` to the ambient
-  controller and rebuilds only when that field's value or visible error
-  changes. `KeyedFormField.text` bundles a `KeyedTextBinding` for a
-  `String` field. Wraps its builder output in a `KeyedFieldAnchor`
+  controller and rebuilds only when that field's value, visible error, or
+  `isValidating` changes. `KeyedFormField.text` bundles a `KeyedTextBinding`
+  for a `String` field. Wraps its builder output in a `KeyedFieldAnchor`
   automatically (`anchor: false` to opt out) so it participates in
-  scroll-to-first-error without extra wiring.
+  scroll-to-first-error without extra wiring. `KeyedFieldState.isValidating`
+  mirrors `form.field(ref).isValidating` — render a spinner from it while a
+  field's own async check (`form.field(ref).validateAsync(...)`) is running.
 - `KeyedFieldList<Root, Item>` — binds one list field and rebuilds only
   when the row set changes (add/remove/reorder); edits *within* a row are
   the job of the `KeyedFormField`s inside it. The analogue of

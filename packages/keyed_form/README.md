@@ -41,6 +41,15 @@ facade (`set` / `update` / `value` / `error` / `dirty` / `touch()`, and
 `list()` for a list field). It is the everyday way in and out of a field;
 `.set(value)` rejects a wrongly-typed value at compile time.
 
+A field whose validation is a server round-trip (checking an email isn't
+already taken) toggles its own `isValidating` flag around the check:
+
+```dart
+await form.field(InvoiceFields.customerEmail).validateAsync(
+  () => api.checkEmailAvailable(form.field(InvoiceFields.customerEmail).value),
+);
+```
+
 Reading the controller's getters (`form.value`, `form.field(x).value`,
 `form.isDirty`) is non-reactive — the `getValues` of this family, for event
 handlers. To *watch* a slice in a widget's `build`, use `keyed_form_flutter`'s
@@ -54,7 +63,9 @@ handlers. To *watch* a slice in a widget's `build`, use `keyed_form_flutter`'s
   `seed`/`reset`, and server-error merging
   (`setServerErrors`/`setServerErrorPaths`).
 - `FieldHandle<Root, V>` — what `form.field(ref)` returns: `set`/`update`,
-  `value`/`error`/`dirty`/`key`, `touch()`, and `list()` for a list field.
+  `value`/`error`/`dirty`/`key`, `touch()`, `isValidating`/`validateAsync`
+  (a field's own async check, e.g. against a server), and `list()` for a
+  list field.
 - `KeyedFormMode` — when a field's error becomes *visible*
   (`onChange`/`onBlur`/`onTouched`/`onSubmit`/`all`), mirroring
   react-hook-form's modes. The controller never hides an error a submit
