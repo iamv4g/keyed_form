@@ -21,6 +21,7 @@ class KeyedFieldState<V> {
     required this.onBlur,
     required this.errorText,
     required this.fieldKey,
+    required this.isValidating,
   });
 
   /// The field's current value, or `null` when its path no longer resolves.
@@ -39,6 +40,12 @@ class KeyedFieldState<V> {
   /// This field's identity — handy for a `ValueKey` on the built control. The
   /// anchor is registered under it automatically; a builder does not need to.
   final FieldKey fieldKey;
+
+  /// Whether this field is currently mid-async-validation — render a spinner
+  /// alongside the control while this is `true`. Set it around your own
+  /// async check with `form.field(ref).validateAsync(...)` (or the
+  /// lower-level `form.setFieldValidating(key, ...)`).
+  final bool isValidating;
 }
 
 /// Binds one [FieldRef] to the ambient [KeyedFormController] (via [KeyedForm]) and
@@ -113,6 +120,7 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
   Object? _lastValue;
   String? _lastError;
   bool _hasField = true;
+  bool _lastValidating = false;
 
   @override
   void didChangeDependencies() {
@@ -138,10 +146,12 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
     final prevValue = _lastValue;
     final prevError = _lastError;
     final prevHasField = _hasField;
+    final prevValidating = _lastValidating;
     _readSnapshot();
     if (prevValue != _lastValue ||
         prevError != _lastError ||
-        prevHasField != _hasField) {
+        prevHasField != _hasField ||
+        prevValidating != _lastValidating) {
       if (mounted) setState(() {});
     }
   }
@@ -153,6 +163,7 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
     _lastValue = widget.field.getOrNull(controller.value);
     final raw = controller.visibleError(widget.field.key);
     _lastError = raw == null ? null : _translate(context, raw);
+    _lastValidating = controller.isValidating(widget.field.key);
   }
 
   @override
@@ -173,6 +184,7 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
         onBlur: () => controller.touch(widget.field.key),
         errorText: _lastError,
         fieldKey: widget.field.key,
+        isValidating: _lastValidating,
       ),
     );
     if (!widget.anchor) return child;

@@ -89,6 +89,36 @@ void main() {
     expect(builds['b'], bBuilds, reason: 'sibling field does not');
   });
 
+  testWidgets('isValidating flipping rebuilds the field, not a sibling', (
+    tester,
+  ) async {
+    final form = KeyedFormController<Pair>(
+      initialValue: const Pair(a: 'x', b: 'y'),
+      mode: KeyedFormMode.onChange,
+      resolver: _resolve,
+    );
+    final builds = <String, int>{};
+    await tester.pumpWidget(_host(form, builds));
+
+    final aBuilds = builds['a']!;
+    final bBuilds = builds['b']!;
+
+    form.setFieldValidating(_a.key, true);
+    await tester.pump();
+    expect(builds['a'], greaterThan(aBuilds), reason: 'isValidating true');
+    expect(builds['b'], bBuilds, reason: 'sibling field does not');
+
+    final aBuildsAfterOn = builds['a']!;
+    form.setFieldValidating(_a.key, false);
+    await tester.pump();
+    expect(
+      builds['a'],
+      greaterThan(aBuildsAfterOn),
+      reason: 'isValidating false',
+    );
+    expect(builds['b'], bBuilds, reason: 'sibling field still unaffected');
+  });
+
   testWidgets('blur wires KeyedFieldState.onBlur → controller.touch', (
     tester,
   ) async {
