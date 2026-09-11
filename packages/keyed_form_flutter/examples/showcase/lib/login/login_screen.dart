@@ -13,7 +13,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final registry = KeyedFieldRegistry();
   final form = KeyedFormController<LoginSchema>(
     initialValue: LoginSchema.create(),
     mode: KeyedFormMode.onTouched,
@@ -26,16 +25,20 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _signIn() {
-    if (!form.validate()) {
-      registry.revealFirst(form.visibleErrorKeys);
-      return;
-    }
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => TourBuilderScreen(email: form.value.email),
-      ),
-    );
+  // `context` must come from inside the `KeyedForm` subtree (a builder's own
+  // context, e.g. `KeyedFormSelector`'s or `KeyedFormField`'s) — not this
+  // State's own `context`, which sits above `KeyedForm` in the tree built
+  // below. Same rule as Flutter's own `Form.of(context)`.
+  Future<void> _signIn(BuildContext context) async {
+    await form.handleSubmit(context, (value) async {
+      await Future.delayed(const Duration(milliseconds: 600)); // simulate auth
+      if (!context.mounted) return;
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => TourBuilderScreen(email: value.email),
+        ),
+      );
+    });
   }
 
   @override
@@ -45,9 +48,8 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 380),
-          child: KeyedFormScope<LoginSchema>(
+          child: KeyedForm<LoginSchema>(
             controller: form,
-            registry: registry,
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
@@ -72,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: controller,
                     obscureText: true,
                     onTapOutside: (_) => f.onBlur(),
-                    onSubmitted: (_) => _signIn(),
+                    onSubmitted: (_) => _signIn(context),
                     decoration: InputDecoration(
                       labelText: 'Password',
                       errorText: f.errorText,
@@ -92,7 +94,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                FilledButton(onPressed: _signIn, child: const Text('Sign in')),
+                KeyedFormSelector<LoginSchema, bool>(
+                  selector: (f) => f.submitting,
+                  builder: (context, submitting, _) => FilledButton(
+                    onPressed: submitting ? null : () => _signIn(context),
+                    child: submitting
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Sign in'),
+                  ),
+                ),
               ],
             ),
           ),

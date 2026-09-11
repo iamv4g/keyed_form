@@ -28,4 +28,25 @@ void main() {
     expect(find.text('Tour builder'), findsOneWidget);
     expect(find.text('signed in as ada@example.com'), findsOneWidget);
   });
+
+  testWidgets('Sign in disables itself and shows a spinner while submitting', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const KeyedFormExampleApp());
+
+    await tester.enterText(find.byType(TextField).at(0), 'ada@example.com');
+    await tester.enterText(find.byType(TextField).at(1), 'lovelace1843');
+    await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+    await tester.pump(); // flip `submitting` and let the reactive scope rebuild
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(
+      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+      isNull,
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Tour builder'), findsOneWidget);
+  });
 }

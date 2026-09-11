@@ -41,6 +41,32 @@ void main() {
     expect(find.textContaining('Give the tour a name'), findsNWidgets(2));
   });
 
+  testWidgets('Save disables itself and shows a spinner while submitting', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 1000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(_app());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Save'));
+    await tester.pump(); // flip `submitting` and let the reactive scope rebuild
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(
+      tester
+          .widget<FloatingActionButton>(find.byType(FloatingActionButton))
+          .onPressed,
+      isNull,
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Save'), findsOneWidget);
+  });
+
   testWidgets('the 14-night cross-field rule fires on Save', (tester) async {
     tester.view.physicalSize = const Size(1400, 1200);
     tester.view.devicePixelRatio = 1.0;

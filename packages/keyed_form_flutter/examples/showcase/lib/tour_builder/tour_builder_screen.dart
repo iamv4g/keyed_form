@@ -19,7 +19,6 @@ class TourBuilderScreen extends StatefulWidget {
 }
 
 class _TourBuilderScreenState extends State<TourBuilderScreen> {
-  final registry = KeyedFieldRegistry();
   final _scroll = ScrollController();
 
   KeyedFormMode _mode = KeyedFormMode.onTouched;
@@ -93,16 +92,22 @@ class _TourBuilderScreenState extends State<TourBuilderScreen> {
   KeyedFormList<TourSchema, StopSchema> get _stops =>
       _form.field(TourFields.stops).list();
 
-  Future<void> _save() async {
-    if (_form.validate()) {
-      final tour = _form.value;
-      final nights = tour.stops.fold<int>(0, (sum, s) => sum + s.nights);
-      _toast(
-        'Saved "${tour.title}" — ${tour.stops.length} stops, $nights nights',
-      );
-      return;
-    }
-    await _revealFirstError();
+  // `context` must come from inside the `KeyedForm` subtree (the FAB's own
+  // builder context below) — not this State's own `context`, which sits
+  // above `KeyedForm` in the tree built below. Same rule as Flutter's own
+  // `Form.of(context)`.
+  Future<void> _save(BuildContext context) async {
+    await _form.submit(
+      (tour) async {
+        await Future.delayed(const Duration(milliseconds: 600)); // simulate save
+        if (!context.mounted) return;
+        final nights = tour.stops.fold<int>(0, (sum, s) => sum + s.nights);
+        _toast(
+          'Saved "${tour.title}" — ${tour.stops.length} stops, $nights nights',
+        );
+      },
+      onInvalid: (_) => _revealFirstError(context),
+    );
   }
 
   void _reset() {
@@ -124,14 +129,16 @@ class _TourBuilderScreenState extends State<TourBuilderScreen> {
 
   // ── scroll-to-first-error (two phase: jump the section, then reveal) ─────
 
-  Future<void> _revealFirstError() async {
+  Future<void> _revealFirstError(BuildContext context) async {
     final keys = _form.visibleErrorKeys.toList();
     if (keys.isEmpty) return;
     await _jumpToSection(_sectionForKey(keys.first));
-    if (!mounted) return;
+    if (!context.mounted) return;
     await WidgetsBinding.instance.endOfFrame;
-    if (!mounted) return;
-    registry.revealFirst(_form.visibleErrorKeys, alignment: 0.5);
+    if (!context.mounted) return;
+    KeyedForm.registryOf<TourSchema>(
+      context,
+    ).revealFirst(_form.visibleErrorKeys, alignment: 0.5);
   }
 
   int _sectionForKey(FieldKey key) {
@@ -213,9 +220,8 @@ class _TourBuilderScreenState extends State<TourBuilderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return KeyedFormScope<TourSchema>(
+    return KeyedForm<TourSchema>(
       controller: _form,
-      registry: registry,
       child: Scaffold(
         appBar: AppBar(
           title: widget.email == null
@@ -256,10 +262,19 @@ class _TourBuilderScreenState extends State<TourBuilderScreen> {
             const SizedBox(width: 8),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: _save,
-          icon: const Icon(Icons.check),
-          label: const Text('Save'),
+        floatingActionButton: KeyedFormSelector<TourSchema, bool>(
+          selector: (f) => f.submitting,
+          builder: (context, submitting, _) => FloatingActionButton.extended(
+            onPressed: submitting ? null : () => _save(context),
+            icon: submitting
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.check),
+            label: Text(submitting ? 'Saving…' : 'Save'),
+          ),
         ),
         body: LayoutBuilder(
           builder: (context, constraints) {
