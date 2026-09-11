@@ -210,6 +210,93 @@ void main() {
     });
   });
 
+  group('async field validation', () {
+    test('setFieldValidating toggles isValidating for that key only', () {
+      final form = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+      var notifications = 0;
+      form.addListener(() => notifications++);
+
+      form.setFieldValidating(TripFields.name.key, true);
+      expect(form.isValidating(TripFields.name.key), isTrue);
+      expect(form.isValidating(TripFields.days.key), isFalse);
+      expect(notifications, 1);
+
+      // no-op: already true.
+      form.setFieldValidating(TripFields.name.key, true);
+      expect(notifications, 1);
+
+      form.setFieldValidating(TripFields.name.key, false);
+      expect(form.isValidating(TripFields.name.key), isFalse);
+      expect(notifications, 2);
+    });
+
+    test('validateFieldAsync toggles isValidating around check()', () async {
+      final form = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+      final gate = Completer<String?>();
+
+      final pending = form.validateFieldAsync(
+        TripFields.name.key,
+        () => gate.future,
+      );
+      expect(form.isValidating(TripFields.name.key), isTrue);
+
+      gate.complete(null);
+      await pending;
+      expect(form.isValidating(TripFields.name.key), isFalse);
+    });
+
+    test('a non-null result is merged as a visible server error', () async {
+      final form = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+
+      await form.validateFieldAsync(
+        TripFields.name.key,
+        () async => 'name.taken',
+      );
+
+      expect(form.visibleErrorFor(TripFields.name), 'name.taken');
+    });
+
+    test('a null result leaves existing errors on the field alone', () async {
+      final form = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+      form.setServerErrorPaths({'name': 'name.taken'});
+
+      await form.validateFieldAsync(TripFields.name.key, () async => null);
+
+      expect(form.visibleErrorFor(TripFields.name), 'name.taken');
+    });
+
+    test(
+      'an older call cannot clobber a newer one on the same field',
+      () async {
+        final form = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+        final first = Completer<String?>();
+        final second = Completer<String?>();
+
+        final firstCall = form.validateFieldAsync(
+          TripFields.name.key,
+          () => first.future,
+        );
+        final secondCall = form.validateFieldAsync(
+          TripFields.name.key,
+          () => second.future,
+        );
+
+        // second settles first...
+        second.complete('second.error');
+        await secondCall;
+        expect(form.isValidating(TripFields.name.key), isFalse);
+        expect(form.visibleErrorFor(TripFields.name), 'second.error');
+
+        // ...then the stale first call settles: must not reopen the spinner
+        // state or overwrite the newer error.
+        first.complete('first.error');
+        await firstCall;
+        expect(form.isValidating(TripFields.name.key), isFalse);
+        expect(form.visibleErrorFor(TripFields.name), 'second.error');
+      },
+    );
+  });
+
   group('scoped validation', () {
     test('a write only revalidates its own subtree', () {
       final form = scopedForm(

@@ -58,6 +58,8 @@ class KeyedFormController<Root> extends ChangeNotifier {
   FieldErrors<String> _errors = const FieldErrors.empty();
   final Set<FieldKey> _touched = {};
   final Set<FieldKey> _revealed = {};
+  final Set<FieldKey> _validating = {};
+  final Map<FieldKey, int> _validationGeneration = {};
   bool _submitted = false;
   bool _submitting = false;
 
@@ -77,6 +79,10 @@ class KeyedFormController<Root> extends ChangeNotifier {
   bool get submitted => _submitted;
 
   bool get submitting => _submitting;
+
+  /// Whether [key] is currently mid-async-validation — see
+  /// [setFieldValidating] / [validateFieldAsync].
+  bool isValidating(FieldKey key) => _validating.contains(key);
 
   /// The fields the user has interacted with (write in [KeyedFormMode.onChange],
   /// blur elsewhere). Unmodifiable.
@@ -358,6 +364,8 @@ class KeyedFormController<Root> extends ChangeNotifier {
     _errors = const FieldErrors.empty();
     _touched.clear();
     _revealed.clear();
+    _validating.clear();
+    _validationGeneration.clear();
     _submitted = false;
     _submitting = false;
   }
@@ -392,5 +400,42 @@ class KeyedFormController<Root> extends ChangeNotifier {
     if (_submitting == value) return;
     _submitting = value;
     notifyListeners();
+  }
+
+  /// Toggles whether [key] is mid-async-validation (drives a per-field
+  /// spinner via [FieldHandle.isValidating] / `KeyedFieldState.isValidating`).
+  /// The resolver itself stays synchronous — call this around your own async
+  /// check (a server round-trip); [validateFieldAsync] does it for you.
+  void setFieldValidating(FieldKey key, bool value) {
+    final changed = value ? _validating.add(key) : _validating.remove(key);
+    if (!changed) return;
+    notifyListeners();
+  }
+
+  /// Runs [check] as [key]'s async validation, toggling [isValidating] around
+  /// it. A non-null result is merged in as a server error on [key] (see
+  /// [setServerErrors]) — `null` leaves existing errors on [key] alone, since
+  /// the sync [resolver] stays authoritative for the field's own format/
+  /// required checks.
+  ///
+  /// Safe against overlapping calls on the same [key]: if a newer call starts
+  /// before an older one resolves, the older one's result and its
+  /// `isValidating(false)` are discarded — only the latest call can settle it.
+  Future<void> validateFieldAsync(
+    FieldKey key,
+    FutureOr<String?> Function() check,
+  ) async {
+    final generation = (_validationGeneration[key] ?? 0) + 1;
+    _validationGeneration[key] = generation;
+    setFieldValidating(key, true);
+    try {
+      final error = await check();
+      if (_validationGeneration[key] != generation) return; // superseded
+      if (error != null) setServerErrors({key: error});
+    } finally {
+      if (_validationGeneration[key] == generation) {
+        setFieldValidating(key, false);
+      }
+    }
   }
 }

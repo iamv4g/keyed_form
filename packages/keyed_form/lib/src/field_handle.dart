@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:keyed_form_core/keyed_form_core.dart';
 
 import 'keyed_form_controller.dart';
@@ -38,6 +40,9 @@ class FieldHandle<Root, V> {
   /// Whether this field differs from the seeded baseline.
   bool get dirty => _form.differs(_ref);
 
+  /// Whether this field is currently mid-async-validation.
+  bool get isValidating => _form.isValidating(_ref.key);
+
   /// Writes [value] to the field (no-op if the path no longer resolves or the
   /// draft is unchanged).
   void set(V value) => _form.setField(_ref, value);
@@ -49,6 +54,11 @@ class FieldHandle<Root, V> {
 
   /// Marks the field touched and re-validates the subtree it belongs to.
   void touch() => _form.touch(_ref.key);
+
+  /// Runs [check] as this field's async validation — see
+  /// [KeyedFormController.validateFieldAsync].
+  Future<void> validateAsync(FutureOr<String?> Function() check) =>
+      _form.validateFieldAsync(_ref.key, check);
 }
 
 /// `form.field(ref)` — the entry point to [FieldHandle].
