@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:keyed_form_flutter/keyed_form_flutter.dart';
 
-import '../fields.dart';
 import '../tour_builder/tour_builder_screen.dart';
 import 'login_schema.dart';
 
@@ -23,6 +22,16 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     form.dispose();
     super.dispose();
+  }
+
+  // Stands in for a server round-trip ("is this email already registered?")
+  // — the case `isValidating` exists for: a field's own async validation,
+  // outside the synchronous `resolver`.
+  Future<String?> _checkEmailTaken(String email) async {
+    await Future.delayed(const Duration(milliseconds: 700));
+    return email.trim().toLowerCase() == 'taken@example.com'
+        ? 'This email is already registered'
+        : null;
   }
 
   // `context` must come from inside the `KeyedForm` subtree (a builder's own
@@ -63,9 +72,39 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 24),
-                KeyedText<LoginSchema>(
+                KeyedFormField.text<LoginSchema>(
                   field: LoginFields.email,
-                  label: 'Email',
+                  builder: (context, f, controller) {
+                    void checkEmail() {
+                      f.onBlur();
+                      form.field(LoginFields.email).validateAsync(
+                        () => _checkEmailTaken(f.value ?? ''),
+                      );
+                    }
+
+                    return TextField(
+                      controller: controller,
+                      onTapOutside: (_) => checkEmail(),
+                      onSubmitted: (_) => checkEmail(),
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        errorText: f.errorText,
+                        border: const OutlineInputBorder(),
+                        suffixIcon: f.isValidating
+                            ? const Padding(
+                                padding: EdgeInsets.all(14),
+                                child: SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              )
+                            : null,
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 16),
                 KeyedFormField.text<LoginSchema>(
