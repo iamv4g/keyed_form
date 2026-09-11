@@ -5,8 +5,8 @@ import 'package:keyed_form/keyed_form.dart';
 /// a field it only knows by identity — the "first validation error" case.
 /// Fields opt in by wrapping themselves in a [KeyedFieldAnchor].
 ///
-/// Create one registry per form (alongside the [KeyedFormController]) and pass it to
-/// [KeyedFormScope]; the registry holds no resources and needs no dispose.
+/// A [KeyedForm] creates and owns one of these itself — apps never construct
+/// one directly.
 class KeyedFieldRegistry {
   final Map<FieldKey, _KeyedFieldAnchorState> _anchors = {};
 

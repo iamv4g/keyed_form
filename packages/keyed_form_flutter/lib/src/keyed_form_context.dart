@@ -9,7 +9,7 @@ import 'package:keyed_form/keyed_form.dart';
 ///
 /// The react-hook-form `watch(name)` / bloc `context.select` of this family.
 /// The machinery mirrors `provider`'s `context.select`: a hidden inherited
-/// scope ([KeyedFormScope] installs it) whose element listens to the
+/// scope ([KeyedForm] installs it) whose element listens to the
 /// controller and, on each change, re-runs every dependent's registered
 /// predicate — a dependent rebuilds only if one says its slice moved.
 extension KeyedFormContext on BuildContext {
@@ -59,7 +59,7 @@ T _watchSlice<Root, T>(
   );
   final element = context
       .getElementForInheritedWidgetOfExactType<_KeyedFormReactiveScope<Root>>();
-  assert(element != null, 'No KeyedFormScope<$Root> ancestor found.');
+  assert(element != null, 'No KeyedForm<$Root> ancestor found.');
   final scope = element! as _KeyedFormReactiveScopeElement<Root>;
   final controller = scope.controller;
 
@@ -114,9 +114,10 @@ class _SliceDependency {
   bool clearScheduled = false;
 }
 
-/// Installed by [KeyedFormScope] just below itself. Never notifies via the
-/// widget-diff path (`updateShouldNotify` is `false`); every rebuild of a
-/// dependent goes through [_KeyedFormReactiveScopeElement.notifyClients].
+/// Installed by [KeyedForm] (via the private `_FormScope`) just below
+/// itself. Never notifies via the widget-diff path (`updateShouldNotify` is
+/// `false`); every rebuild of a dependent goes through
+/// [_KeyedFormReactiveScopeElement.notifyClients].
 class _KeyedFormReactiveScope<Root> extends InheritedWidget {
   const _KeyedFormReactiveScope({
     required this.controller,
@@ -229,8 +230,8 @@ class _KeyedFormReactiveScopeElement<Root> extends InheritedElement {
   }
 }
 
-/// Used by `KeyedFormScope` (same library) to install the reactive scope
-/// below itself.
+/// Used by the private `_FormScope` (`keyed_form.dart`) to install the
+/// reactive scope below itself.
 InheritedWidget wrapWithReactiveScope<Root>(
   KeyedFormController<Root> controller,
   Widget child,

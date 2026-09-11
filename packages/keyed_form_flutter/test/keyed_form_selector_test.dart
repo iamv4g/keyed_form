@@ -43,9 +43,8 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: KeyedFormScope<Pair>(
+          body: KeyedForm<Pair>(
             controller: form,
-            registry: KeyedFieldRegistry(),
             child: Column(
               children: [
                 KeyedFormSelector<Pair, String?>(
@@ -106,9 +105,8 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        home: KeyedFormScope<Pair>(
+        home: KeyedForm<Pair>(
           controller: form,
-          registry: KeyedFieldRegistry(),
           child: KeyedFormSelector<Pair, String?>(
             selector: (f) => f.field(_a).value,
             child: child,

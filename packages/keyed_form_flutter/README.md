@@ -2,7 +2,7 @@
 
 The Flutter binding for [`keyed_form`](../keyed_form).
 
-Wrap an editor subtree in a `KeyedFormScope` to publish its
+Wrap an editor subtree in a `KeyedForm` to publish its
 `KeyedFormController`, then address individual fields with `KeyedFormField`,
 lists with `KeyedFieldList`, and any other slice (a dirty badge, a summary
 line) with `context.watchField` / `context.selectForm` — each rebuilds only
@@ -16,9 +16,8 @@ single import.
 ## Usage
 
 ```dart
-KeyedFormScope<InvoiceForm>(
+KeyedForm<InvoiceForm>(
   controller: form,
-  registry: registry,
   child: Column(
     children: [
       KeyedFormField<InvoiceForm, String>(
@@ -46,11 +45,13 @@ KeyedFormScope<InvoiceForm>(
 
 ## Pieces
 
-- `KeyedFormScope<Root>` — an `InheritedWidget` (not `InheritedNotifier`:
-  the controller is a `package:listen` `ChangeNotifier`, so descendants
-  subscribe to it directly and rebuild selectively) publishing a
-  `KeyedFormController<Root>`, a `KeyedFieldRegistry`, and an optional
-  `KeyedErrorTranslator` for i18n.
+- `KeyedForm<Root>` — the `Form` of this family. Publishes a
+  `KeyedFormController<Root>` down the widget tree (the controller is a
+  `package:listen` `ChangeNotifier`, so descendants subscribe to it directly
+  and rebuild selectively) and owns a `KeyedFieldRegistry` internally — apps
+  never construct one. `KeyedForm.controllerOf` / `registryOf` /
+  `translateErrorOf` read the ambient scope back from a *descendant*
+  context, same rule as `Form.of(context)`.
 - `KeyedFormField<Root, V>` — binds one `FieldRef` to the ambient
   controller and rebuilds only when that field's value or visible error
   changes. `KeyedFormField.text` bundles a `KeyedTextBinding` for a
@@ -81,8 +82,9 @@ KeyedFormScope<InvoiceForm>(
   agnostic: plug the controller it hands you into any text field.
 - `KeyedFieldRegistry` / `KeyedFieldAnchor` — maps `FieldKey`s to live
   field positions so a form can scroll to (and focus) a field it only
-  knows by identity — `registry.revealFirst(form.visibleErrorKeys)` after
-  a failed submit.
+  knows by identity —
+  `KeyedForm.registryOf<Root>(context).revealFirst(form.visibleErrorKeys)`
+  after a failed submit.
 
 ## Scope
 

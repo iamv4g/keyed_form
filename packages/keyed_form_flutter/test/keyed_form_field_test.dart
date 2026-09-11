@@ -58,9 +58,8 @@ Widget _field(
 Widget _host(KeyedFormController<Pair> form, Map<String, int> builds) =>
     MaterialApp(
       home: Scaffold(
-        body: KeyedFormScope<Pair>(
+        body: KeyedForm<Pair>(
           controller: form,
-          registry: KeyedFieldRegistry(),
           child: Column(
             children: [_field('a', _a, builds), _field('b', _b, builds)],
           ),
@@ -104,9 +103,8 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: KeyedFormScope<Pair>(
+          body: KeyedForm<Pair>(
             controller: form,
-            registry: KeyedFieldRegistry(),
             child: Column(
               children: [
                 _field('a', _a, builds, focusNode: node),
@@ -137,24 +135,28 @@ void main() {
       initialValue: const Pair(a: 'x', b: 'y'),
       resolver: _resolve,
     );
-    final registry = KeyedFieldRegistry();
+    late KeyedFieldRegistry registry;
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: KeyedFormScope<Pair>(
+          body: KeyedForm<Pair>(
             controller: form,
-            registry: registry,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 1200),
-                  KeyedFormField<Pair, String>(
-                    field: _a,
-                    builder: (context, f) =>
-                        const SizedBox(height: 40, child: Text('a field')),
+            child: Builder(
+              builder: (context) {
+                registry = KeyedForm.registryOf<Pair>(context);
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 1200),
+                      KeyedFormField<Pair, String>(
+                        field: _a,
+                        builder: (context, f) =>
+                            const SizedBox(height: 40, child: Text('a field')),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ),
@@ -174,17 +176,21 @@ void main() {
       initialValue: const Pair(a: 'x', b: 'y'),
       resolver: _resolve,
     );
-    final registry = KeyedFieldRegistry();
+    late KeyedFieldRegistry registry;
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: KeyedFormScope<Pair>(
+          body: KeyedForm<Pair>(
             controller: form,
-            registry: registry,
-            child: KeyedFormField<Pair, String>(
-              field: _a,
-              anchor: false,
-              builder: (context, f) => const Text('a field'),
+            child: Builder(
+              builder: (context) {
+                registry = KeyedForm.registryOf<Pair>(context);
+                return KeyedFormField<Pair, String>(
+                  field: _a,
+                  anchor: false,
+                  builder: (context, f) => const Text('a field'),
+                );
+              },
             ),
           ),
         ),
@@ -219,9 +225,8 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        home: KeyedFormScope<Pair>(
+        home: KeyedForm<Pair>(
           controller: form,
-          registry: KeyedFieldRegistry(),
           child: KeyedFormField<Pair, String>(
             field: ghost,
             builder: (context, f) => const Text('should not show'),

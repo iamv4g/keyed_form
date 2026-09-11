@@ -2,8 +2,11 @@
 
 Initial release.
 
-- `KeyedFormScope` — publishes a `KeyedFormController` and a
-  `KeyedFieldRegistry` down the widget tree.
+- `KeyedForm` — the `Form` of this family. Publishes a `KeyedFormController`
+  down the widget tree and owns a `KeyedFieldRegistry` internally (apps never
+  construct one); `KeyedForm.controllerOf` / `registryOf` /
+  `translateErrorOf` read it back from a *descendant* context (the `context`
+  a builder callback hands you — same rule as `Form.of(context)`).
 - `KeyedFormField` (and `KeyedFormField.text`) — binds one field reference and
   rebuilds only when that field's value or visible error changes.
 - `KeyedFieldList` — binds one list field and rebuilds only when the row set

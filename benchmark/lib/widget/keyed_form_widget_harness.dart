@@ -6,7 +6,7 @@ import '../scenario.dart';
 import 'widget_harness.dart';
 
 /// `keyed_form_flutter`: one [KeyedFormField] per flat field under a
-/// [KeyedFormScope]. Each field subscribes to the controller and rebuilds
+/// [KeyedForm]. Each field subscribes to the controller and rebuilds
 /// only itself when its own value/error changes.
 class KeyedFormWidgetHarness extends WidgetHarness {
   KeyedFormWidgetHarness({this.scoped = false});
@@ -20,9 +20,8 @@ class KeyedFormWidgetHarness extends WidgetHarness {
   Widget build(Scenario scenario) {
     final controller = buildKfController(scenario, scoped: scoped);
     _controller = controller;
-    return KeyedFormScope<KfDraft>(
+    return KeyedForm<KfDraft>(
       controller: controller,
-      registry: KeyedFieldRegistry(),
       child: SingleChildScrollView(
         child: Column(
           children: [

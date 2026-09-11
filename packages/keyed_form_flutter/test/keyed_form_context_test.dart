@@ -37,11 +37,7 @@ KeyedFormController<Pair> _make([Pair initial = const Pair(a: 'x', b: 'y')]) =>
 
 Widget _host(KeyedFormController<Pair> form, Widget child) => MaterialApp(
   home: Scaffold(
-    body: KeyedFormScope<Pair>(
-      controller: form,
-      registry: KeyedFieldRegistry(),
-      child: child,
-    ),
+    body: KeyedForm<Pair>(controller: form, child: child),
   ),
 );
 
@@ -188,9 +184,8 @@ void main() {
           body: StatefulBuilder(
             builder: (context, setState) {
               setOuter = setState;
-              return KeyedFormScope<Pair>(
+              return KeyedForm<Pair>(
                 controller: useFirst ? form1 : form2,
-                registry: KeyedFieldRegistry(),
                 child: _Probe(n, (c) => seen = c.watchField(_a)),
               );
             },

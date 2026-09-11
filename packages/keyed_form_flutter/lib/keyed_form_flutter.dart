@@ -1,6 +1,6 @@
 /// The Flutter binding for `keyed_form`.
 ///
-/// Wrap an editor subtree in a [KeyedFormScope] to publish its
+/// Wrap an editor subtree in a [KeyedForm] to publish its
 /// [KeyedFormController], then:
 ///
 /// * bind an input with [KeyedFormField] / a list with [KeyedFieldList];
@@ -21,7 +21,7 @@ export 'package:keyed_form/keyed_form.dart';
 
 export 'src/keyed_text_binding.dart';
 export 'src/keyed_field_registry.dart';
-export 'src/keyed_form_scope.dart';
+export 'src/keyed_form.dart';
 export 'src/keyed_field_list.dart';
 export 'src/keyed_form_context.dart' show KeyedFormContext;
 export 'src/keyed_form_field.dart';

@@ -20,7 +20,7 @@ keyed_lens              (pure Dart, zero deps) — general-purpose keyed optics
 | [`keyed_form_schema`](packages/keyed_form_schema) | Declarative schema / validation DSL (`ks.*`); re-exports `keyed_form_core` |
 | [`keyed_form_gen`](packages/keyed_form_gen) | `build_runner` codegen: schema → data class + field references + validation |
 | [`keyed_form`](packages/keyed_form) | Pure-Dart form controller (`KeyedFormController`, react-hook-form analogue) |
-| [`keyed_form_flutter`](packages/keyed_form_flutter) | Flutter binding (`KeyedFormScope`, `KeyedFormField`, `KeyedFieldList`) |
+| [`keyed_form_flutter`](packages/keyed_form_flutter) | Flutter binding (`KeyedForm`, `KeyedFormField`, `KeyedFieldList`) |
 
 ## Development
 

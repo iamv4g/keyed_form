@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:keyed_form/keyed_form.dart';
 
 import 'keyed_form_context.dart';
-import 'keyed_form_scope.dart';
+import 'keyed_form.dart';
 
 /// Scopes a `context.selectForm` rebuild to a subtree — the `provider`
 /// `Selector` / `BlocSelector` of this family. Use it when the enclosing
@@ -60,7 +60,7 @@ class _KeyedFormBuilderState<Root> extends State<KeyedFormBuilder<Root>> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final form = KeyedFormScope.controllerOf<Root>(context);
+    final form = KeyedForm.controllerOf<Root>(context);
     if (!identical(form, _form)) {
       _form?.removeListener(_rebuild);
       _form = form..addListener(_rebuild);

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:keyed_form/keyed_form.dart';
 
-import 'keyed_form_scope.dart';
+import 'keyed_form.dart';
 
 /// Binds one list field to the ambient [KeyedFormController] and rebuilds only when
 /// the row set changes (add / remove / reorder) — edits *within* a row are the
@@ -42,7 +42,7 @@ class _KeyedFieldListState<Root, Item extends KeyedRow>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final controller = KeyedFormScope.controllerOf<Root>(context);
+    final controller = KeyedForm.controllerOf<Root>(context);
     if (!identical(_controller, controller)) {
       _controller?.removeListener(_onFormChange);
       _controller = controller;

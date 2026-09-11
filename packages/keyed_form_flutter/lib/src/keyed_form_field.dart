@@ -3,7 +3,7 @@ import 'package:keyed_form/keyed_form.dart';
 
 import 'keyed_text_binding.dart';
 import 'keyed_field_registry.dart';
-import 'keyed_form_scope.dart';
+import 'keyed_form.dart';
 
 /// Everything a field widget needs, computed from the ambient [KeyedFormController]
 /// for one [FieldRef] — the analogue of react-hook-form's `useController`
@@ -41,7 +41,7 @@ class KeyedFieldState<V> {
   final FieldKey fieldKey;
 }
 
-/// Binds one [FieldRef] to the ambient [KeyedFormController] (via [KeyedFormScope]) and
+/// Binds one [FieldRef] to the ambient [KeyedFormController] (via [KeyedForm]) and
 /// rebuilds **only** when that field's value or visible error changes — a
 /// write to a sibling field does not rebuild this one.
 ///
@@ -117,12 +117,12 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final scope = KeyedFormScope.of<Root>(context);
-    _registry = scope.registry;
-    _translate = scope.translateError;
-    if (!identical(_controller, scope.controller)) {
+    final controller = KeyedForm.controllerOf<Root>(context);
+    _registry = KeyedForm.registryOf<Root>(context);
+    _translate = KeyedForm.translateErrorOf<Root>(context);
+    if (!identical(_controller, controller)) {
       _controller?.removeListener(_onFormChange);
-      _controller = scope.controller;
+      _controller = controller;
       _controller!.addListener(_onFormChange);
     }
     _readSnapshot();
