@@ -1,5 +1,5 @@
 ---
-name: keyed-form
+name: keyed_form
 description: Build Flutter forms with the keyed_form library — KeyedFormController, the keyed_form_schema `ks.*` schema/validation DSL, keyed_form_gen codegen (@keyedSchema), and keyed_form_flutter widgets (KeyedForm, KeyedFormField, KeyedFieldList). Use whenever the user defines a form's data shape, adds or edits fields or validation rules (sync, async, or cross-field), builds a dynamic list of rows, freezes a field, derives one field from another, wires submit or scroll-to-first-error, or works in a project that depends on keyed_form / keyed_form_schema / keyed_form_flutter — even if they never say the word "form".
 ---
 
