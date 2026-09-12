@@ -477,6 +477,26 @@ class SchemaParser {
         }
       }
 
+      // A discriminated-union item always needs a working schemaName: its
+      // variant classes only get their own validate()/validateAsync() body
+      // when schemaName is non-empty (see DataClassGenerator), but the union
+      // *base* class's validate() unconditionally dispatches to each
+      // variant's — so an empty schemaName here doesn't just skip codegen,
+      // it leaves the base calling a method the variant never overrode
+      // (infinite recursion into the inherited base implementation) once the
+      // variant-schemaName-threading fix below applies. An inline union
+      // literal has no sibling schema reference to find above, so fall back
+      // to the nearest ancestor's schemaName — walking up past any plain
+      // nested object, which deliberately keeps schemaName empty itself.
+      if (nestedSchemaName.isEmpty) {
+        final unrolledItem = unrollExpression(itemArg);
+        if (unrolledItem.base is MethodInvocation &&
+            (unrolledItem.base as MethodInvocation).methodName.name ==
+                'discriminatedUnion') {
+          nestedSchemaName = _nearestSchemaName(parentClass);
+        }
+      }
+
       // Parse nested list item
       final nestedClass = _parseObjectExpression(
         itemArg,
@@ -643,7 +663,13 @@ class SchemaParser {
         final variantClass = _parseObjectExpression(
           valExpr,
           variantDefaultName,
-          valExpr is MethodInvocation ? valExpr.methodName.name : '',
+          // The root schema variable/function name, unchanged from the
+          // enclosing discriminatedUnion — every generated validate() in the
+          // tree calls back into the same root schema. Previously this
+          // passed the variant expression's own method name (e.g. the bare
+          // string 'object' for a `ks.object({...})` variant), which
+          // generated code referencing an undefined `object` identifier.
+          schemaName,
           isListItem: true,
           outClasses: outClasses,
           parentClass: unionClass,
@@ -699,6 +725,20 @@ class SchemaParser {
     _updateDescendantAncestors(unionClass, ancestorListItems, outClasses);
 
     return unionClass;
+  }
+
+  /// Walks up [parentClass] until it finds one with a non-empty
+  /// [ParsedClass.schemaName] — a plain nested/list-item object deliberately
+  /// carries an empty one (see the `list` branch of [_parseField]), so this
+  /// always bottoms out at the true root schema, however many such classes
+  /// sit in between.
+  String _nearestSchemaName(ParsedClass? cls) {
+    var current = cls;
+    while (current != null) {
+      if (current.schemaName.isNotEmpty) return current.schemaName;
+      current = current.parentClass;
+    }
+    return '';
   }
 
   String _inferClassName(String schemaName, String suffix) {

@@ -216,6 +216,27 @@ void main() {
         code,
         contains('static SectionFieldRefs section(SectionRef at) =>'),
       );
+
+      // Intermediate list accessors compose through `.asFieldRef` — the
+      // parent navigator (`day(at)`, `group(at)`, …) returns a
+      // DelegatingFieldRef subclass, and calling `.then()` directly on that
+      // resolves to the raw AffineLens method (returning an AffineLens, not
+      // a FieldRef) rather than the FieldRef extension type's `.then()`.
+      // Regression coverage: this used to be generated without
+      // `.asFieldRef`, which type-checks in this string-based test but fails
+      // `dart analyze` on the real output with `return_of_invalid_type`.
+      expect(
+        code,
+        contains('day(at).asFieldRef.then(DayFields.groups)'),
+      );
+      expect(
+        code,
+        contains('group(at).asFieldRef.then(GroupFields.sections)'),
+      );
+      expect(
+        code,
+        contains('section(at).asFieldRef.then(SectionFields.admissions)'),
+      );
       expect(
         code,
         contains('static AdmissionFieldRefs admission(AdmissionRef at) =>'),

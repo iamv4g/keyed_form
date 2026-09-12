@@ -301,7 +301,7 @@ void generateNestedNavigators({
         '$listAccessorName(${_refTypeName(parentSeg)} at) =>',
       );
       buffer.writeln(
-        '      $parentSeg(at).then($parentFieldsName.${field.name});',
+        '      $parentSeg(at).asFieldRef.then($parentFieldsName.${field.name});',
       );
       buffer.writeln();
       buffer.writeln(navDoc);
