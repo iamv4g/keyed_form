@@ -1,7 +1,7 @@
 name: keyed_form_benchmark
 description: >-
   DX and performance comparison harness — keyed_form vs reactive_forms,
-  flutter_form_builder and formz. Not published.
+  flutter_form_builder, formz and advanced_forms. Not published.
 publish_to: none
 version: 0.0.0
 
@@ -29,6 +29,8 @@ dependencies:
   # (formz's own example pairing) — see lib/widget/formz_widget_harness.dart.
   formz: ^0.8.1
   flutter_bloc: ^9.1.1
+  # Typed controller-per-field competitor (LeanCode), model + widget layers.
+  advanced_forms: ^0.2.1
 
 dev_dependencies:
   integration_test:
