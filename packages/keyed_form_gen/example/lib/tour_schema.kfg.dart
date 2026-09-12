@@ -76,11 +76,11 @@ class TourSchema {
   /// Validates this [TourSchema] against its schema. Pass [scope] (a `FieldKey`)
   /// to re-check only that subtree — see `KeyedFormController.scopeOf`.
   FieldErrors<String> validate([FieldKey? scope]) =>
-      tourSchema.validateValues(_validationValues, scope: scope);
+      _tourSchema.validateValues(_validationValues, scope: scope);
 
   /// Asynchronously validates this [TourSchema] against its schema.
   Future<FieldErrors<String>> validateAsync([FieldKey? scope]) =>
-      tourSchema.validateValuesAsync(_validationValues, scope: scope);
+      _tourSchema.validateValuesAsync(_validationValues, scope: scope);
 
   /// Static validator — assignable straight to `KeyedFormController.resolver`.
   static FieldErrors<String> validateData(

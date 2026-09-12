@@ -12,7 +12,7 @@
 
 import 'package:keyed_form_schema/keyed_form_schema.dart';
 
-final tourSchema = ks.object({
+final _tourSchema = ks.object({
   'title': ks.string().min(
     3,
     error: .text('Tour title needs at least 3 characters'),
@@ -60,7 +60,7 @@ void main() {
     'notes': null,
   };
 
-  _printErrors(tourSchema.validateMap(draft));
+  _printErrors(_tourSchema.validateMap(draft));
   //   title: Tour title needs at least 3 characters
   //   stops.['b'].city: City is required
   //   stops: A tour can be at most 14 nights        (10 + 7 = 17 nights)
@@ -74,5 +74,5 @@ void main() {
     ],
     'notes': 'Bring a warm coat',
   };
-  print('fixed draft is valid: ${tourSchema.validateMap(fixed).isEmpty}'); // true
+  print('fixed draft is valid: ${_tourSchema.validateMap(fixed).isEmpty}'); // true
 }

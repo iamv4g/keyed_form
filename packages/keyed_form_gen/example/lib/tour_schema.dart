@@ -12,7 +12,7 @@ import 'package:keyed_form_schema/keyed_form_schema.dart';
 
 part 'tour_schema.kfg.dart';
 
-final tourSchema = ks.object({
+final _tourSchema = ks.object({
   'title': ks.string(error: .text('Tour title is required')).min(
     3,
     error: .text('Tour title needs at least 3 characters'),

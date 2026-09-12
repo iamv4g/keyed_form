@@ -92,11 +92,11 @@ class LoginSchema {
   /// Validates this [LoginSchema] against its schema. Pass [scope] (a `FieldKey`)
   /// to re-check only that subtree — see `KeyedFormController.scopeOf`.
   FieldErrors<String> validate([FieldKey? scope]) =>
-      loginSchema.validateValues(_validationValues, scope: scope);
+      _loginSchema.validateValues(_validationValues, scope: scope);
 
   /// Asynchronously validates this [LoginSchema] against its schema.
   Future<FieldErrors<String>> validateAsync([FieldKey? scope]) =>
-      loginSchema.validateValuesAsync(_validationValues, scope: scope);
+      _loginSchema.validateValuesAsync(_validationValues, scope: scope);
 
   /// Static validator — assignable straight to `KeyedFormController.resolver`.
   static FieldErrors<String> validateData(

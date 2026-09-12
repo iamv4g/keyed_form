@@ -7,7 +7,7 @@ part 'tour_schema.kfg.dart';
 
 enum TourCategory { adventure, culture, food, nature }
 
-final tourSchema = ks
+final _tourSchema = ks
     .object({
       'title': ks.string(error: .text('Give the tour a name')).min(3),
       'category': ks.enums(TourCategory.values).defaultTo(TourCategory.culture),
