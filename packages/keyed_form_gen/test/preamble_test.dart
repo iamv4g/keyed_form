@@ -2,25 +2,22 @@ import 'package:keyed_form_gen/src/generators/preamble.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('generatedPreamble', () {
-    test(
-      'emits the ignore comment and every helper the generator relies on',
-      () {
-        final preamble = generatedPreamble();
+  test('generatedIgnoreComment is the // ignore_for_file: directive', () {
+    expect(generatedIgnoreComment, startsWith('// ignore_for_file:'));
+  });
 
-        expect(preamble, contains('// ignore_for_file:'));
-        expect(
-          preamble,
-          contains('bool _listEquals<T>(List<T>? a, List<T>? b)'),
-        );
-        expect(
-          preamble,
-          contains('bool _mapEquals<K, V>(Map<K, V>? a, Map<K, V>? b)'),
-        );
-        expect(preamble, contains('int _mapHash(Map<Object?, Object?>? map)'));
-        expect(preamble, contains('const _unset = Object();'));
-      },
-    );
+  group('generatedPreamble', () {
+    test('emits every helper the generator relies on', () {
+      final preamble = generatedPreamble();
+
+      expect(preamble, contains('bool _listEquals<T>(List<T>? a, List<T>? b)'));
+      expect(
+        preamble,
+        contains('bool _mapEquals<K, V>(Map<K, V>? a, Map<K, V>? b)'),
+      );
+      expect(preamble, contains('int _mapHash(Map<Object?, Object?>? map)'));
+      expect(preamble, contains('const _unset = Object();'));
+    });
 
     test('_listEquals-equivalent semantics: order-sensitive equality', () {
       // Documents the contract the emitted `_listEquals` source must satisfy

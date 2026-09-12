@@ -1,23 +1,29 @@
-/// The block emitted at the top of every generated part file: the
-/// ignore-comment, the `_listEquals`/`_mapEquals`/`_mapHash` helpers used by
-/// generated `operator ==`/`hashCode`, and the `_unset` sentinel used inside
-/// every generated `_XCopyWithImpl.call()`.
+/// The `// ignore_for_file:` comment shared by every generated part file.
+///
+/// Placed in the file *header* — before `part of`, the same slot generators
+/// like `freezed` use — rather than in the generated body: past `part of`,
+/// `dart format` is free to reflow the blank line separating it from
+/// whatever comes next, since it no longer sits at a fixed spot relative to
+/// the file's very first directive.
+///
+/// The helpers [generatedPreamble] emits are unconditional (regardless of
+/// whether the file's schema actually has a `List`/`Map` field), which is
+/// why this suppresses `unused_element`.
+const generatedIgnoreComment =
+    '// ignore_for_file: type=lint, unused_element, sort_constructors_first, avoid_equals_and_hash_code_on_mutable_classes, specify_nonobvious_property_types';
+
+/// The block emitted at the top of every generated part file's body: the
+/// `_listEquals`/`_mapEquals`/`_mapHash` helpers used by generated
+/// `operator ==`/`hashCode`, and the `_unset` sentinel used inside every
+/// generated `_XCopyWithImpl.call()`.
 ///
 /// Both the real `PartBuilder` ([KeyedFormGenerator], `lib/src/keyed_form_generator.dart`)
 /// and the standalone `tool/regen_schema.dart` must emit byte-identical
 /// output, so both call this instead of duplicating the string — the prior
 /// duplication was itself the cause of one generator fix landing in only one
 /// of the two places.
-///
-/// The helpers are emitted unconditionally (regardless of whether the file's
-/// schema actually has a `List`/`Map` field), which is why the ignore-comment
-/// suppresses `unused_element`.
 String generatedPreamble() {
   final buffer = StringBuffer();
-  buffer.writeln(
-    '// ignore_for_file: type=lint, unused_element, sort_constructors_first, avoid_equals_and_hash_code_on_mutable_classes, specify_nonobvious_property_types',
-  );
-  buffer.writeln();
 
   // List-field equality — order-sensitive (a List's identity includes order).
   buffer.writeln('bool _listEquals<T>(List<T>? a, List<T>? b) {');

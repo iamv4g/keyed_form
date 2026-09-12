@@ -102,15 +102,16 @@ void main(List<String> args) {
     }
 
     final partOf = "part of '${_basename(path)}';";
+    // Mirrors the real PartBuilder in lib/builder.dart byte-for-byte: the
+    // ignore-comment sits in the header, before `part of` (writeDescriptions
+    // is false there, so no generator-description banner follows it either).
     final full =
         '''
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-$partOf
+$generatedIgnoreComment
 
-// **************************************************************************
-// KeyedFormGenerator
-// **************************************************************************
+$partOf
 
 ${body.toString().trimRight()}
 ''';
