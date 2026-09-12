@@ -57,41 +57,36 @@ handlers. To *watch* a slice in a widget's `build`, use `keyed_form_flutter`'s
 
 ## Pieces
 
-- `KeyedFormController<Root>` — the draft, `errors`, `touched`, `revealed`,
-  `submitted`/`submitting`, plus `field(ref)` (per-field read/write facade),
-  `touch`, `validate`/`validateScopes`, `submit(onValid, {onInvalid})`,
-  `seed`/`reset`, and server-error merging
-  (`setServerErrors`/`setServerErrorPaths`).
-- `FieldHandle<Root, V>` — what `form.field(ref)` returns: `set`/`update`,
-  `value`/`error`/`dirty`/`key`, `touch()`, and `list()` for a list field.
-- `validateAsync(check, {timeout, onFailure})` — a field's own async check
-  (e.g. against a server). `isValidating` is true while it runs. A thrown
-  check, or one that exceeds `timeout`, sets `isFailedValidation` instead of
-  writing an error or propagating — a technical fault ("couldn't check the
-  value"), kept separate from `errors` ("the value is invalid") and cleared
-  by the next `validateAsync` call, not sticky.
-- `markReadOnly()`/`unmarkReadOnly()`/`isReadOnly` — freeze a field (and,
-  via `FieldKey` ancestor coverage, everything nested under it) against
-  `set`/`update`/list mutation, without affecting validation. Pass
-  `force: true` to write through the freeze. Read-only is configuration: it
-  survives `seed()`/`reset()`, unlike touched/revealed/validating/failed.
-- `form.addRelation(source, select, onChange)` — calls `onChange` with the
-  selected slice of `source` whenever it actually changes; registering it
-  does not itself call `onChange`. Returns a callback to unsubscribe — the
-  controller does not track or dispose relations for you.
-- `KeyedFormMode` — when a field's error becomes *visible*
-  (`onChange`/`onBlur`/`onTouched`/`onSubmit`/`all`). The controller never
-  hides an error a submit attempt surfaced, nor one explicitly `reveal`ed.
-- `KeyedFormResolver<Root>` / `KeyedFormScopeOf` — a validation function
-  `(draft, scope) => FieldErrors<String>`, and an optional
-  written-field-to-subtree mapper so a large aggregate can re-validate one
-  subtree at a time instead of the whole draft on every keystroke.
-- `KeyedFormList<Root, Item>` — a by-id editor for one list field
-  (`append`/`insert`/`removeById`/`move`/`updateById`, …). Obtain one with
-  `form.field(InvoiceFields.lineItems).list()`.
-- `KeyedFormSnapshot<Root>` — an immutable, `==`-comparable point-in-time
-  copy of the controller's coarse state, for a host that wants a value
-  rather than a listenable.
+| Piece | What it is |
+|---|---|
+| `KeyedFormController<Root>` | Owns the draft, `errors`, `touched`, `revealed`, `submitted`/`submitting`; `field(ref)`, `touch`, `validate`/`validateScopes`, `submit(onValid, {onInvalid})`, `seed`/`reset`, `setServerErrors`/`setServerErrorPaths` |
+| `FieldHandle<Root, V>` | What `form.field(ref)` returns — `set`/`update`, `value`/`error`/`dirty`/`key`, `touch()`, `list()` for a list field |
+| `validateAsync(check, {timeout, onFailure})` | A field's own async check (e.g. against a server) — see below |
+| `markReadOnly()` / `unmarkReadOnly()` / `isReadOnly` | Freeze a field against writes without affecting validation — see below |
+| `form.addRelation(source, select, onChange)` | Derive one field's value from another — see below |
+| `KeyedFormMode` | When a field's error becomes *visible* (`onChange`/`onBlur`/`onTouched`/`onSubmit`/`all`) |
+| `KeyedFormResolver<Root>` / `KeyedFormScopeOf` | Validation function `(draft, scope) => FieldErrors<String>`, and an optional written-field-to-subtree mapper |
+| `KeyedFormList<Root, Item>` | By-id editor for one list field — `append`/`insert`/`removeById`/`move`/`updateById`, …; obtain one with `form.field(ref).list()` |
+| `KeyedFormSnapshot<Root>` | Immutable, `==`-comparable point-in-time copy of the controller's coarse state, for a host that wants a value rather than a listenable |
+
+`KeyedFormMode` never hides an error a submit attempt surfaced, nor one
+explicitly `reveal`ed — the mode only governs visibility before one of those.
+
+**`validateAsync`** — `isValidating` is true while the check runs. A thrown
+check, or one that exceeds `timeout`, sets `isFailedValidation` instead of
+writing an error or propagating — a technical fault ("couldn't check the
+value"), kept separate from `errors` ("the value is invalid") and cleared by
+the next `validateAsync` call, not sticky.
+
+**Read-only** — freezing a key also freezes, by `FieldKey` ancestor
+coverage, everything nested under it. Pass `force: true` to `set`/`update`
+to write through the freeze. Read-only is configuration: it survives
+`seed()`/`reset()`, unlike touched/revealed/validating/failed.
+
+**`addRelation`** — calls `onChange` with the selected slice of `source`
+whenever it actually changes; registering it does not itself call
+`onChange`. Returns a callback to unsubscribe — the controller does not
+track or dispose relations for you.
 
 ## Scoped validation
 
