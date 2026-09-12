@@ -28,7 +28,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
         ),
       ],
     ),
-    mode: KeyedFormMode.onSubmit,
+    mode: KeyedFormMode.onTouched,
     resolver: ItinerarySchema.validateData,
   );
 

@@ -25,7 +25,7 @@ class _PackingListScreenState extends State<PackingListScreen> {
         PackingItemSchema.create(label: 'Rain jacket'),
       ],
     ),
-    mode: KeyedFormMode.onSubmit,
+    mode: KeyedFormMode.onTouched,
     resolver: PackingSchema.validateData,
   );
 
