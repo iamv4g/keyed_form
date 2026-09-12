@@ -61,7 +61,7 @@ final tourDays = Lens<Tour, List<Day>>.of(
 Compose with `.then(...)` / `.thenTotal(...)`; the behavior **and** the
 `FieldKey` concatenate, so a fully composed accessor knows its own identity.
 
-For schema-driven models, [`keyed_form_gen`](../keyed_form_gen) generates the
+For schema-driven models, [`keyed_form_gen`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_gen) generates the
 data classes plus a `<Root>Fields` namespace of these accessors from a
 `keyed_form_schema` declaration, so you don't hand-write them.
 

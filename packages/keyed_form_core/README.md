@@ -1,8 +1,8 @@
 # keyed_form_core
 
 Shared vocabulary for the `keyed_form` family. It sits on
-[`keyed_lens`](../keyed_lens) and below
-[`keyed_form_schema`](../keyed_form_schema) / [`keyed_form`](../keyed_form) —
+[`keyed_lens`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_lens) and below
+[`keyed_form_schema`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_schema) / [`keyed_form`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form) —
 you normally reach it transitively, not by importing it directly.
 
 ## What it gives the form layers

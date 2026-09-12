@@ -7,13 +7,13 @@ dependency.
 validation errors, and the touched/dirty/revealed bookkeeping that decides
 *when* an error is shown. Reads, writes, validation lookups and dirty
 checks all speak the `FieldRef` vocabulary from
-[`keyed_form_core`](../keyed_form_core), re-exported here — so UI code
+[`keyed_form_core`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_core), re-exported here — so UI code
 addresses a field the same way whether it is reading it, writing it, or
 asking for its error.
 
 Observability is `ChangeNotifier` from `package:listen` (the official
 Flutter-team observable package), so the controller can live in a plain
-Dart test, a CLI, or — via [`keyed_form_flutter`](../keyed_form_flutter) —
+Dart test, a CLI, or — via [`keyed_form_flutter`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter) —
 a widget tree.
 
 ## Usage
@@ -112,6 +112,6 @@ them), so keep calling `validate()` on submit.
 ## Scope
 
 Deliberately out of scope: widgets (that is
-[`keyed_form_flutter`](../keyed_form_flutter)), schema/validation DSL (that
-is [`keyed_form_schema`](../keyed_form_schema)), and any serialization format for the
+[`keyed_form_flutter`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter)), schema/validation DSL (that
+is [`keyed_form_schema`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_schema)), and any serialization format for the
 draft itself.

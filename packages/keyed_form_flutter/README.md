@@ -1,6 +1,6 @@
 # keyed_form_flutter
 
-The Flutter binding for [`keyed_form`](../keyed_form). Wrap an editor
+The Flutter binding for [`keyed_form`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form). Wrap an editor
 subtree in a `KeyedForm` to publish its `KeyedFormController`, then bind
 each field with `KeyedFormField`. Re-exports all of `keyed_form` (and thus
 `keyed_form_core`), so a screen needs one import:
@@ -134,10 +134,10 @@ field inside it — handles edits within a row.
 
 ## More
 
-- [`skills/keyed_form/SKILL.md`](../../skills/keyed_form/SKILL.md) — the
+- [`skills/keyed_form/SKILL.md`](https://github.com/iamv4g/keyed_form/blob/main/skills/keyed_form/SKILL.md) — the
   full API reference: cross-field and async validation, read-only fields,
   derived fields, scroll-to-first-error in a lazy list, and more.
-- [`examples/showcase`](examples/showcase) — a runnable sign-in + dynamic
+- [`examples/showcase`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter/examples/showcase) — a runnable sign-in + dynamic
   tour-builder app exercising the whole surface.
 
 ## Pieces

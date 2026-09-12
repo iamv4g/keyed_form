@@ -1,6 +1,6 @@
 # keyed_form_gen
 
-Code generator for [`keyed_form_schema`](../keyed_form_schema) schemas.
+Code generator for [`keyed_form_schema`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_schema) schemas.
 
 Automatically translates declarative `ks.object({...})` schemas into **Immutable Data Models**, **field-name keyed references** (`Fields` navigators + `FieldRefs` wrappers), and **type-safe validation functions**.
 

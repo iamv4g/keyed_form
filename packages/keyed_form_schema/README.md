@@ -32,4 +32,4 @@ final _invoiceSchema = ks.object({
 });
 ```
 
-Combine with [`keyed_form_gen`](../keyed_form_gen) to automatically generate Immutable Data Classes (`InvoiceSchema`, `LineItemSchema`), keyed optics (`InvoiceFields.lineItem(ref).description`), and validation methods (`InvoiceSchema.validateData(schema)` / `schema.validate()`).
+Combine with [`keyed_form_gen`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_gen) to automatically generate Immutable Data Classes (`InvoiceSchema`, `LineItemSchema`), keyed optics (`InvoiceFields.lineItem(ref).description`), and validation methods (`InvoiceSchema.validateData(schema)` / `schema.validate()`).
