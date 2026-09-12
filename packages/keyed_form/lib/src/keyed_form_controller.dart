@@ -59,6 +59,7 @@ class KeyedFormController<Root> extends ChangeNotifier {
   final Set<FieldKey> _touched = {};
   final Set<FieldKey> _revealed = {};
   final Set<FieldKey> _validating = {};
+  final Set<FieldKey> _failed = {};
   final Map<FieldKey, int> _validationGeneration = {};
   bool _submitted = false;
   bool _submitting = false;
@@ -83,6 +84,13 @@ class KeyedFormController<Root> extends ChangeNotifier {
   /// Whether [key] is currently mid-async-validation — see
   /// [setFieldValidating] / [validateFieldAsync].
   bool isValidating(FieldKey key) => _validating.contains(key);
+
+  /// Whether [key]'s async validation last ended in a technical failure (the
+  /// check threw, or exceeded its timeout) rather than a verdict about the
+  /// value — see [validateFieldAsync]. Orthogonal to [errors]: this reports
+  /// "the check couldn't run", not "the value is invalid". Not sticky — the
+  /// next [validateFieldAsync] call on the same key clears it, win or lose.
+  bool isFailedValidation(FieldKey key) => _failed.contains(key);
 
   /// The fields the user has interacted with (write in [KeyedFormMode.onChange],
   /// blur elsewhere). Unmodifiable.
@@ -365,6 +373,7 @@ class KeyedFormController<Root> extends ChangeNotifier {
     _touched.clear();
     _revealed.clear();
     _validating.clear();
+    _failed.clear();
     _validationGeneration.clear();
     _submitted = false;
     _submitting = false;
@@ -418,20 +427,38 @@ class KeyedFormController<Root> extends ChangeNotifier {
   /// the sync [resolver] stays authoritative for the field's own format/
   /// required checks.
   ///
+  /// A thrown error, or a run that exceeds [timeout], is a technical failure,
+  /// not a verdict about the value: [key] lands on [isFailedValidation]
+  /// instead of [errors], [onFailure] (if given) is called with the error and
+  /// stack trace, and the call still completes normally rather than
+  /// propagating. Not sticky — a later call on the same [key] clears it,
+  /// whether that call succeeds or fails in turn.
+  ///
   /// Safe against overlapping calls on the same [key]: if a newer call starts
-  /// before an older one resolves, the older one's result and its
-  /// `isValidating(false)` are discarded — only the latest call can settle it.
+  /// before an older one resolves, the older one's result — success or
+  /// failure — is discarded; only the latest call can settle it.
   Future<void> validateFieldAsync(
     FieldKey key,
-    FutureOr<String?> Function() check,
-  ) async {
+    FutureOr<String?> Function() check, {
+    Duration? timeout,
+    void Function(Object error, StackTrace stackTrace)? onFailure,
+  }) async {
     final generation = (_validationGeneration[key] ?? 0) + 1;
     _validationGeneration[key] = generation;
-    setFieldValidating(key, true);
+    final hadFailure = _failed.remove(key);
+    final startedValidating = _validating.add(key);
+    if (hadFailure || startedValidating) notifyListeners();
     try {
-      final error = await check();
+      final result = timeout == null
+          ? await check()
+          : await Future<String?>.sync(check).timeout(timeout);
       if (_validationGeneration[key] != generation) return; // superseded
-      if (error != null) setServerErrors({key: error});
+      if (result != null) setServerErrors({key: result});
+    } catch (error, stackTrace) {
+      if (_validationGeneration[key] != generation) return; // superseded
+      _failed.add(key);
+      onFailure?.call(error, stackTrace);
+      notifyListeners();
     } finally {
       if (_validationGeneration[key] == generation) {
         setFieldValidating(key, false);

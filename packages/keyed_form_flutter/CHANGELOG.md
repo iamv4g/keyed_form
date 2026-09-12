@@ -12,6 +12,10 @@ Initial release.
   changes. `KeyedFieldState.isValidating` mirrors
   `KeyedFormController.isValidating` — render a spinner from it while a
   field's own async validation (`form.field(ref).validateAsync`) is running.
+- `KeyedFieldState.isFailedValidation` mirrors
+  `KeyedFormController.isFailedValidation` — render a retry affordance from
+  it when a field's async check itself failed (it threw, or exceeded its
+  timeout), as distinct from `errorText`.
 - `KeyedFieldList` — binds one list field and rebuilds only when the row set
   changes.
 - `context.watchField(ref)` / `context.watchForm<Root>()` /

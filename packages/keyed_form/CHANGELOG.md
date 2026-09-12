@@ -30,3 +30,10 @@ Initial release.
   field, and is safe against overlapping calls on the same field — a stale
   response can't clobber a newer one's result or reopen the spinner. The raw
   primitive underneath is `KeyedFormController.setFieldValidating`.
+- `validateAsync` accepts optional `timeout` / `onFailure`. A thrown check, or
+  one that exceeds `timeout`, marks the field `isFailedValidation`
+  (`FieldHandle.isFailedValidation` / `KeyedFormController.isFailedValidation`)
+  instead of propagating out of the returned `Future` or writing into
+  `errors` — a technical fault is a different state from "the value is
+  invalid". Not sticky: the next `validateAsync` call on the same field
+  clears it, whether that call succeeds or fails in turn.

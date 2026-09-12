@@ -26,10 +26,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // Stands in for a server round-trip ("is this email already registered?")
   // — the case `isValidating` exists for: a field's own async validation,
-  // outside the synchronous `resolver`.
+  // outside the synchronous `resolver`. 'error@example.com' stands in for the
+  // check itself failing (a dropped connection, a 500) — the case
+  // `isFailedValidation` exists for, distinct from the value being invalid.
   Future<String?> _checkEmailTaken(String email) async {
     await Future.delayed(const Duration(milliseconds: 700));
-    return email.trim().toLowerCase() == 'taken@example.com'
+    final trimmed = email.trim().toLowerCase();
+    if (trimmed == 'error@example.com') {
+      throw Exception('email lookup failed');
+    }
+    return trimmed == 'taken@example.com'
         ? 'This email is already registered'
         : null;
   }
@@ -79,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       f.onBlur();
                       form.field(LoginFields.email).validateAsync(
                         () => _checkEmailTaken(f.value ?? ''),
+                        timeout: const Duration(seconds: 5),
                       );
                     }
 
@@ -89,6 +96,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         labelText: 'Email',
                         errorText: f.errorText,
+                        helperText: f.isFailedValidation
+                            ? "Couldn't verify this email — try again."
+                            : null,
                         border: const OutlineInputBorder(),
                         suffixIcon: f.isValidating
                             ? const Padding(
@@ -101,6 +111,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               )
+                            : f.isFailedValidation
+                            ? const Icon(Icons.warning_amber_rounded)
                             : null,
                       ),
                     );

@@ -295,6 +295,116 @@ void main() {
         expect(form.visibleErrorFor(TripFields.name), 'second.error');
       },
     );
+
+    test(
+      'a thrown check marks the field failed, not invalid, and does not '
+      'throw out of the returned Future',
+      () async {
+        final form = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+
+        await form.validateFieldAsync(
+          TripFields.name.key,
+          () async => throw Exception('boom'),
+        );
+
+        expect(form.isFailedValidation(TripFields.name.key), isTrue);
+        expect(form.isValidating(TripFields.name.key), isFalse);
+        expect(form.errors.byKey(TripFields.name.key), isNull);
+      },
+    );
+
+    test(
+      'a check exceeding timeout marks failed instead of hanging',
+      () async {
+        final form = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+        final neverCompletes = Completer<String?>();
+
+        await form.validateFieldAsync(
+          TripFields.name.key,
+          () => neverCompletes.future,
+          timeout: const Duration(milliseconds: 10),
+        );
+
+        expect(form.isFailedValidation(TripFields.name.key), isTrue);
+        expect(form.isValidating(TripFields.name.key), isFalse);
+      },
+    );
+
+    test('a successful retry after a failure clears isFailedValidation', () async {
+      final form = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+
+      await form.validateFieldAsync(
+        TripFields.name.key,
+        () async => throw Exception('boom'),
+      );
+      expect(form.isFailedValidation(TripFields.name.key), isTrue);
+
+      await form.validateFieldAsync(TripFields.name.key, () async => null);
+      expect(form.isFailedValidation(TripFields.name.key), isFalse);
+    });
+
+    test('onFailure is invoked with the thrown error and stack trace', () async {
+      final form = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+      final thrown = Exception('boom');
+      Object? capturedError;
+      StackTrace? capturedStack;
+
+      await form.validateFieldAsync(
+        TripFields.name.key,
+        () async => throw thrown,
+        onFailure: (error, stackTrace) {
+          capturedError = error;
+          capturedStack = stackTrace;
+        },
+      );
+
+      expect(capturedError, thrown);
+      expect(capturedStack, isNotNull);
+    });
+
+    test(
+      'a stale failure cannot clobber a newer success, and a stale success '
+      'cannot clobber a newer failure',
+      () async {
+        final form = flatForm(initial: const Trip(name: 'Kyoto', days: 3));
+
+        // Older call fails after a newer call already succeeded.
+        final firstA = Completer<String?>();
+        final secondA = Completer<String?>();
+        final firstCallA = form.validateFieldAsync(
+          TripFields.name.key,
+          () => firstA.future,
+        );
+        final secondCallA = form.validateFieldAsync(
+          TripFields.name.key,
+          () => secondA.future,
+        );
+        secondA.complete(null);
+        await secondCallA;
+        expect(form.isFailedValidation(TripFields.name.key), isFalse);
+        firstA.completeError(Exception('stale'));
+        await firstCallA;
+        expect(form.isFailedValidation(TripFields.name.key), isFalse);
+
+        // Older call succeeds after a newer call already failed.
+        final firstB = Completer<String?>();
+        final secondB = Completer<String?>();
+        final firstCallB = form.validateFieldAsync(
+          TripFields.name.key,
+          () => firstB.future,
+        );
+        final secondCallB = form.validateFieldAsync(
+          TripFields.name.key,
+          () => secondB.future,
+        );
+        secondB.completeError(Exception('newer failure'));
+        await secondCallB;
+        expect(form.isFailedValidation(TripFields.name.key), isTrue);
+        firstB.complete(null);
+        await firstCallB;
+        expect(form.isFailedValidation(TripFields.name.key), isTrue);
+      },
+    );
   });
 
   group('scoped validation', () {

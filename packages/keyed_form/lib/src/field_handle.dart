@@ -43,6 +43,11 @@ class FieldHandle<Root, V> {
   /// Whether this field is currently mid-async-validation.
   bool get isValidating => _form.isValidating(_ref.key);
 
+  /// Whether this field's last [validateAsync] ended in a technical failure
+  /// (threw, or exceeded its timeout) rather than a verdict about the value —
+  /// see [KeyedFormController.isFailedValidation].
+  bool get isFailedValidation => _form.isFailedValidation(_ref.key);
+
   /// Writes [value] to the field (no-op if the path no longer resolves or the
   /// draft is unchanged).
   void set(V value) => _form.setField(_ref, value);
@@ -57,8 +62,16 @@ class FieldHandle<Root, V> {
 
   /// Runs [check] as this field's async validation — see
   /// [KeyedFormController.validateFieldAsync].
-  Future<void> validateAsync(FutureOr<String?> Function() check) =>
-      _form.validateFieldAsync(_ref.key, check);
+  Future<void> validateAsync(
+    FutureOr<String?> Function() check, {
+    Duration? timeout,
+    void Function(Object error, StackTrace stackTrace)? onFailure,
+  }) => _form.validateFieldAsync(
+    _ref.key,
+    check,
+    timeout: timeout,
+    onFailure: onFailure,
+  );
 }
 
 /// `form.field(ref)` — the entry point to [FieldHandle].

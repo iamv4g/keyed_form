@@ -22,6 +22,7 @@ class KeyedFieldState<V> {
     required this.errorText,
     required this.fieldKey,
     required this.isValidating,
+    required this.isFailedValidation,
   });
 
   /// The field's current value, or `null` when its path no longer resolves.
@@ -46,6 +47,12 @@ class KeyedFieldState<V> {
   /// async check with `form.field(ref).validateAsync(...)` (or the
   /// lower-level `form.setFieldValidating(key, ...)`).
   final bool isValidating;
+
+  /// Whether this field's last `validateAsync` call ended in a technical
+  /// failure (it threw, or exceeded its timeout) rather than a verdict about
+  /// the value — render a retry affordance from this, distinct from
+  /// [errorText]. See `KeyedFormController.isFailedValidation`.
+  final bool isFailedValidation;
 }
 
 /// Binds one [FieldRef] to the ambient [KeyedFormController] (via [KeyedForm]) and
@@ -121,6 +128,7 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
   String? _lastError;
   bool _hasField = true;
   bool _lastValidating = false;
+  bool _lastFailed = false;
 
   @override
   void didChangeDependencies() {
@@ -147,11 +155,13 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
     final prevError = _lastError;
     final prevHasField = _hasField;
     final prevValidating = _lastValidating;
+    final prevFailed = _lastFailed;
     _readSnapshot();
     if (prevValue != _lastValue ||
         prevError != _lastError ||
         prevHasField != _hasField ||
-        prevValidating != _lastValidating) {
+        prevValidating != _lastValidating ||
+        prevFailed != _lastFailed) {
       if (mounted) setState(() {});
     }
   }
@@ -164,6 +174,7 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
     final raw = controller.visibleError(widget.field.key);
     _lastError = raw == null ? null : _translate(context, raw);
     _lastValidating = controller.isValidating(widget.field.key);
+    _lastFailed = controller.isFailedValidation(widget.field.key);
   }
 
   @override
@@ -185,6 +196,7 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
         errorText: _lastError,
         fieldKey: widget.field.key,
         isValidating: _lastValidating,
+        isFailedValidation: _lastFailed,
       ),
     );
     if (!widget.anchor) return child;
