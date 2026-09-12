@@ -2,8 +2,9 @@
 
 Initial release. Shared vocabulary for the `keyed_form` family:
 
-- `FieldRef` / `StrictFieldRef` / `VariantRef` — field-reference aliases over
-  the `keyed_lens` optics.
+- `FieldRef` / `StrictFieldRef` / `VariantRef` — field-reference `extension
+  type`s over the `keyed_lens` optics, so IDE hover/autocomplete shows the
+  field-reference vocabulary instead of the underlying optic types.
 - `DelegatingFieldRef` — base class the generated `<X>FieldRefs` wrappers
   extend.
 - `.whenPresent()` / `.narrow()` / `.at()` extensions on `FieldRef`.
