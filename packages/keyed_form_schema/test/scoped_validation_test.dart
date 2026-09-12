@@ -5,32 +5,34 @@ import 'package:test/test.dart';
 /// subtree at `scope` and return errors *only* at or under it — the contract
 /// `KeyedFormController._spliceScope` asserts.
 void main() {
-  final schema = ks.object({
-    'title': ks.string().min(3, error: .text('title short')),
-    'address': ks.object({
-      'zip': ks.string().min(5, error: .text('zip short')),
-      'city': ks.string().min(2, error: .text('city short')),
-    }),
-    'stops': ks
-        .list(
-          ks.object(className: 'Stop', {
-            'city': ks.string(error: .text('stop city required')).min(1),
-            'nights': ks.int().min(1, error: .text('nights >= 1')),
-          }),
-        )
-        .min(1, error: .text('add a stop')),
-  }).refine(
-    (data) {
-      final stops = (data['stops'] as List?) ?? const [];
-      final total = stops.fold<int>(
-        0,
-        (sum, s) => sum + (((s as Map)['nights'] as int?) ?? 0),
+  final schema = ks
+      .object({
+        'title': ks.string().min(3, error: .text('title short')),
+        'address': ks.object({
+          'zip': ks.string().min(5, error: .text('zip short')),
+          'city': ks.string().min(2, error: .text('city short')),
+        }),
+        'stops': ks
+            .list(
+              ks.object(className: 'Stop', {
+                'city': ks.string(error: .text('stop city required')).min(1),
+                'nights': ks.int().min(1, error: .text('nights >= 1')),
+              }),
+            )
+            .min(1, error: .text('add a stop')),
+      })
+      .refine(
+        (data) {
+          final stops = (data['stops'] as List?) ?? const [];
+          final total = stops.fold<int>(
+            0,
+            (sum, s) => sum + (((s as Map)['nights'] as int?) ?? 0),
+          );
+          return total <= 5;
+        },
+        path: 'stops',
+        error: .text('at most 5 nights'),
       );
-      return total <= 5;
-    },
-    path: 'stops',
-    error: .text('at most 5 nights'),
-  );
 
   Map<String, Object?> badDraft() => {
     'title': 'x',
@@ -43,20 +45,22 @@ void main() {
 
   void assertAllUnder(FieldErrors<String> errors, FieldKey scope) {
     for (final k in errors.keys) {
-      expect(scope.contains(k), isTrue,
-          reason: '$k is outside scope $scope');
+      expect(scope.contains(k), isTrue, reason: '$k is outside scope $scope');
     }
   }
 
   test('no scope validates the whole draft', () {
     final errors = schema.validateMap(badDraft());
-    expect(errors.keys.map((k) => k.toPath()), containsAll(<String>[
-      'title',
-      "address.zip",
-      "stops.['a'].city",
-      "stops.['b'].city",
-      'stops', // the 8 > 5 refinement
-    ]));
+    expect(
+      errors.keys.map((k) => k.toPath()),
+      containsAll(<String>[
+        'title',
+        "address.zip",
+        "stops.['a'].city",
+        "stops.['b'].city",
+        'stops', // the 8 > 5 refinement
+      ]),
+    );
   });
 
   test('scope = a flat field checks only that field', () {
@@ -86,11 +90,17 @@ void main() {
     final scope = FieldKey.name('stops') + FieldKey.id('a');
     final errors = schema.validateMap(badDraft(), scope: scope);
     expect(errors.byKey(scope + FieldKey.name('city')), 'stop city required');
-    expect(errors.byKey(FieldKey.name('stops')), isNull,
-        reason: 'the min-items / refinement error is out of a row scope');
-    expect(errors.byKey(
-        FieldKey.name('stops') + FieldKey.id('b') + FieldKey.name('city')),
-        isNull);
+    expect(
+      errors.byKey(FieldKey.name('stops')),
+      isNull,
+      reason: 'the min-items / refinement error is out of a row scope',
+    );
+    expect(
+      errors.byKey(
+        FieldKey.name('stops') + FieldKey.id('b') + FieldKey.name('city'),
+      ),
+      isNull,
+    );
     assertAllUnder(errors, scope);
   });
 

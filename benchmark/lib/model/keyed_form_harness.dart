@@ -27,7 +27,10 @@ class KeyedFormHarness extends ModelHarness {
       _form.field(kfFieldRef(index)).set(value);
 
   @override
-  void addRow(RowData row) => _form.field(kfRowsRef).list().append(
+  void addRow(RowData row) => _form
+      .field(kfRowsRef)
+      .list()
+      .append(
         KfRow(
           clientId: 'r${DateTime.now().microsecondsSinceEpoch}',
           city: row.city,
@@ -49,8 +52,7 @@ class KeyedFormHarness extends ModelHarness {
   bool get isDirty => _form.isDirty;
 
   @override
-  String fieldValue(int index) =>
-      _form.field(kfFieldRef(index)).value ?? '';
+  String fieldValue(int index) => _form.field(kfFieldRef(index)).value ?? '';
 
   @override
   int get rowCount => (kfRowsRef.getOrNull(_form.value) ?? const []).length;

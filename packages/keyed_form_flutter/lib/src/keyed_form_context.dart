@@ -130,7 +130,8 @@ class _KeyedFormReactiveScope<Root> extends InheritedWidget {
   bool updateShouldNotify(_KeyedFormReactiveScope<Root> oldWidget) => false;
 
   @override
-  InheritedElement createElement() => _KeyedFormReactiveScopeElement<Root>(this);
+  InheritedElement createElement() =>
+      _KeyedFormReactiveScopeElement<Root>(this);
 }
 
 class _KeyedFormReactiveScopeElement<Root> extends InheritedElement {

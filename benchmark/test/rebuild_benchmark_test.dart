@@ -72,23 +72,32 @@ void main() {
 
         debugOnRebuildDirtyWidget = null;
 
-        final top = (byType.entries.toList()
-              ..sort((a, b) => b.value.compareTo(a.value)))
-            .take(4)
-            .map((e) => '${e.key}:${e.value}')
-            .join('  ');
+        final top =
+            (byType.entries.toList()
+                  ..sort((a, b) => b.value.compareTo(a.value)))
+                .take(4)
+                .map((e) => '${e.key}:${e.value}')
+                .join('  ');
 
         report
-          ..add(Sample('${harness.name} · ${scenario.label} · rebuilds',
-              [total.toDouble()]))
-          ..add(Sample('${harness.name} · ${scenario.label} · pump µs',
-              [sw.elapsedMicroseconds.toDouble()]));
+          ..add(
+            Sample('${harness.name} · ${scenario.label} · rebuilds', [
+              total.toDouble(),
+            ]),
+          )
+          ..add(
+            Sample('${harness.name} · ${scenario.label} · pump µs', [
+              sw.elapsedMicroseconds.toDouble(),
+            ]),
+          );
 
         // ignore: avoid_print
-        print('${harness.name.padRight(22)} ${scenario.label.padLeft(5)}  '
-            'rebuilds=${total.toString().padLeft(5)}  '
-            'pump=${(sw.elapsedMicroseconds / 1000).toStringAsFixed(2).padLeft(7)}ms   '
-            '[$top]');
+        print(
+          '${harness.name.padRight(22)} ${scenario.label.padLeft(5)}  '
+          'rebuilds=${total.toString().padLeft(5)}  '
+          'pump=${(sw.elapsedMicroseconds / 1000).toStringAsFixed(2).padLeft(7)}ms   '
+          '[$top]',
+        );
       });
     }
   }

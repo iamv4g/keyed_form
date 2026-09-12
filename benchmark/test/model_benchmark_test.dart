@@ -33,12 +33,14 @@ void main() {
         final lib = make().name;
 
         // build: construct a fresh form of this size.
-        report.add(measure(
-          '$lib · build',
-          () => make()..build(scenario),
-          warmup: 50,
-          iterations: 150,
-        ));
+        report.add(
+          measure(
+            '$lib · build',
+            () => make()..build(scenario),
+            warmup: 50,
+            iterations: 150,
+          ),
+        );
 
         // setField: the hot path — one valid write + whatever the library
         // does synchronously (revalidate / dirty / notify).
@@ -46,10 +48,12 @@ void main() {
           final h = make()..build(scenario);
           final mid = scenario.fieldCount ~/ 2;
           var n = 0;
-          report.add(measure(
-            '$lib · setField (mid)',
-            () => h.setField(mid, 'v${n++ & 1023}'),
-          ));
+          report.add(
+            measure(
+              '$lib · setField (mid)',
+              () => h.setField(mid, 'v${n++ & 1023}'),
+            ),
+          );
           h.dispose();
         }
 
@@ -65,15 +69,17 @@ void main() {
         // list churn (row scenarios only).
         if (scenario.rowCount > 0) {
           final h = make()..build(scenario);
-          report.add(measure(
-            '$lib · addRow + removeRow',
-            () {
-              h.addRow(const RowData(city: 'X', nights: 1));
-              h.removeRow(h.rowCount - 1);
-            },
-            warmup: 50,
-            iterations: 100,
-          ));
+          report.add(
+            measure(
+              '$lib · addRow + removeRow',
+              () {
+                h.addRow(const RowData(city: 'X', nights: 1));
+                h.removeRow(h.rowCount - 1);
+              },
+              warmup: 50,
+              iterations: 100,
+            ),
+          );
           h.dispose();
         }
       }

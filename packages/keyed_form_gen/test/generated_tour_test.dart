@@ -74,8 +74,11 @@ void main() {
       final scoped = tour.validate(hotelKey);
 
       expect(whole.byKey(FieldKey.name('title')), isNotNull);
-      expect(scoped.byKey(FieldKey.name('title')), isNull,
-          reason: 'title is outside the hotel scope');
+      expect(
+        scoped.byKey(FieldKey.name('title')),
+        isNull,
+        reason: 'title is outside the hotel scope',
+      );
       for (final k in scoped.keys) {
         expect(hotelKey.contains(k), isTrue);
       }
@@ -83,14 +86,18 @@ void main() {
     });
 
     test('TourSchema.scopeOf routes a hotel-field write to the hotel row', () {
-      final hotelFieldKey = FieldKey.name('hotels') +
+      final hotelFieldKey =
+          FieldKey.name('hotels') +
           FieldKey.id('h1') +
           FieldKey.name('hotelName');
       expect(
         TourSchema.scopeOf(hotelFieldKey),
         FieldKey.name('hotels') + FieldKey.id('h1'),
       );
-      expect(TourSchema.scopeOf(FieldKey.name('title')), FieldKey.name('title'));
+      expect(
+        TourSchema.scopeOf(FieldKey.name('title')),
+        FieldKey.name('title'),
+      );
     });
   });
 

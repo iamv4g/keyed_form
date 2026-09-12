@@ -33,7 +33,10 @@ class FormzHarness extends ModelHarness {
     final seeded = seedRows(scenario.rowCount);
     _seedRowCount = seeded.length;
     _form = _FormzForm(
-      [for (var i = 0; i < scenario.fieldCount; i++) const FlatInput.pure('val')],
+      [
+        for (var i = 0; i < scenario.fieldCount; i++)
+          const FlatInput.pure('val'),
+      ],
       [for (final r in seeded) _RowInput(CityInput.pure(r.city), r.nights)],
     );
   }
@@ -45,10 +48,10 @@ class FormzHarness extends ModelHarness {
   }
 
   @override
-  void addRow(RowData row) => _form = _FormzForm(
-        _form.fields,
-        [..._form.rows, _RowInput(CityInput.dirty(row.city), row.nights)],
-      );
+  void addRow(RowData row) => _form = _FormzForm(_form.fields, [
+    ..._form.rows,
+    _RowInput(CityInput.dirty(row.city), row.nights),
+  ]);
 
   @override
   void removeRow(int index) {
@@ -56,8 +59,7 @@ class FormzHarness extends ModelHarness {
     _form = _FormzForm(_form.fields, [..._form.rows]..removeAt(index));
   }
 
-  int get _totalNights =>
-      _form.rows.fold(0, (sum, r) => sum + r.nights);
+  int get _totalNights => _form.rows.fold(0, (sum, r) => sum + r.nights);
 
   @override
   bool get isValid => _form.isValid && _totalNights <= _maxNights;
@@ -90,6 +92,8 @@ class _FormzForm with FormzMixin {
   final List<_RowInput> rows;
 
   @override
-  List<FormzInput<dynamic, dynamic>> get inputs =>
-      [...fields, for (final r in rows) r.city];
+  List<FormzInput<dynamic, dynamic>> get inputs => [
+    ...fields,
+    for (final r in rows) r.city,
+  ];
 }

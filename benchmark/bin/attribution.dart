@@ -76,13 +76,19 @@ void main() {
     changed == seed;
   });
 
-  final toMap = bench('obj.toMap()              [N-entry map alloc]',
-      () => seed.toMap());
+  final toMap = bench(
+    'obj.toMap()              [N-entry map alloc]',
+    () => seed.toMap(),
+  );
   final m = seed.toMap();
-  final vmap = bench('schema.validateMap(map)   [old: map + walk]',
-      () => benchSchema.validateMap(m));
-  final vdata = bench('Bench100Schema.validateData(obj)  [new: list + walk]',
-      () => Bench100Schema.validateData(seed));
+  final vmap = bench(
+    'schema.validateMap(map)   [old: map + walk]',
+    () => benchSchema.validateMap(m),
+  );
+  final vdata = bench(
+    'Bench100Schema.validateData(obj)  [new: list + walk]',
+    () => Bench100Schema.validateData(seed),
+  );
 
   print(
     '\n  validateData (new path) ${vdata.toStringAsFixed(2)} µs is '

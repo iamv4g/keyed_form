@@ -1,6 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'bench_schema.dart';
+
 // ignore_for_file: type=lint, unused_element, sort_constructors_first, avoid_equals_and_hash_code_on_mutable_classes, specify_nonobvious_property_types
 
 bool _listEquals<T>(List<T>? a, List<T>? b) {

@@ -56,26 +56,20 @@ void main() {
     expect(find.text('Tour builder'), findsOneWidget);
   });
 
-  testWidgets(
-    'email field shows a spinner during its async check, then the '
-    'server error',
-    (tester) async {
-      await openSignIn(tester);
+  testWidgets('email field shows a spinner during its async check, then the '
+      'server error', (tester) async {
+    await openSignIn(tester);
 
-      await tester.enterText(
-        find.byType(TextField).at(0),
-        'taken@example.com',
-      );
-      await tester.pump(); // let the field rebuild with the typed value
-      await tester.testTextInput.receiveAction(TextInputAction.done);
-      await tester.pump();
+    await tester.enterText(find.byType(TextField).at(0), 'taken@example.com');
+    await tester.pump(); // let the field rebuild with the typed value
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pump();
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      await tester.pumpAndSettle();
+    await tester.pumpAndSettle();
 
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-      expect(find.text('This email is already registered'), findsOneWidget);
-    },
-  );
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.text('This email is already registered'), findsOneWidget);
+  });
 }

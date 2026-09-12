@@ -14,9 +14,9 @@ abstract class WidgetHarness {
 
   /// The `EditableText` for flat field [index].
   Finder editableAt(int index) => find.descendant(
-        of: find.byKey(ValueKey('bench_field_$index')),
-        matching: find.byType(EditableText),
-      );
+    of: find.byKey(ValueKey('bench_field_$index')),
+    matching: find.byType(EditableText),
+  );
 
   /// Whole-form dirty — for parity assertions (may cost O(fields) in some
   /// libraries; that is itself a datapoint).

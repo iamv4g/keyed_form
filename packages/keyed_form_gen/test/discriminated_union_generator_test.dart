@@ -225,14 +225,8 @@ void main() {
       // Regression coverage: this used to be generated without
       // `.asFieldRef`, which type-checks in this string-based test but fails
       // `dart analyze` on the real output with `return_of_invalid_type`.
-      expect(
-        code,
-        contains('day(at).asFieldRef.then(DayFields.groups)'),
-      );
-      expect(
-        code,
-        contains('group(at).asFieldRef.then(GroupFields.sections)'),
-      );
+      expect(code, contains('day(at).asFieldRef.then(DayFields.groups)'));
+      expect(code, contains('group(at).asFieldRef.then(GroupFields.sections)'));
       expect(
         code,
         contains('section(at).asFieldRef.then(SectionFields.admissions)'),

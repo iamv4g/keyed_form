@@ -318,11 +318,9 @@ final testSchema = ks.discriminatedUnion(someVar, {
       },
     );
 
-    test(
-      'a variant nested inside a list keeps the root schemaName, not the '
-      "variant's own ks.object() method name",
-      () {
-        const source = '''
+    test('a variant nested inside a list keeps the root schemaName, not the '
+        "variant's own ks.object() method name", () {
+      const source = '''
 final testSchema = ks.object({
   'items': ks.list(
     ks.discriminatedUnion('kind', {
@@ -332,27 +330,26 @@ final testSchema = ks.object({
   ),
 });
 ''';
-        final unit = parseString(content: source).unit;
-        final decl = unit.declarations.first as TopLevelVariableDeclaration;
-        final classes = parser.parseElement(
-          _FakeElement('testSchema'),
-          decl,
-          compilationUnit: unit,
-        );
+      final unit = parseString(content: source).unit;
+      final decl = unit.declarations.first as TopLevelVariableDeclaration;
+      final classes = parser.parseElement(
+        _FakeElement('testSchema'),
+        decl,
+        compilationUnit: unit,
+      );
 
-        final union = classes.firstWhere((c) => c.name == 'ItemSchema');
-        for (final variant in union.unionVariants!.values) {
-          expect(
-            variant.schemaName,
-            'testSchema',
-            reason:
-                'every generated validate() in the tree calls back into the '
-                "root schema — a variant's schemaName must never fall back "
-                "to the bare method name of its own ks.object(...) call",
-          );
-        }
-      },
-    );
+      final union = classes.firstWhere((c) => c.name == 'ItemSchema');
+      for (final variant in union.unionVariants!.values) {
+        expect(
+          variant.schemaName,
+          'testSchema',
+          reason:
+              'every generated validate() in the tree calls back into the '
+              "root schema — a variant's schemaName must never fall back "
+              "to the bare method name of its own ks.object(...) call",
+        );
+      }
+    });
   });
 
   group('nested object field (non-list)', () {

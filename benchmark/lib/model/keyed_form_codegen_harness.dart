@@ -51,7 +51,8 @@ class KeyedFormCodegenHarness extends ModelHarness {
   void addRow(RowData row) => throw UnsupportedError('codegen harness is flat');
 
   @override
-  void removeRow(int index) => throw UnsupportedError('codegen harness is flat');
+  void removeRow(int index) =>
+      throw UnsupportedError('codegen harness is flat');
 
   @override
   bool get isValid => _form.errors.isEmpty;

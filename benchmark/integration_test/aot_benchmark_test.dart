@@ -51,8 +51,9 @@ void main() {
     final scenario = Scenario(fieldCount: n);
     for (final make in widgetHarnesses) {
       final harness = make();
-      testWidgets('AOT · widget · ${harness.name} · one keystroke · ${n}f',
-          (tester) async {
+      testWidgets('AOT · widget · ${harness.name} · one keystroke · ${n}f', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           MaterialApp(home: Scaffold(body: harness.build(scenario))),
         );
@@ -77,10 +78,12 @@ void main() {
         samples.sort();
 
         // ignore: avoid_print
-        print('AOT ${harness.name.padRight(22)} ${n.toString().padLeft(5)}f  '
-            'rebuilds=${rebuilds.toString().padLeft(5)}  '
-            'pump median=${(samples[6] / 1000).toStringAsFixed(2)}ms  '
-            'p90=${(samples[10] / 1000).toStringAsFixed(2)}ms');
+        print(
+          'AOT ${harness.name.padRight(22)} ${n.toString().padLeft(5)}f  '
+          'rebuilds=${rebuilds.toString().padLeft(5)}  '
+          'pump median=${(samples[6] / 1000).toStringAsFixed(2)}ms  '
+          'p90=${(samples[10] / 1000).toStringAsFixed(2)}ms',
+        );
       });
     }
   }

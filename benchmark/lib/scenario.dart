@@ -32,9 +32,8 @@ class Scenario {
     Scenario(fieldCount: 20, rowCount: 100, maxNights: 150),
   ];
 
-  String get label => rowCount == 0
-      ? '${fieldCount}f'
-      : '${fieldCount}f+${rowCount}r';
+  String get label =>
+      rowCount == 0 ? '${fieldCount}f' : '${fieldCount}f+${rowCount}r';
 
   @override
   String toString() => 'Scenario($label, maxNights=$maxNights)';
@@ -58,5 +57,6 @@ class RowData {
 }
 
 /// The initial rows for a scenario: `City0…`, 1 night each.
-List<RowData> seedRows(int rowCount) =>
-    [for (var i = 0; i < rowCount; i++) RowData(city: 'City$i', nights: 1)];
+List<RowData> seedRows(int rowCount) => [
+  for (var i = 0; i < rowCount; i++) RowData(city: 'City$i', nights: 1),
+];

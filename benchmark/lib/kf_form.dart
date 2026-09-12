@@ -16,8 +16,7 @@ class KfDraft {
   final List<String> values;
   final List<KfRow> rows;
 
-  KfDraft withFieldAt(int i, String v) =>
-      KfDraft([...values]..[i] = v, rows);
+  KfDraft withFieldAt(int i, String v) => KfDraft([...values]..[i] = v, rows);
   KfDraft withRows(List<KfRow> r) => KfDraft(values, r);
 
   @override
@@ -31,17 +30,21 @@ class KfDraft {
 }
 
 class KfRow implements KeyedRow {
-  const KfRow({required this.clientId, required this.city, required this.nights});
+  const KfRow({
+    required this.clientId,
+    required this.city,
+    required this.nights,
+  });
   @override
   final String clientId;
   final String city;
   final int nights;
 
   KfRow copyWith({String? city, int? nights}) => KfRow(
-        clientId: clientId,
-        city: city ?? this.city,
-        nights: nights ?? this.nights,
-      );
+    clientId: clientId,
+    city: city ?? this.city,
+    nights: nights ?? this.nights,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -73,10 +76,10 @@ StrictFieldRef<KfDraft, String> kfFieldRef(int index) =>
 
 final StrictFieldRef<KfDraft, List<KfRow>> kfRowsRef =
     StrictFieldRef<KfDraft, List<KfRow>>.of(
-  key: FieldKey.name('rows'),
-  get: (d) => d.rows,
-  set: (d, r) => d.withRows(r),
-);
+      key: FieldKey.name('rows'),
+      get: (d) => d.rows,
+      set: (d, r) => d.withRows(r),
+    );
 
 KfDraft kfSeed(Scenario scenario) {
   final seeded = seedRows(scenario.rowCount);
@@ -117,10 +120,9 @@ FieldErrors<String> kfResolve(KfDraft d, FieldKey? scope, int maxNights) {
 KeyedFormController<KfDraft> buildKfController(
   Scenario scenario, {
   required bool scoped,
-}) =>
-    KeyedFormController<KfDraft>(
-      initialValue: kfSeed(scenario),
-      mode: KeyedFormMode.onChange,
-      resolver: (d, scope) => kfResolve(d, scope, scenario.maxNights),
-      scopeOf: scoped ? (key) => key.prefix(1) : null,
-    );
+}) => KeyedFormController<KfDraft>(
+  initialValue: kfSeed(scenario),
+  mode: KeyedFormMode.onChange,
+  resolver: (d, scope) => kfResolve(d, scope, scenario.maxNights),
+  scopeOf: scoped ? (key) => key.prefix(1) : null,
+);

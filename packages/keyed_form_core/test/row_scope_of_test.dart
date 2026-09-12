@@ -23,7 +23,8 @@ void main() {
     });
 
     test('deeply nested rows -> the innermost row', () {
-      final inner = FieldKey.name('days') +
+      final inner =
+          FieldKey.name('days') +
           FieldKey.id('d1') +
           FieldKey.name('groups') +
           FieldKey.id('g2');

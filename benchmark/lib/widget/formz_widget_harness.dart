@@ -51,7 +51,7 @@ class FormzWidgetHarness extends WidgetHarness {
 /// bloc never de-dupes it, and `BlocSelector` does the per-field diffing.
 class _FieldsCubit extends Cubit<List<FlatInput>> {
   _FieldsCubit(int count)
-      : super(List<FlatInput>.filled(count, const FlatInput.pure('val')));
+    : super(List<FlatInput>.filled(count, const FlatInput.pure('val')));
 
   void setField(int index, String value) {
     emit([...state]..[index] = FlatInput.dirty(value));

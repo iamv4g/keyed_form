@@ -35,8 +35,11 @@ class Stop implements KeyedRow {
   final String city;
   final int nights;
 
-  Stop copyWith({String? city, int? nights}) =>
-      Stop(clientId: clientId, city: city ?? this.city, nights: nights ?? this.nights);
+  Stop copyWith({String? city, int? nights}) => Stop(
+    clientId: clientId,
+    city: city ?? this.city,
+    nights: nights ?? this.nights,
+  );
 }
 
 const _unset = Object();
@@ -47,17 +50,18 @@ const _unset = Object();
 // the row may be gone.
 
 abstract final class StopFields {
-  static StrictFieldRef<Stop, String> get city => StrictFieldRef<Stop, String>.of(
+  static StrictFieldRef<Stop, String> get city =>
+      StrictFieldRef<Stop, String>.of(
         key: FieldKey.name('city'),
         get: (s) => s.city,
         set: (s, v) => s.copyWith(city: v),
       );
 
   static StrictFieldRef<Stop, int> get nights => StrictFieldRef<Stop, int>.of(
-        key: FieldKey.name('nights'),
-        get: (s) => s.nights,
-        set: (s, v) => s.copyWith(nights: v),
-      );
+    key: FieldKey.name('nights'),
+    get: (s) => s.nights,
+    set: (s, v) => s.copyWith(nights: v),
+  );
 }
 
 final class StopFieldRefs extends DelegatingFieldRef<Tour, Stop> {

@@ -72,8 +72,7 @@ class AdvancedFormsHarness extends ModelHarness {
     return _Row(form, cityField, nightsField);
   }
 
-  int _sumNights() =>
-      _rows.fold(0, (sum, row) => sum + row.nights.fieldValue);
+  int _sumNights() => _rows.fold(0, (sum, row) => sum + row.nights.fieldValue);
 
   @override
   void setField(int index, String value) => _flatFields[index].setValue(value);

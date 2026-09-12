@@ -34,8 +34,11 @@ extension KeyedFormHandleSubmit<Root> on KeyedFormController<Root> {
       onValid,
       onInvalid:
           onInvalid ??
-          (keys) =>
-              registry.revealFirst(keys, duration: duration, alignment: alignment),
+          (keys) => registry.revealFirst(
+            keys,
+            duration: duration,
+            alignment: alignment,
+          ),
     );
   }
 }

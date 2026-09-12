@@ -70,14 +70,18 @@ class Report {
 
   String table() {
     final b = StringBuffer('\n$title\n');
-    b.writeln('${'operation'.padRight(46)}  ${'median µs'.padLeft(11)}'
-        '  ${'p90 µs'.padLeft(11)}  ${'min µs'.padLeft(11)}');
+    b.writeln(
+      '${'operation'.padRight(46)}  ${'median µs'.padLeft(11)}'
+      '  ${'p90 µs'.padLeft(11)}  ${'min µs'.padLeft(11)}',
+    );
     b.writeln('-' * 84);
     for (final s in samples) {
-      b.writeln('${s.name.padRight(46)}  '
-          '${s.median.toStringAsFixed(2).padLeft(11)}  '
-          '${s.p90.toStringAsFixed(2).padLeft(11)}  '
-          '${s.min.toStringAsFixed(2).padLeft(11)}');
+      b.writeln(
+        '${s.name.padRight(46)}  '
+        '${s.median.toStringAsFixed(2).padLeft(11)}  '
+        '${s.p90.toStringAsFixed(2).padLeft(11)}  '
+        '${s.min.toStringAsFixed(2).padLeft(11)}',
+      );
     }
     return b.toString();
   }

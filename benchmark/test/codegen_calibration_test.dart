@@ -57,14 +57,22 @@ void main() {
     final report = Report('codegen calibration · ${scenario.label}');
     for (final make in builders) {
       final lib = make().name;
-      report.add(measure('$lib · build', () => make()..build(scenario),
-          warmup: 30, iterations: 120));
+      report.add(
+        measure(
+          '$lib · build',
+          () => make()..build(scenario),
+          warmup: 30,
+          iterations: 120,
+        ),
+      );
       final h = make()..build(scenario);
       var n = 0;
-      report.add(measure(
-        '$lib · setField (mid)',
-        () => h.setField(50, 'v${n++ & 1023}'),
-      ));
+      report.add(
+        measure(
+          '$lib · setField (mid)',
+          () => h.setField(50, 'v${n++ & 1023}'),
+        ),
+      );
       h.dispose();
     }
 

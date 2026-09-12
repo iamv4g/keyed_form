@@ -96,7 +96,8 @@ class KeyedFormController<Root> extends ChangeNotifier {
   /// Whether [key] is frozen against [setField] / [updateField] / list
   /// mutation — see [markReadOnly]. Covers a key nested under a read-only
   /// scope the same way [_revealedCovers] covers a nested error.
-  bool isReadOnly(FieldKey key) => _readOnly.any((scope) => scope.contains(key));
+  bool isReadOnly(FieldKey key) =>
+      _readOnly.any((scope) => scope.contains(key));
 
   /// The fields the user has interacted with (write in [KeyedFormMode.onChange],
   /// blur elsewhere). Unmodifiable.

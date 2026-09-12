@@ -52,7 +52,10 @@ void main() {
     });
 
     test('error is gated by mode, dirty tracks the baseline', () {
-      final f = form(initial: const Trip(name: 'Nara'), mode: KeyedFormMode.onTouched);
+      final f = form(
+        initial: const Trip(name: 'Nara'),
+        mode: KeyedFormMode.onTouched,
+      );
       final name = f.field(TripFields.name);
 
       name.set('');
@@ -67,7 +70,9 @@ void main() {
   group('FieldHandle — list', () {
     test('list() edits rows by id and dirtyRows() reports changes', () {
       final f = form(
-        initial: const Trip(stops: [Stop(clientId: 'a', label: 'Kyoto')]),
+        initial: const Trip(
+          stops: [Stop(clientId: 'a', label: 'Kyoto')],
+        ),
       );
       final stops = f.field(TripFields.stops).list();
 

@@ -73,9 +73,9 @@ class HomeScreen extends StatelessWidget {
                   title: Text(demo.title),
                   subtitle: Text(demo.description),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(builder: demo.builder),
-                  ),
+                  onTap: () => Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute<void>(builder: demo.builder)),
                 ),
               );
             },

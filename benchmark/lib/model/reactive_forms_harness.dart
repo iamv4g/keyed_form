@@ -33,12 +33,9 @@ class ReactiveFormsHarness extends ModelHarness {
   }
 
   FormGroup _rowGroup(String city, int nights) => FormGroup({
-        'city': FormControl<String>(
-          value: city,
-          validators: [Validators.required],
-        ),
-        'nights': FormControl<int>(value: nights),
-      });
+    'city': FormControl<String>(value: city, validators: [Validators.required]),
+    'nights': FormControl<int>(value: nights),
+  });
 
   Map<String, dynamic>? _totalNights(AbstractControl<dynamic> control) {
     final rows = (control as FormGroup).control('rows') as FormArray;

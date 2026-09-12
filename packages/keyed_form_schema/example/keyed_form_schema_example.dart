@@ -12,25 +12,27 @@
 
 import 'package:keyed_form_schema/keyed_form_schema.dart';
 
-final _tourSchema = ks.object({
-  'title': ks.string().min(
-    3,
-    error: .text('Tour title needs at least 3 characters'),
-  ),
-  'stops': ks
-      .list(
-        ks.object({
-          'city': ks.string(error: .text('City is required')).min(1),
-          'nights': ks.int().min(1, error: .text('At least one night')),
-        }),
-      )
-      .min(1, error: .text('Add at least one stop')),
-  'notes': ks.string().optional().nullable(),
-}).refine(
-  (data) => _totalNights(data) <= 14,
-  error: .text('A tour can be at most 14 nights'),
-  path: 'stops',
-);
+final _tourSchema = ks
+    .object({
+      'title': ks.string().min(
+        3,
+        error: .text('Tour title needs at least 3 characters'),
+      ),
+      'stops': ks
+          .list(
+            ks.object({
+              'city': ks.string(error: .text('City is required')).min(1),
+              'nights': ks.int().min(1, error: .text('At least one night')),
+            }),
+          )
+          .min(1, error: .text('Add at least one stop')),
+      'notes': ks.string().optional().nullable(),
+    })
+    .refine(
+      (data) => _totalNights(data) <= 14,
+      error: .text('A tour can be at most 14 nights'),
+      path: 'stops',
+    );
 
 int _totalNights(Map<String, Object?> data) {
   final stops = (data['stops'] as List?) ?? const [];
@@ -74,5 +76,7 @@ void main() {
     ],
     'notes': 'Bring a warm coat',
   };
-  print('fixed draft is valid: ${_tourSchema.validateMap(fixed).isEmpty}'); // true
+  print(
+    'fixed draft is valid: ${_tourSchema.validateMap(fixed).isEmpty}',
+  ); // true
 }

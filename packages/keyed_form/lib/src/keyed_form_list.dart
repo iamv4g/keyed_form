@@ -46,14 +46,12 @@ class KeyedFormList<Root, Item extends KeyedRow> {
 
   /// Inserts [item] right after the row with [clientId]; no-op if that row is
   /// gone.
-  void insertAfter(String clientId, Item item, {bool force = false}) => _write(
-    (list) {
-      final at = list.indexWhere((e) => e.clientId == clientId);
-      if (at < 0) return list;
-      return [...list]..insert(at + 1, item);
-    },
-    force: force,
-  );
+  void insertAfter(String clientId, Item item, {bool force = false}) =>
+      _write((list) {
+        final at = list.indexWhere((e) => e.clientId == clientId);
+        if (at < 0) return list;
+        return [...list]..insert(at + 1, item);
+      }, force: force);
 
   /// Removes row [index] and returns it, or `null` if out of range.
   Item? removeAt(int index, {bool force = false}) {

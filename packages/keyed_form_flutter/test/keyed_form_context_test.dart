@@ -92,7 +92,8 @@ void main() {
         form,
         _Probe(
           n,
-          (c) => dirty = c.selectForm((KeyedFormController<Pair> f) => f.isDirty),
+          (c) =>
+              dirty = c.selectForm((KeyedFormController<Pair> f) => f.isDirty),
         ),
       ),
     );
@@ -117,9 +118,7 @@ void main() {
   testWidgets('watchForm rebuilds on any field write', (tester) async {
     final form = _make();
     final n = [0];
-    await tester.pumpWidget(
-      _host(form, _Probe(n, (c) => c.watchForm<Pair>())),
-    );
+    await tester.pumpWidget(_host(form, _Probe(n, (c) => c.watchForm<Pair>())));
     final base = n[0];
     form.field(_b).set('b1');
     await tester.pump();
@@ -215,9 +214,7 @@ void main() {
   ) async {
     final form = _make();
     final n = [0];
-    await tester.pumpWidget(
-      _host(form, _Probe(n, (c) => c.watchField(_a))),
-    );
+    await tester.pumpWidget(_host(form, _Probe(n, (c) => c.watchField(_a))));
     await tester.pumpWidget(_host(form, const SizedBox()));
     expect(() => form.field(_a).set('gone'), returnsNormally);
   });

@@ -68,7 +68,11 @@ void main() {
     test('the returned callback unsubscribes the relation', () {
       final form = flatForm(initial: const Trip(days: 2));
       final calls = <int>[];
-      final unsubscribe = form.addRelation(TripFields.days, (d) => d, calls.add);
+      final unsubscribe = form.addRelation(
+        TripFields.days,
+        (d) => d,
+        calls.add,
+      );
 
       form.setField(TripFields.days, 3);
       unsubscribe();

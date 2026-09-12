@@ -97,17 +97,14 @@ class _TourBuilderScreenState extends State<TourBuilderScreen> {
   // above `KeyedForm` in the tree built below. Same rule as Flutter's own
   // `Form.of(context)`.
   Future<void> _save(BuildContext context) async {
-    await _form.submit(
-      (tour) async {
-        await Future.delayed(const Duration(milliseconds: 600)); // simulate save
-        if (!context.mounted) return;
-        final nights = tour.stops.fold<int>(0, (sum, s) => sum + s.nights);
-        _toast(
-          'Saved "${tour.title}" — ${tour.stops.length} stops, $nights nights',
-        );
-      },
-      onInvalid: (_) => _revealFirstError(context),
-    );
+    await _form.submit((tour) async {
+      await Future.delayed(const Duration(milliseconds: 600)); // simulate save
+      if (!context.mounted) return;
+      final nights = tour.stops.fold<int>(0, (sum, s) => sum + s.nights);
+      _toast(
+        'Saved "${tour.title}" — ${tour.stops.length} stops, $nights nights',
+      );
+    }, onInvalid: (_) => _revealFirstError(context));
   }
 
   void _reset() {

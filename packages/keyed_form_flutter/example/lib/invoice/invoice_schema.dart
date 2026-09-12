@@ -12,11 +12,10 @@ final _invoiceSchema = ks.object({
           'description': ks
               .string(error: .text('Description is required'))
               .min(1),
-          'quantity': ks
-              .int()
-              .min(1, error: .text('At least 1'))
-              .defaultTo(1),
-          'unitPrice': ks.int().min(0, error: .text('Cannot be negative')).defaultTo(0),
+          'quantity': ks.int().min(1, error: .text('At least 1')).defaultTo(1),
+          'unitPrice': ks.int()
+              .min(0, error: .text('Cannot be negative'))
+              .defaultTo(0),
         }),
       )
       .min(1, error: .text('Add at least one line item')),

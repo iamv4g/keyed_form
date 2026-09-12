@@ -46,8 +46,9 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
   /// [fields] as a fixed list, so validation does not re-materialise the
   /// `entries` iterable on every call. A [KSObject] is built once (via
   /// `ks.object(...)`) and reused for every keystroke.
-  late final List<MapEntry<String, KSValidator<Object?>>> _fieldList =
-      fields.entries.toList(growable: false);
+  late final List<MapEntry<String, KSValidator<Object?>>> _fieldList = fields
+      .entries
+      .toList(growable: false);
 
   /// The per-field [FieldKey]s relative to this object's root, computed once.
   /// A `FieldKey` is immutable; without this the same N keys are rebuilt on
@@ -58,10 +59,9 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
 
   /// [rootPrefix] + the cached key for [fieldName], skipping the concat for
   /// the common top-level (root prefix) case.
-  FieldKey _fieldKey(FieldKey rootPrefix, String fieldName) =>
-      rootPrefix.isRoot
-          ? _fieldKeys[fieldName]!
-          : rootPrefix + _fieldKeys[fieldName]!;
+  FieldKey _fieldKey(FieldKey rootPrefix, String fieldName) => rootPrefix.isRoot
+      ? _fieldKeys[fieldName]!
+      : rootPrefix + _fieldKeys[fieldName]!;
 
   /// Zips positional [orderedValues] back to a `{name: value}` map — only for
   /// the refinement callbacks, which want the whole object.
@@ -92,10 +92,8 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
   /// The absolute key a refinement's error lands on, relative to [rootPrefix].
   static FieldKey _refineKey(FieldKey rootPrefix, ObjectRefinement ref) =>
       ref.key != null
-          ? rootPrefix + ref.key!
-          : (ref.path != null
-                ? rootPrefix + FieldKey.name(ref.path!)
-                : rootPrefix);
+      ? rootPrefix + ref.key!
+      : (ref.path != null ? rootPrefix + FieldKey.name(ref.path!) : rootPrefix);
 
   @override
   final bool isOptional;
@@ -213,8 +211,9 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
       final entry = _fieldList[i];
       final fieldName = entry.key;
       final validator = entry.value;
-      final fieldValue =
-          orderedValues != null ? orderedValues[i] : data![fieldName];
+      final fieldValue = orderedValues != null
+          ? orderedValues[i]
+          : data![fieldName];
       final fieldKey = _fieldKey(rootPrefix, fieldName);
       if (!_inScope(scope, fieldKey)) continue;
       final fieldScope = _narrow(scope, fieldKey);
@@ -379,8 +378,9 @@ class KSObject extends KSValidator<Map<String, Object?>?> {
       final entry = _fieldList[i];
       final fieldName = entry.key;
       final validator = entry.value;
-      final fieldValue =
-          orderedValues != null ? orderedValues[i] : data![fieldName];
+      final fieldValue = orderedValues != null
+          ? orderedValues[i]
+          : data![fieldName];
       final fieldKey = _fieldKey(rootPrefix, fieldName);
       if (!_inScope(scope, fieldKey)) continue;
       final fieldScope = _narrow(scope, fieldKey);

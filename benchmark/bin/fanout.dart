@@ -25,8 +25,10 @@ double _time(void Function() body, {int warmup = 3000, int iters = 20000}) {
 
 void main() {
   print('listener fan-out per keystroke — no-op resolver (AOT)\n');
-  print('  ${'fields'.padLeft(6)}  ${'µs/write'.padLeft(9)}  '
-      '${'ns/listener'.padLeft(11)}  ${'vs bare notify'.padLeft(14)}');
+  print(
+    '  ${'fields'.padLeft(6)}  ${'µs/write'.padLeft(9)}  '
+    '${'ns/listener'.padLeft(11)}  ${'vs bare notify'.padLeft(14)}',
+  );
 
   for (final n in const [50, 100, 250, 500, 1000, 2000]) {
     final scenario = Scenario(fieldCount: n);
@@ -68,9 +70,11 @@ void main() {
     final a = _time(() => formA.field(mid).set('x${k++ & 1023}'));
     final b = _time(() => formB.field(mid).set('x${k++ & 1023}'));
 
-    print('  ${n.toString().padLeft(6)}  ${a.toStringAsFixed(2).padLeft(9)}  '
-        '${(a / n * 1000).toStringAsFixed(1).padLeft(11)}  '
-        '${'${(a / b).toStringAsFixed(1)}x'.padLeft(14)}');
+    print(
+      '  ${n.toString().padLeft(6)}  ${a.toStringAsFixed(2).padLeft(9)}  '
+      '${(a / n * 1000).toStringAsFixed(1).padLeft(11)}  '
+      '${'${(a / b).toStringAsFixed(1)}x'.padLeft(14)}',
+    );
 
     formA.dispose();
     formB.dispose();

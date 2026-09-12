@@ -110,7 +110,8 @@ void main() {
           child: KeyedFormSelector<Pair, String?>(
             selector: (f) => f.field(_a).value,
             child: child,
-            builder: (context, value, c) => Column(children: [Text('$value'), c!]),
+            builder: (context, value, c) =>
+                Column(children: [Text('$value'), c!]),
           ),
         ),
       ),
