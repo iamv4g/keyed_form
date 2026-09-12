@@ -49,7 +49,7 @@ jobs:
           set -e
           flutter analyze
           flutter test
-        working-directory: packages/keyed_form_flutter/examples/showcase
+        working-directory: packages/keyed_form_flutter/example
 
       - name: Test (pure Dart packages)
         run: |

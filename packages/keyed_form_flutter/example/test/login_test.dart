@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:keyed_form_flutter_showcase/main.dart';
+import 'package:keyed_form_flutter_example/main.dart';
 
 void main() {
+  Future<void> openSignIn(WidgetTester tester) async {
+    await tester.pumpWidget(const KeyedFormExampleApp());
+    await tester.tap(find.text('Sign in'));
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('bad credentials stay on the login screen with errors', (
     tester,
   ) async {
-    await tester.pumpWidget(const KeyedFormExampleApp());
+    await openSignIn(tester);
 
     await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
     await tester.pumpAndSettle();
@@ -18,7 +24,7 @@ void main() {
   });
 
   testWidgets('a valid sign-in pushes the tour builder', (tester) async {
-    await tester.pumpWidget(const KeyedFormExampleApp());
+    await openSignIn(tester);
 
     await tester.enterText(find.byType(TextField).at(0), 'ada@example.com');
     await tester.enterText(find.byType(TextField).at(1), 'lovelace1843');
@@ -32,7 +38,7 @@ void main() {
   testWidgets('Sign in disables itself and shows a spinner while submitting', (
     tester,
   ) async {
-    await tester.pumpWidget(const KeyedFormExampleApp());
+    await openSignIn(tester);
 
     await tester.enterText(find.byType(TextField).at(0), 'ada@example.com');
     await tester.enterText(find.byType(TextField).at(1), 'lovelace1843');
@@ -54,7 +60,7 @@ void main() {
     'email field shows a spinner during its async check, then the '
     'server error',
     (tester) async {
-      await tester.pumpWidget(const KeyedFormExampleApp());
+      await openSignIn(tester);
 
       await tester.enterText(
         find.byType(TextField).at(0),

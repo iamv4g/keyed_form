@@ -137,8 +137,9 @@ field inside it — handles edits within a row.
 - [`skills/keyed_form/SKILL.md`](https://github.com/iamv4g/keyed_form/blob/main/skills/keyed_form/SKILL.md) — the
   full API reference: cross-field and async validation, read-only fields,
   derived fields, scroll-to-first-error in a lazy list, and more.
-- [`examples/showcase`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter/examples/showcase) — a runnable sign-in + dynamic
-  tour-builder app exercising the whole surface.
+- [`example/`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter/example) — a runnable app, one screen per
+  pattern; see [`example.md`](https://github.com/iamv4g/keyed_form/blob/main/packages/keyed_form_flutter/example/example.md)
+  for the guide.
 
 ## Pieces
 

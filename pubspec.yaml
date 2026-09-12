@@ -12,5 +12,5 @@ workspace:
   - packages/keyed_form_gen/example
   - packages/keyed_form
   - packages/keyed_form_flutter
-  - packages/keyed_form_flutter/examples/showcase
+  - packages/keyed_form_flutter/example
   - benchmark

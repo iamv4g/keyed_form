@@ -44,7 +44,7 @@ The same "Kyoto tour" runs through every package, bottom to top:
 | `keyed_form_schema` | [`example/`](packages/keyed_form_schema/example/keyed_form_schema_example.dart) — the `ks.*` DSL + `validateMap` | `dart run example/keyed_form_schema_example.dart` |
 | `keyed_form_gen` | [`example/`](packages/keyed_form_gen/example/) — schema → generated models / refs / validators | `dart run build_runner build && dart run lib/main.dart` |
 | `keyed_form` | [`example/`](packages/keyed_form/example/keyed_form_example.dart) — the `KeyedFormController` | `dart run example/keyed_form_example.dart` |
-| `keyed_form_flutter` | [`examples/showcase/`](packages/keyed_form_flutter/examples/showcase/) — a sign-in form that pushes a full web/desktop tour builder | `dart run build_runner build && flutter run -d chrome` |
+| `keyed_form_flutter` | [`example/`](packages/keyed_form_flutter/example/) — one screen per pattern (sign-in, read-only + derived fields, a dynamic list, nested schema + discriminated union, O(1) rebuilds made visible, and a full tour builder); see [`example.md`](packages/keyed_form_flutter/example/example.md) for the guide | `dart run build_runner build && flutter run -d chrome` |
 
 ## Agent Skill
 

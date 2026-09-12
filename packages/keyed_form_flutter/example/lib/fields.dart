@@ -27,6 +27,7 @@ class KeyedText<R> extends StatelessWidget {
     anchor: anchor,
     builder: (context, f, controller) => TextField(
       controller: controller,
+      enabled: !f.isReadOnly,
       onTapOutside: (_) => f.onBlur(),
       minLines: maxLines > 1 ? maxLines : null,
       maxLines: maxLines,
@@ -103,10 +104,14 @@ class KeyedSwitch<R> extends StatelessWidget {
       title: Text(title),
       subtitle: subtitle == null ? null : Text(subtitle!),
       value: f.value ?? false,
-      onChanged: (value) {
-        f.onChanged(value);
-        f.onBlur();
-      },
+      // A Switch has no separate `enabled:` — a null onChanged is what greys
+      // it out, so gate the callback itself rather than wrapping it.
+      onChanged: f.isReadOnly
+          ? null
+          : (value) {
+              f.onChanged(value);
+              f.onBlur();
+            },
     ),
   );
 }
@@ -142,7 +147,7 @@ class KeyedStepper<R> extends StatelessWidget {
               iconSize: 18,
               padding: EdgeInsets.zero,
               constraints: BoxConstraints.tight(Size.square(24)),
-              onPressed: value > min
+              onPressed: (!f.isReadOnly && value > min)
                   ? () {
                       f.onChanged(value - 1);
                       f.onBlur();
@@ -155,7 +160,7 @@ class KeyedStepper<R> extends StatelessWidget {
               iconSize: 18,
               padding: EdgeInsets.zero,
               constraints: BoxConstraints.tight(Size.square(24)),
-              onPressed: value < max
+              onPressed: (!f.isReadOnly && value < max)
                   ? () {
                       f.onChanged(value + 1);
                       f.onBlur();

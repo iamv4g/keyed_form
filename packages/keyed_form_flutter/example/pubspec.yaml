@@ -1,5 +1,5 @@
-name: keyed_form_flutter_showcase
-description: Sign in, then build a tour — the full keyed_form_flutter surface in one app.
+name: keyed_form_flutter_example
+description: One screen per keyed_form_flutter pattern — sign in, invoice, packing list, itinerary, rebuild lab, and a full tour builder.
 publish_to: none
 version: 1.0.0+1
 

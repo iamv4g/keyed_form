@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:keyed_form_flutter_showcase/tour_builder/tour_builder_screen.dart';
+import 'package:keyed_form_flutter_example/tour_builder/tour_builder_screen.dart';
 
 Widget _app() =>
     const MaterialApp(home: TourBuilderScreen(email: 'ada@example.com'));

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'login/login_screen.dart';
+import 'home/home_screen.dart';
 
 void main() => runApp(const KeyedFormExampleApp());
 
@@ -24,6 +24,6 @@ class KeyedFormExampleApp extends StatelessWidget {
       visualDensity: .compact,
       materialTapTargetSize: .shrinkWrap,
     ),
-    home: const LoginScreen(),
+    home: const HomeScreen(),
   );
 }
