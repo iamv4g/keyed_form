@@ -20,7 +20,7 @@ import 'package:keyed_form_schema/keyed_form_schema.dart';
 
 part 'invoice_schema.kfg.dart';
 
-final invoiceSchema = ks.object({
+final _invoiceSchema = ks.object({
   'title': ks.string().min(3, error: .text('Invoice title must be at least 3 characters')),
   'lineItems': ks.list(
     ks.object({

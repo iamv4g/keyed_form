@@ -52,40 +52,41 @@ KeyedForm<InvoiceForm>(
 `context` for `handleSubmit` must come from inside the `KeyedForm` subtree —
 the `context` a builder callback hands you (as above), not the `context` of
 the `State` that *created* the `KeyedForm` (that one sits above it in the
-tree). Same rule as Flutter's own `Form.of(context)`.
+tree, so an ancestor lookup from it fails).
 
 ## Pieces
 
-- `KeyedForm<Root>` — the `Form` of this family. Publishes a
-  `KeyedFormController<Root>` down the widget tree (the controller is a
-  `package:listen` `ChangeNotifier`, so descendants subscribe to it directly
-  and rebuild selectively) and owns a `KeyedFieldRegistry` internally — apps
-  never construct one. `KeyedForm.controllerOf` / `registryOf` /
-  `translateErrorOf` read the ambient scope back from a *descendant*
-  context, same rule as `Form.of(context)`.
+- `KeyedForm<Root>` — publishes a `KeyedFormController<Root>` down the
+  widget tree (the controller is a `package:listen` `ChangeNotifier`, so
+  descendants subscribe to it directly and rebuild selectively) and owns a
+  `KeyedFieldRegistry` internally — apps never construct one.
+  `KeyedForm.controllerOf` / `registryOf` / `translateErrorOf` read the
+  ambient scope back from a context *inside* the subtree `KeyedForm` builds
+  — never the context of the widget that constructs `KeyedForm` itself.
 - `KeyedFormField<Root, V>` — binds one `FieldRef` to the ambient
-  controller and rebuilds only when that field's value, visible error, or
-  `isValidating` changes. `KeyedFormField.text` bundles a `KeyedTextBinding`
-  for a `String` field. Wraps its builder output in a `KeyedFieldAnchor`
-  automatically (`anchor: false` to opt out) so it participates in
-  scroll-to-first-error without extra wiring. `KeyedFieldState.isValidating`
-  mirrors `form.field(ref).isValidating` — render a spinner from it while a
-  field's own async check (`form.field(ref).validateAsync(...)`) is running.
+  controller and rebuilds only when that field's value, visible error,
+  `isValidating`, `isFailedValidation`, or `isReadOnly` changes.
+  `KeyedFormField.text` bundles a `KeyedTextBinding` for a `String` field.
+  Wraps its builder output in a `KeyedFieldAnchor` automatically
+  (`anchor: false` to opt out) so it participates in scroll-to-first-error
+  without extra wiring. `KeyedFieldState.isValidating` mirrors
+  `form.field(ref).isValidating` — render a spinner from it while a field's
+  own async check (`form.field(ref).validateAsync(...)`) is running;
+  `isFailedValidation` mirrors a check that threw or timed out (distinct
+  from `errorText`); `isReadOnly` mirrors a frozen field — pair it with
+  `enabled: !state.isReadOnly` on the wrapped widget (`onChanged` stays
+  safe to wire unconditionally, since the controller already no-ops a
+  frozen write).
 - `KeyedFieldList<Root, Item>` — binds one list field and rebuilds only
   when the row set changes (add/remove/reorder); edits *within* a row are
-  the job of the `KeyedFormField`s inside it. The analogue of
-  react-hook-form's `useFieldArray`.
+  the job of the `KeyedFormField`s inside it.
 - `context.watchField(ref)` / `context.watchForm<Root>()` /
   `context.selectForm((f) => slice)` — read a form slice in a widget's
   `build()`, get the value back, and rebuild that widget only when the slice
-  changes. `watchField` is react-hook-form's `watch("name")` (returns the
-  value; its error/dirty are on the controller); `watchForm` is `watch()`;
-  `selectForm` is bloc's `context.select`. Non-reactive reads
-  (`form.field(x).value`, `form.isDirty` in an event handler) are the
-  `getValues` side — plain getters, no subscription.
+  changes. Non-reactive reads (`form.field(x).value`, `form.isDirty` in an
+  event handler) are plain getters, no subscription.
 - `KeyedFormSelector<Root, T>` — the `context.selectForm` above wrapped in a
-  widget, to scope the rebuild to a subtree (with a non-rebuilt `child`) —
-  `provider`'s `Selector` alongside its `context.select`.
+  widget, to scope the rebuild to a subtree, with a non-rebuilt `child`.
 - `KeyedFormBuilder<Root>` — rebuilds on *every* controller change; the
   escape hatch for a widget that genuinely needs the whole state (a live
   inspector).
@@ -93,11 +94,10 @@ tree). Same rule as Flutter's own `Form.of(context)`.
   external string value, keeping the caret and IME composing region stable
   as the value round-trips through the form controller. Design-system
   agnostic: plug the controller it hands you into any text field.
-- `form.handleSubmit(context, onValid, {onInvalid})` — the react-hook-form
-  `handleSubmit` of this family: validates, and on success runs `onValid`
-  with the draft while toggling `submitting`; on failure its default
-  `onInvalid` reveals the first visible error via the ambient
-  `KeyedFieldRegistry`. Pass `onInvalid` to override for custom
+- `form.handleSubmit(context, onValid, {onInvalid})` — validates, and on
+  success runs `onValid` with the draft while toggling `submitting`; on
+  failure its default `onInvalid` reveals the first visible error via the
+  ambient `KeyedFieldRegistry`. Pass `onInvalid` to override for custom
   invalid-handling (e.g. scrolling a lazily-built section list first).
 - `KeyedFieldRegistry` / `KeyedFieldAnchor` — maps `FieldKey`s to live
   field positions so a form can scroll to (and focus) a field it only

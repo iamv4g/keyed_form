@@ -36,7 +36,8 @@ From a single declarative schema declaration, `keyed_form_gen` generates:
 3. **Synchronous & Asynchronous Validation methods:**
    - `<Name>.validate()` / `<Name>.validateAsync()` on the data class.
    - `<Name>.validateData(schema)` / `<Name>.validateDataAsync(schema)` statics
-     (handy for Riverpod / callbacks).
+     — exactly the `(value, scope) -> FieldErrors<String>` shape a form
+     controller's resolver expects, so it can be passed directly.
    - Errors map directly to `FieldKey` and `FieldErrors<String>`.
 
 ---
@@ -50,7 +51,7 @@ dependencies:
   keyed_form_schema: ^0.1.0
 
 dev_dependencies:
-  build_runner: ^2.4.0
+  build_runner: ^2.15.0
   keyed_form_gen: ^0.1.0
 ```
 
@@ -72,7 +73,7 @@ import 'package:keyed_form_schema/keyed_form_schema.dart';
 
 part 'invoice_schema.kfg.dart';
 
-final invoiceSchema = ks.object({
+final _invoiceSchema = ks.object({
   'title': ks.string().min(3, error: .text('Invoice title must be at least 3 characters')),
   'lineItems': ks.list(
     ks.object({
@@ -84,10 +85,15 @@ final invoiceSchema = ks.object({
 });
 ```
 
+The schema variable is named with a leading underscore — app code addresses
+the generated class and its `Fields` class, never the schema variable
+itself, so keeping it private avoids adding a public name to the library's
+top level for no reason.
+
 ### 2. Run Code Generation
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 ### 3. Use Generated Code
@@ -129,8 +135,10 @@ if (errors.isNotEmpty) {
 
 ### Default Suffix (`Schema`)
 By default, `@keyedSchema` appends the `Schema` suffix to all generated classes;
-the `<Root>Fields` namespace drops it (`InvoiceSchema` → `InvoiceFields`):
-- `invoiceSchema` $\rightarrow$ **`InvoiceSchema`** / **`InvoiceFields`**
+the `<Root>Fields` namespace drops it (`InvoiceSchema` → `InvoiceFields`). The
+generator strips a leading underscore first, so a private schema variable
+generates the identical class names:
+- `_invoiceSchema` $\rightarrow$ **`InvoiceSchema`** / **`InvoiceFields`**
 - `'lineItems'` $\rightarrow$ **`LineItemSchema`** (with `LineItemRef`, `LineItemFieldRefs`, `InvoiceFields.lineItem(ref)`)
 - `'itinerary'` $\rightarrow$ **`ItinerarySchema`** (with `ItineraryRef`, `ItineraryFieldRefs`)
 
@@ -143,7 +151,7 @@ library;
 
 // ...
 
-final invoiceSchema = ks.object({
+final _invoiceSchema = ks.object({
   'lineItems': ks.list(
     ks.object({
       'description': ks.string(),
@@ -168,9 +176,13 @@ ks.object(className: 'CustomLineItem', {
 
 ---
 
-## Function Schema (Dynamic i18n & Lazy Message Resolution)
+## Dynamic i18n & Lazy Message Resolution
 
-For dynamic translation resolution with packages like `slang`:
+`KSError.builder((issue) => ...)` resolves the message at the point a rule
+actually fails, not when the schema is built — return the current locale's
+string from inside the closure and the message tracks whatever the active
+locale is at validation time. It works the same whether the schema is a
+plain `final` variable or a function:
 
 ```dart
 @keyedSchema
@@ -178,22 +190,11 @@ library;
 
 // ...
 
-KSObject loginSchema() {
-  return ks.object({
-    'username': ks.string().required(t.errors.auth.username),
-    'password': ks.string().required(t.errors.auth.password),
-    'remember': ks.boolean().defaultTo(false),
-  });
-}
-```
-Or with lazy callbacks in variable schemas:
-```dart
-@keyedSchema
-library;
-
-// ...
-
-final loginSchema = ks.object({
-  'username': ks.string().required(() => t.errors.auth.username),
+final _loginSchema = ks.object({
+  'username': ks.string(error: .builder((_) => t.errors.auth.username)),
+  'password': ks.string(error: .builder((_) => t.errors.auth.password)),
+  'remember': ks.boolean().defaultTo(false),
 });
 ```
+
+Reach for the function form instead — `KSObject _loginSchema() { return ks.object({...}); }` — only when the schema's own *structure* (which fields exist, which rules apply), not just a message string, needs to be rebuilt on every call; every generated `validate()`/`validateAsync()` then re-invokes that function.

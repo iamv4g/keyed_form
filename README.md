@@ -1,6 +1,6 @@
 # keyed_form
 
-A react-hook-form + zod analogue for Flutter, built on keyed optics.
+A typed form library for Flutter, built on keyed optics.
 
 A Dart pub workspace of six packages:
 
@@ -19,7 +19,7 @@ keyed_lens              (pure Dart, zero deps) — general-purpose keyed optics
 | [`keyed_form_core`](packages/keyed_form_core) | Shared form vocabulary: `FieldRef` / `StrictFieldRef` / `VariantRef`, `FieldErrors`, `@keyedSchema` |
 | [`keyed_form_schema`](packages/keyed_form_schema) | Declarative schema / validation DSL (`ks.*`); re-exports `keyed_form_core` |
 | [`keyed_form_gen`](packages/keyed_form_gen) | `build_runner` codegen: schema → data class + field references + validation |
-| [`keyed_form`](packages/keyed_form) | Pure-Dart form controller (`KeyedFormController`, react-hook-form analogue) |
+| [`keyed_form`](packages/keyed_form) | Pure-Dart form controller (`KeyedFormController`) |
 | [`keyed_form_flutter`](packages/keyed_form_flutter) | Flutter binding (`KeyedForm`, `KeyedFormField`, `KeyedFieldList`) |
 
 ## Development
@@ -45,6 +45,10 @@ The same "Kyoto tour" runs through every package, bottom to top:
 | `keyed_form_gen` | [`example/`](packages/keyed_form_gen/example/) — schema → generated models / refs / validators | `dart run build_runner build && dart run lib/main.dart` |
 | `keyed_form` | [`example/`](packages/keyed_form/example/keyed_form_example.dart) — the `KeyedFormController` | `dart run example/keyed_form_example.dart` |
 | `keyed_form_flutter` | [`examples/showcase/`](packages/keyed_form_flutter/examples/showcase/) — a sign-in form that pushes a full web/desktop tour builder | `dart run build_runner build && flutter run -d chrome` |
+
+## Agent Skill
+
+[`skills/keyed_form/`](skills/keyed_form/SKILL.md) is a Claude Agent Skill that teaches an AI agent the full API, so it wires schemas, fields, validation, dynamic lists and submit handling idiomatically. Copy it into a project's `.claude/skills/` (or `~/.claude/skills/`) to enable it.
 
 ## License
 

@@ -1,7 +1,7 @@
 # keyed_form
 
-A form-state controller for immutable aggregates — the react-hook-form of
-the `keyed_form` family. Pure Dart, no Flutter dependency.
+A form-state controller for immutable aggregates. Pure Dart, no Flutter
+dependency.
 
 `KeyedFormController<Root>` owns the editable draft, the field-keyed
 validation errors, and the touched/dirty/revealed bookkeeping that decides
@@ -63,24 +63,35 @@ handlers. To *watch* a slice in a widget's `build`, use `keyed_form_flutter`'s
   `seed`/`reset`, and server-error merging
   (`setServerErrors`/`setServerErrorPaths`).
 - `FieldHandle<Root, V>` — what `form.field(ref)` returns: `set`/`update`,
-  `value`/`error`/`dirty`/`key`, `touch()`, `isValidating`/`validateAsync`
-  (a field's own async check, e.g. against a server), and `list()` for a
-  list field.
+  `value`/`error`/`dirty`/`key`, `touch()`, and `list()` for a list field.
+- `validateAsync(check, {timeout, onFailure})` — a field's own async check
+  (e.g. against a server). `isValidating` is true while it runs. A thrown
+  check, or one that exceeds `timeout`, sets `isFailedValidation` instead of
+  writing an error or propagating — a technical fault ("couldn't check the
+  value"), kept separate from `errors` ("the value is invalid") and cleared
+  by the next `validateAsync` call, not sticky.
+- `markReadOnly()`/`unmarkReadOnly()`/`isReadOnly` — freeze a field (and,
+  via `FieldKey` ancestor coverage, everything nested under it) against
+  `set`/`update`/list mutation, without affecting validation. Pass
+  `force: true` to write through the freeze. Read-only is configuration: it
+  survives `seed()`/`reset()`, unlike touched/revealed/validating/failed.
+- `form.addRelation(source, select, onChange)` — calls `onChange` with the
+  selected slice of `source` whenever it actually changes; registering it
+  does not itself call `onChange`. Returns a callback to unsubscribe — the
+  controller does not track or dispose relations for you.
 - `KeyedFormMode` — when a field's error becomes *visible*
-  (`onChange`/`onBlur`/`onTouched`/`onSubmit`/`all`), mirroring
-  react-hook-form's modes. The controller never hides an error a submit
-  attempt surfaced, nor one explicitly `reveal`ed.
+  (`onChange`/`onBlur`/`onTouched`/`onSubmit`/`all`). The controller never
+  hides an error a submit attempt surfaced, nor one explicitly `reveal`ed.
 - `KeyedFormResolver<Root>` / `KeyedFormScopeOf` — a validation function
   `(draft, scope) => FieldErrors<String>`, and an optional
   written-field-to-subtree mapper so a large aggregate can re-validate one
   subtree at a time instead of the whole draft on every keystroke.
 - `KeyedFormList<Root, Item>` — a by-id editor for one list field
-  (`append`/`insert`/`removeById`/`move`/`updateById`, …), the
-  `useFieldArray` of this family. Obtain one with
+  (`append`/`insert`/`removeById`/`move`/`updateById`, …). Obtain one with
   `form.field(InvoiceFields.lineItems).list()`.
 - `KeyedFormSnapshot<Root>` — an immutable, `==`-comparable point-in-time
-  copy of the controller's coarse state, for hosts (Riverpod `Notifier`,
-  …) that want a value rather than a listenable.
+  copy of the controller's coarse state, for a host that wants a value
+  rather than a listenable.
 
 ## Scoped validation
 
