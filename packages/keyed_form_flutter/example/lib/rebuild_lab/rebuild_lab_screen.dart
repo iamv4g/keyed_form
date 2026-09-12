@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:keyed_form_flutter/keyed_form_flutter.dart';
 
 import '../widgets/demo_note.dart';
+import '../widgets/demo_scaffold.dart';
 import 'rebuild_lab_schema.dart';
 
 /// The benchmark numbers made visible: 24 fields, each carrying its own
@@ -86,9 +87,9 @@ class _RebuildLabScreenState extends State<RebuildLabScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Rebuild lab')),
-      body: KeyedForm<RebuildLabSchema>(
+    return DemoScaffold(
+      title: 'Rebuild lab',
+      child: KeyedForm<RebuildLabSchema>(
         controller: form,
         child: Column(
           children: [
@@ -126,23 +127,25 @@ class _RebuildLabScreenState extends State<RebuildLabScreen> {
                   mainAxisSpacing: 12,
                 ),
                 itemCount: _refs.length,
-                itemBuilder: (context, i) => KeyedFormField.text<RebuildLabSchema>(
-                  field: _refs[i],
-                  anchor: false,
-                  builder: (context, f, controller) {
-                    _fieldRebuilds[i]++;
-                    return TextField(
-                      controller: controller,
-                      onTapOutside: (_) => f.onBlur(),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        labelText: 'Field $i · rebuilt ${_fieldRebuilds[i]}×',
-                        errorText: f.errorText,
-                        border: const OutlineInputBorder(),
-                      ),
-                    );
-                  },
-                ),
+                itemBuilder: (context, i) =>
+                    KeyedFormField.text<RebuildLabSchema>(
+                      field: _refs[i],
+                      anchor: false,
+                      builder: (context, f, controller) {
+                        _fieldRebuilds[i]++;
+                        return TextField(
+                          controller: controller,
+                          onTapOutside: (_) => f.onBlur(),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            labelText:
+                                'Field $i · rebuilt ${_fieldRebuilds[i]}×',
+                            errorText: f.errorText,
+                            border: const OutlineInputBorder(),
+                          ),
+                        );
+                      },
+                    ),
               ),
             ),
           ],

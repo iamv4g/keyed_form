@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:keyed_form_flutter/keyed_form_flutter.dart';
 
 import '../tour_builder/tour_builder_screen.dart';
+import '../widgets/demo_scaffold.dart';
 import 'login_schema.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -58,109 +59,105 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Sign in')),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 380),
-          child: KeyedForm<LoginSchema>(
-            controller: form,
-            child: ListView(
-              padding: const EdgeInsets.all(24),
-              children: [
-                Text(
-                  'keyed_form_flutter',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Sign in, then build a tour.',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 24),
-                KeyedFormField.text<LoginSchema>(
-                  field: LoginFields.email,
-                  builder: (context, f, controller) {
-                    void checkEmail() {
-                      f.onBlur();
-                      form.field(LoginFields.email).validateAsync(
+    return DemoScaffold(
+      title: 'Sign in',
+      maxWidth: 380,
+      child: KeyedForm<LoginSchema>(
+        controller: form,
+        child: ListView(
+          padding: const EdgeInsets.all(24),
+          children: [
+            Text(
+              'keyed_form_flutter',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Sign in, then build a tour.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 24),
+            KeyedFormField.text<LoginSchema>(
+              field: LoginFields.email,
+              builder: (context, f, controller) {
+                void checkEmail() {
+                  f.onBlur();
+                  form
+                      .field(LoginFields.email)
+                      .validateAsync(
                         () => _checkEmailTaken(f.value ?? ''),
                         timeout: const Duration(seconds: 5),
                       );
-                    }
+                }
 
-                    return TextField(
-                      controller: controller,
-                      onTapOutside: (_) => checkEmail(),
-                      onSubmitted: (_) => checkEmail(),
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        errorText: f.errorText,
-                        helperText: f.isFailedValidation
-                            ? "Couldn't verify this email — try again."
-                            : null,
-                        border: const OutlineInputBorder(),
-                        suffixIcon: f.isValidating
-                            ? const Padding(
-                                padding: EdgeInsets.all(14),
-                                child: SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                              )
-                            : f.isFailedValidation
-                            ? const Icon(Icons.warning_amber_rounded)
-                            : null,
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 16),
-                KeyedFormField.text<LoginSchema>(
-                  field: LoginFields.password,
-                  builder: (context, f, controller) => TextField(
-                    controller: controller,
-                    obscureText: true,
-                    onTapOutside: (_) => f.onBlur(),
-                    onSubmitted: (_) => _signIn(context),
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      errorText: f.errorText,
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                KeyedFormField<LoginSchema, bool>(
-                  field: LoginFields.remember,
-                  anchor: false,
-                  builder: (context, f) => CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    controlAffinity: ListTileControlAffinity.leading,
-                    title: const Text('Remember me'),
-                    value: f.value ?? false,
-                    onChanged: (value) => f.onChanged(value ?? false),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                KeyedFormSelector<LoginSchema, bool>(
-                  selector: (f) => f.submitting,
-                  builder: (context, submitting, _) => FilledButton(
-                    onPressed: submitting ? null : () => _signIn(context),
-                    child: submitting
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                return TextField(
+                  controller: controller,
+                  onTapOutside: (_) => checkEmail(),
+                  onSubmitted: (_) => checkEmail(),
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    errorText: f.errorText,
+                    helperText: f.isFailedValidation
+                        ? "Couldn't verify this email — try again."
+                        : null,
+                    border: const OutlineInputBorder(),
+                    suffixIcon: f.isValidating
+                        ? const Padding(
+                            padding: EdgeInsets.all(14),
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
                           )
-                        : const Text('Sign in'),
+                        : f.isFailedValidation
+                        ? const Icon(Icons.warning_amber_rounded)
+                        : null,
                   ),
-                ),
-              ],
+                );
+              },
             ),
-          ),
+            const SizedBox(height: 16),
+            KeyedFormField.text<LoginSchema>(
+              field: LoginFields.password,
+              builder: (context, f, controller) => TextField(
+                controller: controller,
+                obscureText: true,
+                onTapOutside: (_) => f.onBlur(),
+                onSubmitted: (_) => _signIn(context),
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  errorText: f.errorText,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ),
+            KeyedFormField<LoginSchema, bool>(
+              field: LoginFields.remember,
+              anchor: false,
+              builder: (context, f) => CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                title: const Text('Remember me'),
+                value: f.value ?? false,
+                onChanged: (value) => f.onChanged(value ?? false),
+              ),
+            ),
+            const SizedBox(height: 16),
+            KeyedFormSelector<LoginSchema, bool>(
+              selector: (f) => f.submitting,
+              builder: (context, submitting, _) => FilledButton(
+                onPressed: submitting ? null : () => _signIn(context),
+                child: submitting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Sign in'),
+              ),
+            ),
+          ],
         ),
       ),
     );

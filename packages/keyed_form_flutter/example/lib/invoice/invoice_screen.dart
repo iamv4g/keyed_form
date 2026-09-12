@@ -3,6 +3,7 @@ import 'package:keyed_form_flutter/keyed_form_flutter.dart';
 
 import '../fields.dart';
 import '../widgets/demo_note.dart';
+import '../widgets/demo_scaffold.dart';
 import 'invoice_schema.dart';
 
 /// Read-only fields (`markReadOnly` / `force: true`) and a derived field
@@ -33,10 +34,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   late final VoidCallback _unsubscribeTotal;
   bool _locked = false;
 
-  static int _sumLineItems(List<LineItemSchema> items) => items.fold(
-    0,
-    (sum, item) => sum + item.quantity * item.unitPrice,
-  );
+  static int _sumLineItems(List<LineItemSchema> items) =>
+      items.fold(0, (sum, item) => sum + item.quantity * item.unitPrice);
 
   @override
   void initState() {
@@ -50,9 +49,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
     // addRelation only fires on a later change, so seed the initial total by
     // hand — same force: true, since the field is already frozen.
-    form.field(
-      InvoiceFields.total,
-    ).set(_sumLineItems(form.value.lineItems), force: true);
+    form
+        .field(InvoiceFields.total)
+        .set(_sumLineItems(form.value.lineItems), force: true);
   }
 
   @override
@@ -75,72 +74,64 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Invoice'),
-        actions: [
-          IconButton(
-            tooltip: _locked ? 'Unlock line items' : 'Lock line items',
-            icon: Icon(_locked ? Icons.lock : Icons.lock_open),
-            onPressed: _toggleLock,
-          ),
-        ],
-      ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: KeyedForm<InvoiceSchema>(
-            controller: form,
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                const DemoNote(
-                  'Lock line items to freeze the whole list — and every '
-                  'field inside every row — with one markReadOnly call on '
-                  'the list key. The total below is separately, permanently '
-                  'read-only: addRelation is the only thing that ever '
-                  'writes it, with force: true.',
-                ),
-                const SizedBox(height: 16),
-                KeyedFieldList<InvoiceSchema, LineItemSchema>(
-                  field: InvoiceFields.lineItems,
-                  builder: (context, items, list) => Column(
-                    children: [
-                      for (final item in items)
-                        _LineItemRow(
-                          key: ValueKey(item.clientId),
-                          fields: InvoiceFields.lineItem((
-                            lineItem: item.clientId,
-                          )),
-                          onRemove: items.length > 1
-                              ? () => list.removeById(item.clientId)
-                              : null,
-                        ),
-                      const SizedBox(height: 8),
-                      OutlinedButton.icon(
-                        onPressed: () => list.append(
-                          LineItemSchema.create(quantity: 1, unitPrice: 0),
-                        ),
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add line item'),
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(height: 32),
-                KeyedFormSelector<InvoiceSchema, int>(
-                  selector: (f) => f.read(InvoiceFields.total) ?? 0,
-                  builder: (context, total, _) => ListTile(
-                    title: const Text('Total'),
-                    trailing: Text(
-                      '\$$total',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ),
-                ),
-              ],
+    return DemoScaffold(
+      title: 'Invoice',
+      maxWidth: 480,
+      actions: [
+        IconButton(
+          tooltip: _locked ? 'Unlock line items' : 'Lock line items',
+          icon: Icon(_locked ? Icons.lock : Icons.lock_open),
+          onPressed: _toggleLock,
+        ),
+      ],
+      child: KeyedForm<InvoiceSchema>(
+        controller: form,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            const DemoNote(
+              'Lock line items to freeze the whole list — and every '
+              'field inside every row — with one markReadOnly call on '
+              'the list key. The total below is separately, permanently '
+              'read-only: addRelation is the only thing that ever '
+              'writes it, with force: true.',
             ),
-          ),
+            const SizedBox(height: 16),
+            KeyedFieldList<InvoiceSchema, LineItemSchema>(
+              field: InvoiceFields.lineItems,
+              builder: (context, items, list) => Column(
+                children: [
+                  for (final item in items)
+                    _LineItemRow(
+                      key: ValueKey(item.clientId),
+                      fields: InvoiceFields.lineItem((lineItem: item.clientId)),
+                      onRemove: items.length > 1
+                          ? () => list.removeById(item.clientId)
+                          : null,
+                    ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: () => list.append(
+                      LineItemSchema.create(quantity: 1, unitPrice: 0),
+                    ),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add line item'),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 32),
+            KeyedFormSelector<InvoiceSchema, int>(
+              selector: (f) => f.read(InvoiceFields.total) ?? 0,
+              builder: (context, total, _) => ListTile(
+                title: const Text('Total'),
+                trailing: Text(
+                  '\$$total',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -148,11 +139,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 }
 
 class _LineItemRow extends StatelessWidget {
-  const _LineItemRow({
-    super.key,
-    required this.fields,
-    required this.onRemove,
-  });
+  const _LineItemRow({super.key, required this.fields, required this.onRemove});
 
   final LineItemFieldRefs fields;
   final VoidCallback? onRemove;

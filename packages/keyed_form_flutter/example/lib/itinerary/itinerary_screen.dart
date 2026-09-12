@@ -3,6 +3,7 @@ import 'package:keyed_form_flutter/keyed_form_flutter.dart';
 
 import '../fields.dart';
 import '../widgets/demo_note.dart';
+import '../widgets/demo_scaffold.dart';
 import 'itinerary_schema.dart';
 
 /// Schema nested two levels deep (days -> activities) where each activity is
@@ -21,7 +22,9 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
       days: [
         DaySchema.create(
           label: 'Day 1',
-          activities: [SightseeingActivitySchema.create(place: 'Fushimi Inari')],
+          activities: [
+            SightseeingActivitySchema.create(place: 'Fushimi Inari'),
+          ],
         ),
       ],
     ),
@@ -37,49 +40,45 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Itinerary')),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
-          child: KeyedForm<ItinerarySchema>(
-            controller: form,
-            child: KeyedFieldList<ItinerarySchema, DaySchema>(
-              field: ItineraryFields.days,
-              builder: (context, days, dayList) => ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  const DemoNote(
-                    'Each day is a row containing its own by-id list of '
-                    'activities, and each activity is a discriminated union '
-                    '— switch its kind and the previous narrowed field '
-                    '(.asSightseeing / .asMeal) simply stops resolving, no '
-                    'error.',
-                  ),
-                  const SizedBox(height: 16),
-                  for (final day in days)
-                    _DayCard(
-                      key: ValueKey(day.clientId),
-                      form: form,
-                      dayId: day.clientId,
-                      onRemoveDay: days.length > 1
-                          ? () => dayList.removeById(day.clientId)
-                          : null,
-                    ),
-                  const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    onPressed: () => dayList.append(
-                      DaySchema.create(
-                        label: 'Day ${days.length + 1}',
-                        activities: [SightseeingActivitySchema.create()],
-                      ),
-                    ),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add day'),
-                  ),
-                ],
+    return DemoScaffold(
+      title: 'Itinerary',
+      maxWidth: 560,
+      child: KeyedForm<ItinerarySchema>(
+        controller: form,
+        child: KeyedFieldList<ItinerarySchema, DaySchema>(
+          field: ItineraryFields.days,
+          builder: (context, days, dayList) => ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              const DemoNote(
+                'Each day is a row containing its own by-id list of '
+                'activities, and each activity is a discriminated union '
+                '— switch its kind and the previous narrowed field '
+                '(.asSightseeing / .asMeal) simply stops resolving, no '
+                'error.',
               ),
-            ),
+              const SizedBox(height: 16),
+              for (final day in days)
+                _DayCard(
+                  key: ValueKey(day.clientId),
+                  form: form,
+                  dayId: day.clientId,
+                  onRemoveDay: days.length > 1
+                      ? () => dayList.removeById(day.clientId)
+                      : null,
+                ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () => dayList.append(
+                  DaySchema.create(
+                    label: 'Day ${days.length + 1}',
+                    activities: [SightseeingActivitySchema.create()],
+                  ),
+                ),
+                icon: const Icon(Icons.add),
+                label: const Text('Add day'),
+              ),
+            ],
           ),
         ),
       ),
@@ -152,8 +151,9 @@ class _DayCard extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: TextButton.icon(
-                      onPressed: () =>
-                          activityList.append(SightseeingActivitySchema.create()),
+                      onPressed: () => activityList.append(
+                        SightseeingActivitySchema.create(),
+                      ),
                       icon: const Icon(Icons.add, size: 18),
                       label: const Text('Add activity'),
                     ),
@@ -196,15 +196,11 @@ class _ActivityRow extends StatelessWidget {
           children: [
             SegmentedButton<String>(
               segments: const [
-                ButtonSegment(
-                  value: 'sightseeing',
-                  label: Text('Sightseeing'),
-                ),
+                ButtonSegment(value: 'sightseeing', label: Text('Sightseeing')),
                 ButtonSegment(value: 'meal', label: Text('Meal')),
               ],
               selected: {kind},
-              onSelectionChanged: (selection) =>
-                  onChangeKind(selection.first),
+              onSelectionChanged: (selection) => onChangeKind(selection.first),
             ),
             const SizedBox(height: 8),
             Row(
@@ -221,10 +217,7 @@ class _ActivityRow extends StatelessWidget {
                     ),
                   },
                 ),
-                IconButton(
-                  onPressed: onRemove,
-                  icon: const Icon(Icons.close),
-                ),
+                IconButton(onPressed: onRemove, icon: const Icon(Icons.close)),
               ],
             ),
           ],
