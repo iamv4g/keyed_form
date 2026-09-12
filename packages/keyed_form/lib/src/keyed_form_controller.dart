@@ -60,6 +60,7 @@ class KeyedFormController<Root> extends ChangeNotifier {
   final Set<FieldKey> _revealed = {};
   final Set<FieldKey> _validating = {};
   final Set<FieldKey> _failed = {};
+  final Set<FieldKey> _readOnly = {};
   final Map<FieldKey, int> _validationGeneration = {};
   bool _submitted = false;
   bool _submitting = false;
@@ -91,6 +92,11 @@ class KeyedFormController<Root> extends ChangeNotifier {
   /// "the check couldn't run", not "the value is invalid". Not sticky — the
   /// next [validateFieldAsync] call on the same key clears it, win or lose.
   bool isFailedValidation(FieldKey key) => _failed.contains(key);
+
+  /// Whether [key] is frozen against [setField] / [updateField] / list
+  /// mutation — see [markReadOnly]. Covers a key nested under a read-only
+  /// scope the same way [_revealedCovers] covers a nested error.
+  bool isReadOnly(FieldKey key) => _readOnly.any((scope) => scope.contains(key));
 
   /// The fields the user has interacted with (write in [KeyedFormMode.onChange],
   /// blur elsewhere). Unmodifiable.
@@ -191,19 +197,27 @@ class KeyedFormController<Root> extends ChangeNotifier {
   // and this comment, and re-document them as public. `FieldHandle` stays as
   // the ergonomic facade.
 
-  /// Writes [value] to [field] (no-op if the path no longer resolves or the
-  /// draft is unchanged). Internal primitive behind `form.field(field).set`.
+  /// Writes [value] to [field] (no-op if the path no longer resolves, the
+  /// draft is unchanged, or [field] is read-only and [force] is false).
+  /// Internal primitive behind `form.field(field).set`.
   @internal
-  void setField<V>(FieldRef<Root, V> field, V value) =>
-      _commit(field.key, field.set(_value, value));
+  void setField<V>(FieldRef<Root, V> field, V value, {bool force = false}) {
+    if (!force && isReadOnly(field.key)) return;
+    _commit(field.key, field.set(_value, value));
+  }
 
   /// Reads [field], applies [transform], writes it back — one revalidation,
-  /// one notification. Internal primitive behind `form.field(field).update`.
+  /// one notification. No-op if [field] is read-only and [force] is false.
+  /// Internal primitive behind `form.field(field).update`.
   @internal
   void updateField<V>(
     FieldRef<Root, V> field,
-    V Function(V current) transform,
-  ) => _commit(field.key, field.update(_value, transform));
+    V Function(V current) transform, {
+    bool force = false,
+  }) {
+    if (!force && isReadOnly(field.key)) return;
+    _commit(field.key, field.update(_value, transform));
+  }
 
   /// A by-id list editor over [field] — append/insert/remove/move/update.
   /// Internal primitive behind `form.field(field).list()`.
@@ -227,8 +241,10 @@ class KeyedFormController<Root> extends ChangeNotifier {
   @internal
   void mutateList<Item extends KeyedRow>(
     FieldRef<Root, List<Item>> field,
-    List<Item> Function(List<Item> current) transform,
-  ) {
+    List<Item> Function(List<Item> current) transform, {
+    bool force = false,
+  }) {
+    if (!force && isReadOnly(field.key)) return;
     final before = field.getOrNull(_value) ?? const [];
     final after = transform(List<Item>.of(before));
     final next = field.set(_value, after);
@@ -377,6 +393,9 @@ class KeyedFormController<Root> extends ChangeNotifier {
     _validationGeneration.clear();
     _submitted = false;
     _submitting = false;
+    // _readOnly is deliberately left alone: it is configuration (like a
+    // field's frozen state), not draft bookkeeping, so seed()/reset() must
+    // not clear it.
   }
 
   /// Merges server-reported errors into the map and force-reveals them (they
@@ -464,5 +483,28 @@ class KeyedFormController<Root> extends ChangeNotifier {
         setFieldValidating(key, false);
       }
     }
+  }
+
+  // --- read-only -----------------------------------------------------------
+
+  /// Freezes [key] — and, by [FieldKey] ancestor coverage, everything nested
+  /// under it — against [setField] / [updateField] / list mutation, without
+  /// affecting validation: a read-only field still validates normally.
+  ///
+  /// Configuration, not draft state: unlike [touched] / [revealed] /
+  /// [isValidating] / [isFailedValidation], it survives [seed] and [reset].
+  /// Pass `force: true` to [setField] / [updateField] to write through the
+  /// freeze anyway.
+  void markReadOnly(FieldKey key) {
+    if (!_readOnly.add(key)) return;
+    notifyListeners();
+  }
+
+  /// Unfreezes [key]. A no-op if it (or an ancestor scope) was not frozen —
+  /// note that unmarking a leaf does not unmark an ancestor scope that covers
+  /// it; unmark that scope's own key instead.
+  void unmarkReadOnly(FieldKey key) {
+    if (!_readOnly.remove(key)) return;
+    notifyListeners();
   }
 }

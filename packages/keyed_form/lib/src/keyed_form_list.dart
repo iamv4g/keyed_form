@@ -33,32 +33,39 @@ class KeyedFormList<Root, Item extends KeyedRow> {
   int indexOf(String clientId) =>
       items.indexWhere((item) => item.clientId == clientId);
 
-  void append(Item item) => _write((list) => [...list, item]);
+  void append(Item item, {bool force = false}) =>
+      _write((list) => [...list, item], force: force);
 
-  void prepend(Item item) => _write((list) => [item, ...list]);
+  void prepend(Item item, {bool force = false}) =>
+      _write((list) => [item, ...list], force: force);
 
-  void insert(int index, Item item) =>
-      _write((list) => [...list]..insert(index.clamp(0, list.length), item));
+  void insert(int index, Item item, {bool force = false}) => _write(
+    (list) => [...list]..insert(index.clamp(0, list.length), item),
+    force: force,
+  );
 
   /// Inserts [item] right after the row with [clientId]; no-op if that row is
   /// gone.
-  void insertAfter(String clientId, Item item) => _write((list) {
-    final at = list.indexWhere((e) => e.clientId == clientId);
-    if (at < 0) return list;
-    return [...list]..insert(at + 1, item);
-  });
+  void insertAfter(String clientId, Item item, {bool force = false}) => _write(
+    (list) {
+      final at = list.indexWhere((e) => e.clientId == clientId);
+      if (at < 0) return list;
+      return [...list]..insert(at + 1, item);
+    },
+    force: force,
+  );
 
   /// Removes row [index] and returns it, or `null` if out of range.
-  Item? removeAt(int index) {
+  Item? removeAt(int index, {bool force = false}) {
     final list = items;
     if (index < 0 || index >= list.length) return null;
     final removed = list[index];
-    _write((current) => [...current]..removeAt(index));
+    _write((current) => [...current]..removeAt(index), force: force);
     return removed;
   }
 
   /// Removes the row with [clientId] and returns it, or `null` if not found.
-  Item? removeById(String clientId) {
+  Item? removeById(String clientId, {bool force = false}) {
     final removed = byId(clientId);
     if (removed == null) return null;
     _write(
@@ -66,41 +73,51 @@ class KeyedFormList<Root, Item extends KeyedRow> {
         for (final item in list)
           if (item.clientId != clientId) item,
       ],
+      force: force,
     );
     return removed;
   }
 
-  void move(int from, int to) => _write((list) {
+  void move(int from, int to, {bool force = false}) => _write((list) {
     if (from < 0 || from >= list.length || to < 0 || to >= list.length) {
       return list;
     }
     final next = [...list];
     next.insert(to, next.removeAt(from));
     return next;
-  });
+  }, force: force);
 
-  void swap(int a, int b) => _write((list) {
+  void swap(int a, int b, {bool force = false}) => _write((list) {
     if (a < 0 || a >= list.length || b < 0 || b >= list.length) return list;
     final next = [...list];
     next[a] = list[b];
     next[b] = list[a];
     return next;
-  });
+  }, force: force);
 
-  void updateAt(int index, Item Function(Item current) transform) =>
-      _write((list) {
-        if (index < 0 || index >= list.length) return list;
-        return [...list]..[index] = transform(list[index]);
-      });
+  void updateAt(
+    int index,
+    Item Function(Item current) transform, {
+    bool force = false,
+  }) => _write((list) {
+    if (index < 0 || index >= list.length) return list;
+    return [...list]..[index] = transform(list[index]);
+  }, force: force);
 
-  void updateById(String clientId, Item Function(Item current) transform) =>
-      _write(
-        (list) => [
-          for (final item in list)
-            if (item.clientId == clientId) transform(item) else item,
-        ],
-      );
+  void updateById(
+    String clientId,
+    Item Function(Item current) transform, {
+    bool force = false,
+  }) => _write(
+    (list) => [
+      for (final item in list)
+        if (item.clientId == clientId) transform(item) else item,
+    ],
+    force: force,
+  );
 
-  void _write(List<Item> Function(List<Item> current) transform) =>
-      _controller.mutateList(_field, transform);
+  void _write(
+    List<Item> Function(List<Item> current) transform, {
+    bool force = false,
+  }) => _controller.mutateList(_field, transform, force: force);
 }

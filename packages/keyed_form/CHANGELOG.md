@@ -37,3 +37,11 @@ Initial release.
   `errors` — a technical fault is a different state from "the value is
   invalid". Not sticky: the next `validateAsync` call on the same field
   clears it, whether that call succeeds or fails in turn.
+- `form.field(ref).markReadOnly()` / `.unmarkReadOnly()` / `.isReadOnly` (and
+  `KeyedFormController.markReadOnly` / `unmarkReadOnly` / `isReadOnly`) freeze
+  a field — and, by `FieldKey` ancestor coverage, everything nested under it —
+  against `set` / `update` / list mutation, without affecting validation.
+  Pass `force: true` to `set` / `update` (and to every `KeyedFormList`
+  mutator) to write through the freeze anyway. Read-only status is
+  configuration: `seed()` / `reset()` deliberately leave it in place, unlike
+  the touched / revealed / validating / failed bookkeeping they clear.

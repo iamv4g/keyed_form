@@ -407,6 +407,77 @@ void main() {
     );
   });
 
+  group('read-only fields', () {
+    test('set() is a no-op on a read-only field', () {
+      final form = flatForm(initial: const Trip(name: 'A'));
+      form.markReadOnly(TripFields.name.key);
+
+      form.setField(TripFields.name, 'B');
+
+      expect(form.value.name, 'A');
+    });
+
+    test('set(force: true) writes through a read-only field', () {
+      final form = flatForm(initial: const Trip(name: 'A'));
+      form.markReadOnly(TripFields.name.key);
+
+      form.setField(TripFields.name, 'B', force: true);
+
+      expect(form.value.name, 'B');
+    });
+
+    test('marking a parent scope read-only freezes a descendant field', () {
+      final form = scopedForm(
+        initial: const Trip(
+          name: 'T',
+          days: 1,
+          stops: [Stop(clientId: 'a', label: 'A')],
+        ),
+      );
+      form.markReadOnly(TripFields.stop('a').key);
+
+      expect(form.isReadOnly(TripFields.stopLabel('a').key), isTrue);
+      form.setField(TripFields.stopLabel('a'), 'Changed');
+      expect(form.value.stops.single.label, 'A');
+    });
+
+    test('validate() still reports errors on a read-only field', () {
+      final form = flatForm(initial: const Trip(name: '', days: 1));
+      form.markReadOnly(TripFields.name.key);
+
+      expect(form.validate(), isFalse);
+      expect(form.errors.byKey(TripFields.name.key), 'name.required');
+    });
+
+    test('reset() does not clear read-only status', () {
+      final form = flatForm(initial: const Trip(name: 'A'));
+      form.markReadOnly(TripFields.name.key);
+
+      form.reset();
+
+      expect(form.isReadOnly(TripFields.name.key), isTrue);
+    });
+
+    test(
+      'markReadOnly / unmarkReadOnly are no-ops when already in that state',
+      () {
+        final form = flatForm();
+        var notifications = 0;
+        form.addListener(() => notifications++);
+
+        form.markReadOnly(TripFields.name.key);
+        expect(notifications, 1);
+        form.markReadOnly(TripFields.name.key);
+        expect(notifications, 1);
+
+        form.unmarkReadOnly(TripFields.name.key);
+        expect(notifications, 2);
+        form.unmarkReadOnly(TripFields.name.key);
+        expect(notifications, 2);
+      },
+    );
+  });
+
   group('scoped validation', () {
     test('a write only revalidates its own subtree', () {
       final form = scopedForm(

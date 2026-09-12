@@ -23,6 +23,7 @@ class KeyedFieldState<V> {
     required this.fieldKey,
     required this.isValidating,
     required this.isFailedValidation,
+    required this.isReadOnly,
   });
 
   /// The field's current value, or `null` when its path no longer resolves.
@@ -53,6 +54,12 @@ class KeyedFieldState<V> {
   /// the value — render a retry affordance from this, distinct from
   /// [errorText]. See `KeyedFormController.isFailedValidation`.
   final bool isFailedValidation;
+
+  /// Whether this field is frozen against writes — pass `enabled: !isReadOnly`
+  /// to the wrapped Material widget to grey it out. [onChanged] stays safe to
+  /// wire unconditionally: the controller already no-ops a frozen write. See
+  /// `KeyedFormController.markReadOnly`.
+  final bool isReadOnly;
 }
 
 /// Binds one [FieldRef] to the ambient [KeyedFormController] (via [KeyedForm]) and
@@ -129,6 +136,7 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
   bool _hasField = true;
   bool _lastValidating = false;
   bool _lastFailed = false;
+  bool _lastReadOnly = false;
 
   @override
   void didChangeDependencies() {
@@ -156,12 +164,14 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
     final prevHasField = _hasField;
     final prevValidating = _lastValidating;
     final prevFailed = _lastFailed;
+    final prevReadOnly = _lastReadOnly;
     _readSnapshot();
     if (prevValue != _lastValue ||
         prevError != _lastError ||
         prevHasField != _hasField ||
         prevValidating != _lastValidating ||
-        prevFailed != _lastFailed) {
+        prevFailed != _lastFailed ||
+        prevReadOnly != _lastReadOnly) {
       if (mounted) setState(() {});
     }
   }
@@ -175,6 +185,7 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
     _lastError = raw == null ? null : _translate(context, raw);
     _lastValidating = controller.isValidating(widget.field.key);
     _lastFailed = controller.isFailedValidation(widget.field.key);
+    _lastReadOnly = controller.isReadOnly(widget.field.key);
   }
 
   @override
@@ -197,6 +208,7 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
         fieldKey: widget.field.key,
         isValidating: _lastValidating,
         isFailedValidation: _lastFailed,
+        isReadOnly: _lastReadOnly,
       ),
     );
     if (!widget.anchor) return child;

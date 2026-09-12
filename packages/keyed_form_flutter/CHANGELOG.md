@@ -16,6 +16,10 @@ Initial release.
   `KeyedFormController.isFailedValidation` — render a retry affordance from
   it when a field's async check itself failed (it threw, or exceeded its
   timeout), as distinct from `errorText`.
+- `KeyedFieldState.isReadOnly` mirrors `KeyedFormController.isReadOnly` — pass
+  `enabled: !state.isReadOnly` to the wrapped Material widget to grey it out.
+  `onChanged` stays safe to wire unconditionally: the controller already
+  no-ops a write to a frozen field.
 - `KeyedFieldList` — binds one list field and rebuilds only when the row set
   changes.
 - `context.watchField(ref)` / `context.watchForm<Root>()` /

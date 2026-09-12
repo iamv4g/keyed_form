@@ -48,17 +48,29 @@ class FieldHandle<Root, V> {
   /// see [KeyedFormController.isFailedValidation].
   bool get isFailedValidation => _form.isFailedValidation(_ref.key);
 
-  /// Writes [value] to the field (no-op if the path no longer resolves or the
-  /// draft is unchanged).
-  void set(V value) => _form.setField(_ref, value);
+  /// Whether this field is frozen against [set] / [update] — see
+  /// [KeyedFormController.markReadOnly].
+  bool get isReadOnly => _form.isReadOnly(_ref.key);
+
+  /// Writes [value] to the field (no-op if the path no longer resolves, the
+  /// draft is unchanged, or the field is read-only and [force] is false).
+  void set(V value, {bool force = false}) =>
+      _form.setField(_ref, value, force: force);
 
   /// Reads the field, applies [transform], writes it back — one revalidation,
-  /// one notification.
-  void update(V Function(V current) transform) =>
-      _form.updateField(_ref, transform);
+  /// one notification. No-op if the field is read-only and [force] is false.
+  void update(V Function(V current) transform, {bool force = false}) =>
+      _form.updateField(_ref, transform, force: force);
 
   /// Marks the field touched and re-validates the subtree it belongs to.
   void touch() => _form.touch(_ref.key);
+
+  /// Freezes the field against [set] / [update] until [unmarkReadOnly] —
+  /// validation is unaffected. See [KeyedFormController.markReadOnly].
+  void markReadOnly() => _form.markReadOnly(_ref.key);
+
+  /// Unfreezes the field. See [KeyedFormController.unmarkReadOnly].
+  void unmarkReadOnly() => _form.unmarkReadOnly(_ref.key);
 
   /// Runs [check] as this field's async validation — see
   /// [KeyedFormController.validateFieldAsync].
