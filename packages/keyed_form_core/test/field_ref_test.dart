@@ -1,5 +1,4 @@
 import 'package:keyed_form_core/keyed_form_core.dart';
-import 'package:keyed_lens/keyed_lens.dart' show Prism;
 import 'package:test/test.dart';
 
 class Addr {
@@ -84,11 +83,11 @@ void main() {
     final AddrFieldRefs w = AddrFieldRefs(_profileAddr);
 
     // usable where a FieldRef is expected
-    final FieldRef<Profile, Addr> asRef = w;
+    final FieldRef<Profile, Addr> asRef = w.asFieldRef;
     expect(asRef.getOrNull(p)?.city, 'London');
 
     // composes via inherited .then
-    final FieldRef<Profile, String> composed = w.then(
+    final FieldRef<Profile, String> composed = w.asFieldRef.then(
       StrictFieldRef<Addr, String>.of(
         key: FieldKey.name('city'),
         get: (a) => a.city,
@@ -120,7 +119,7 @@ void main() {
       get: (r) => r.$1,
       set: (r, v) => (v,),
     );
-    final VariantRef<Pay, Cash> cash = Prism<Pay, Cash>.type();
+    final VariantRef<Pay, Cash> cash = VariantRef<Pay, Cash>.type();
     final FieldRef<(Pay,), String> note = pay
         .narrow(cash)
         .then(
