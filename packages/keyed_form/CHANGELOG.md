@@ -45,3 +45,10 @@ Initial release.
   mutator) to write through the freeze anyway. Read-only status is
   configuration: `seed()` / `reset()` deliberately leave it in place, unlike
   the touched / revealed / validating / failed bookkeeping they clear.
+- `form.addRelation(source, select, onChange)` — calls `onChange` with the
+  selected, `==`-deduplicated slice of `source` whenever it actually changes.
+  Registering the relation does not itself call `onChange`. Returns a
+  callback that unsubscribes it — call that from your own `dispose()`, since
+  the controller does not track relations for you. Skips silently while
+  `source` does not resolve (for example, a row that has been removed from a
+  list).

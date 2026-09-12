@@ -18,5 +18,6 @@ export 'src/field_handle.dart';
 export 'src/keyed_form_controller.dart';
 export 'src/keyed_form_list.dart';
 export 'src/keyed_form_mode.dart';
+export 'src/keyed_form_relations.dart';
 export 'src/keyed_form_resolver.dart';
 export 'src/keyed_form_snapshot.dart';
