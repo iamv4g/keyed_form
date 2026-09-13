@@ -1,6 +1,6 @@
 ## 0.1.0
 
-Initial release. Shared vocabulary for the `keyed_form` family:
+Initial release.
 
 - `FieldRef` / `StrictFieldRef` / `VariantRef` — field-reference `extension
   type`s over the `keyed_lens` optics, so IDE hover/autocomplete shows the

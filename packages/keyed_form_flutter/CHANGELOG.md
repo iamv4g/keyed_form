@@ -24,18 +24,17 @@ Initial release.
   changes.
 - `context.watchField(ref)` / `context.watchForm<Root>()` /
   `context.selectForm((f) => slice)` — read a form slice in `build()`, get the
-  value back, rebuild this element only when *that* changes. The react-hook-form
-  `watch` / bloc `context.select` of this family (same selective-`InheritedElement`
-  machinery as `provider`).
+  value back, rebuild this element only when *that* changes: a selective read
+  built on the same `InheritedElement` machinery as Flutter's scoped-rebuild
+  widgets.
 - `KeyedFormSelector<Root, T>` — scopes a `context.selectForm` rebuild to a
-  subtree (`provider`'s `Selector` alongside `context.select`); has a
-  non-rebuilt `child`.
+  subtree; has a non-rebuilt `child`.
 - `KeyedFormBuilder<Root>` — the whole-form escape hatch (rebuilds on every
   controller change).
 - `KeyedTextBinding` — a caret- and IME-stable `TextEditingController` binding.
 - `KeyedFieldRegistry` / `KeyedFieldAnchor` — scroll-to-first-error.
-- `form.handleSubmit(context, onValid, {onInvalid})` — the react-hook-form
-  `handleSubmit` of this family: wraps `KeyedFormController.submit` with a
-  default `onInvalid` that reveals the first visible error via the ambient
-  `KeyedFieldRegistry`; pass `onInvalid` to override for custom
-  invalid-handling (e.g. scrolling a lazily-built section list first).
+- `form.handleSubmit(context, onValid, {onInvalid})` — wraps
+  `KeyedFormController.submit` with a default `onInvalid` that reveals the
+  first visible error via the ambient `KeyedFieldRegistry`; pass `onInvalid`
+  to override for custom invalid-handling (e.g. scrolling a lazily-built
+  section list first).
