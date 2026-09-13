@@ -5,44 +5,50 @@
 library;
 
 import 'package:jaspr/dom.dart';
-// Server-specific Jaspr import.
 import 'package:jaspr/server.dart';
 
-// Imports the [App] component.
 import 'app.dart';
-
-// This file is generated automatically by Jaspr, do not remove or edit.
 import 'main.server.options.dart';
 
 void main() {
-  // Initializes the server environment with the generated default options.
   Jaspr.initializeApp(
     options: defaultServerOptions,
   );
 
-  // Starts the app.
-  //
-  // [Document] renders the root document structure (<html>, <head> and <body>)
-  // with the provided parameters and components.
-  runApp(Document(
-    title: 'website',
-    styles: [
-      // Special import rule to include to another css file.
-      css.import('https://fonts.googleapis.com/css?family=Roboto'),
-      // Each style rule takes a valid css selector and a set of styles.
-      // Styles are defined using type-safe css bindings and can be freely chained and nested.
-      css('html, body').styles(
-        width: 100.percent,
-        minHeight: 100.vh,
-        padding: .zero,
-        margin: .zero,
-        fontFamily: const .list([FontFamily('Roboto'), FontFamilies.sansSerif]),
-      ),
-      css('h1').styles(
-        margin: .unset,
-        fontSize: 4.rem,
-      ),
-    ],
-    body: App(),
-  ));
+  runApp(
+    Document(
+      title: 'keyed_form — typed, O(1) Flutter forms built on keyed optics',
+      lang: 'en',
+      meta: {
+        'description':
+            "keyed_form gives every field a stable, typed, serializable identity — dynamic lists survive reorders, rebuilds stay O(1) at any form size, and a form's state is a plain immutable value you can test without a widget.",
+        'og:title': 'keyed_form — typed, O(1) Flutter forms on keyed optics',
+        'og:description':
+            'Typed, O(1) Flutter forms built on keyed optics. Benchmarked against reactive_forms, flutter_form_builder and formz.',
+        'og:type': 'website',
+        'og:url': 'https://iamv4g.github.io/keyed_form/',
+        'twitter:card': 'summary_large_image',
+      },
+      head: [
+        const Document.html(attributes: {'data-theme': 'dark'}),
+        link(
+          rel: 'icon',
+          href:
+              "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300F0FF' stroke-width='2'><circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='3' fill='%2300F0FF'/><line x1='12' y1='2' x2='12' y2='4'/><line x1='12' y1='20' x2='12' y2='22'/><line x1='2' y1='12' x2='4' y2='12'/><line x1='20' y1='12' x2='22' y2='12'/></svg>",
+        ),
+        link(rel: 'preconnect', href: 'https://fonts.googleapis.com'),
+        link(
+          rel: 'preconnect',
+          href: 'https://fonts.gstatic.com',
+          attributes: {'crossorigin': ''},
+        ),
+        link(
+          rel: 'stylesheet',
+          href:
+              'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap',
+        ),
+      ],
+      body: const App(),
+    ),
+  );
 }

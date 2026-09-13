@@ -139,11 +139,15 @@ List<StyleRule> get appStyles => [
   ),
   css('[data-theme="dark"] header').styles(
     backgroundColor: Color('rgba(7, 11, 14, 0.88)'),
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px),
+    ),
   ),
   css('[data-theme="light"] header').styles(
     backgroundColor: Color('rgba(244, 247, 249, 0.88)'),
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px),
+    ),
   ),
 
   css('.nav-inner').styles(
@@ -387,10 +391,14 @@ List<StyleRule> get appStyles => [
     padding: .only(bottom: 12.px),
   ),
   css('[data-theme="dark"] .workbench-header').styles(
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px),
+    ),
   ),
   css('[data-theme="light"] .workbench-header').styles(
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px),
+    ),
   ),
 
   css('.workbench-title').styles(
@@ -525,7 +533,9 @@ List<StyleRule> get appStyles => [
   css('.card-diff').styles(
     padding: .symmetric(vertical: 10.px, horizontal: 14.px),
     fontSize: 0.82.rem,
-    border: Border.only(left: BorderSide.solid(color: AppColors.cyan, width: 2.px)),
+    border: Border.only(
+      left: BorderSide.solid(color: AppColors.cyan, width: 2.px),
+    ),
   ),
   css('[data-theme="dark"] .card-diff').styles(
     backgroundColor: AppColors.surfaceElevatedDark,
@@ -649,10 +659,14 @@ List<StyleRule> get appStyles => [
     padding: .symmetric(vertical: 12.px, horizontal: 16.px),
   ),
   css('[data-theme="dark"] table.spec th, [data-theme="dark"] table.spec td').styles(
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px),
+    ),
   ),
   css('[data-theme="light"] table.spec th, [data-theme="light"] table.spec td').styles(
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px),
+    ),
   ),
 
   css('table.spec thead th').styles(
@@ -664,12 +678,16 @@ List<StyleRule> get appStyles => [
   css('[data-theme="dark"] table.spec thead th').styles(
     color: AppColors.inkMutedDark,
     backgroundColor: AppColors.surfaceElevatedDark,
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderBrightDark, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderBrightDark, width: 1.px),
+    ),
   ),
   css('[data-theme="light"] table.spec thead th').styles(
     color: AppColors.inkMutedLight,
     backgroundColor: AppColors.surfaceElevatedLight,
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderBrightLight, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderBrightLight, width: 1.px),
+    ),
   ),
 
   css('table.spec td.num, table.spec th.num').styles(
@@ -711,10 +729,14 @@ List<StyleRule> get appStyles => [
     padding: .symmetric(vertical: 12.px, horizontal: 14.px),
   ),
   css('[data-theme="dark"] table.matrix th, [data-theme="dark"] table.matrix td').styles(
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px),
+    ),
   ),
   css('[data-theme="light"] table.matrix th, [data-theme="light"] table.matrix td').styles(
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px),
+    ),
   ),
   css('table.matrix thead th').styles(
     fontFamily: const .list([FontFamily('JetBrains Mono'), FontFamilies.monospace]),
@@ -726,12 +748,16 @@ List<StyleRule> get appStyles => [
   css('[data-theme="dark"] table.matrix thead th').styles(
     color: AppColors.inkMutedDark,
     backgroundColor: AppColors.surfaceElevatedDark,
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderBrightDark, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderBrightDark, width: 1.px),
+    ),
   ),
   css('[data-theme="light"] table.matrix thead th').styles(
     color: AppColors.inkMutedLight,
     backgroundColor: AppColors.surfaceElevatedLight,
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderBrightLight, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderBrightLight, width: 1.px),
+    ),
   ),
   css('table.matrix thead th:first-child').styles(
     textAlign: TextAlign.left,
@@ -791,11 +817,15 @@ List<StyleRule> get appStyles => [
   ),
   css('[data-theme="dark"] .code-header-bar').styles(
     backgroundColor: AppColors.surfaceElevatedDark,
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px),
+    ),
   ),
   css('[data-theme="light"] .code-header-bar').styles(
     backgroundColor: AppColors.surfaceElevatedLight,
-    border: Border.only(bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px)),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px),
+    ),
   ),
 
   css('.code-tabs').styles(
@@ -892,11 +922,15 @@ List<StyleRule> get appStyles => [
   ),
   css('[data-theme="dark"] footer').styles(
     backgroundColor: AppColors.surfaceDark,
-    border: Border.only(top: BorderSide.solid(color: AppColors.borderDark, width: 1.px)),
+    border: Border.only(
+      top: BorderSide.solid(color: AppColors.borderDark, width: 1.px),
+    ),
   ),
   css('[data-theme="light"] footer').styles(
     backgroundColor: AppColors.surfaceLight,
-    border: Border.only(top: BorderSide.solid(color: AppColors.borderLight, width: 1.px)),
+    border: Border.only(
+      top: BorderSide.solid(color: AppColors.borderLight, width: 1.px),
+    ),
   ),
 
   css('.footer-bottom').styles(
@@ -947,6 +981,12 @@ List<StyleRule> get appStyles => [
   css('.text-cyan').styles(color: AppColors.cyan),
   css('.text-red').styles(color: AppColors.red),
   css('.font-semibold').styles(fontWeight: FontWeight.w600),
+  css('.mt-24').styles(margin: .only(top: 24.px)),
+  css('.code-filename').styles(
+    fontSize: 0.8.rem,
+  ),
+  css('[data-theme="dark"] .code-filename').styles(color: AppColors.inkMutedDark),
+  css('[data-theme="light"] .code-filename').styles(color: AppColors.inkMutedLight),
 
   css('.footer-links').styles(
     display: Display.flex,
