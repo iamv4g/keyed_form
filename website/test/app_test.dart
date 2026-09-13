@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:jaspr_test/jaspr_test.dart';
 import 'package:website/app.dart';
 import 'package:website/components/code_section.dart';
@@ -142,6 +143,17 @@ void main() {
 
       // Client hydration script present
       expect(content, contains('src="main.client.dart.js"'));
+
+      // CSS Custom Properties and Blueprint Grid verification
+      expect(content, contains(':root[data-theme="dark"]'));
+      expect(content, contains(':root[data-theme="light"]'));
+      expect(content, contains('--cyan: #00f0ff'));
+      expect(content, contains('--cyan: #008799'));
+      expect(content, contains('--grid: rgba(0, 240, 255, 0.04)'));
+      expect(
+        content,
+        contains('linear-gradient(to right, var(--grid) 1px, transparent 1px)'),
+      );
 
       // Check client JS file exists
       final jsFile = File('build/jaspr/main.client.dart.js');

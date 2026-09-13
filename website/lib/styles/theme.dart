@@ -1,35 +1,70 @@
 import 'package:jaspr/dom.dart';
 
 abstract final class AppColors {
-  // Brand & Accents
-  static const cyan = Color('#00f0ff');
-  static const cyanGlow = Color('rgba(0, 240, 255, 0.16)');
-  static const amber = Color('#ffb020');
-  static const amberGlow = Color('rgba(255, 176, 32, 0.16)');
-  static const green = Color('#00e599');
-  static const red = Color('#ff4d4d');
+  // Brand & Semantic Accents
+  static const cyan = Color.variable('--cyan');
+  static const cyanGlow = Color.variable('--cyan-glow');
+  static const amber = Color.variable('--amber');
+  static const amberGlow = Color.variable('--amber-glow');
+  static const green = Color.variable('--green');
+  static const red = Color.variable('--red');
 
-  // Dark Palette
-  static const bgDark = Color('#070b0e');
-  static const surfaceDark = Color('#0e141b');
-  static const surfaceElevatedDark = Color('#141d26');
-  static const borderDark = Color('#1f2c38');
-  static const borderBrightDark = Color('#304456');
-  static const inkDark = Color('#eaf2f8');
-  static const inkMutedDark = Color('#8397a7');
-
-  // Light Palette
-  static const bgLight = Color('#f4f7f9');
-  static const surfaceLight = Color('#ffffff');
-  static const surfaceElevatedLight = Color('#eaf0f4');
-  static const borderLight = Color('#d3dfe8');
-  static const borderBrightLight = Color('#a8bfcf');
-  static const inkLight = Color('#0b1924');
-  static const inkMutedLight = Color('#4b6375');
+  // Semantic Surface & Theme Colors
+  static const bg = Color.variable('--bg');
+  static const surface = Color.variable('--surface');
+  static const surfaceElevated = Color.variable('--surface-elevated');
+  static const border = Color.variable('--border');
+  static const borderBright = Color.variable('--border-bright');
+  static const ink = Color.variable('--ink');
+  static const inkMuted = Color.variable('--ink-muted');
+  static const inkFaint = Color.variable('--ink-faint');
+  static const grid = Color.variable('--grid');
 }
 
 @css
 List<StyleRule> get appStyles => [
+  // CSS Custom Properties for Dark and Light Themes
+  css(':root[data-theme="dark"]').styles(
+    raw: {
+      '--bg': '#070b0e',
+      '--surface': '#0e141b',
+      '--surface-elevated': '#141d26',
+      '--border': '#1f2c38',
+      '--border-bright': '#304456',
+      '--ink': '#eaf2f8',
+      '--ink-muted': '#8397a7',
+      '--ink-faint': '#445666',
+      '--cyan': '#00f0ff',
+      '--cyan-glow': 'rgba(0, 240, 255, 0.16)',
+      '--amber': '#ffb020',
+      '--amber-glow': 'rgba(255, 176, 32, 0.16)',
+      '--green': '#00e599',
+      '--red': '#ff4d4d',
+      '--grid': 'rgba(0, 240, 255, 0.04)',
+      '--card-shadow': '0 4px 20px rgba(0, 0, 0, 0.5)',
+    },
+  ),
+  css(':root[data-theme="light"]').styles(
+    raw: {
+      '--bg': '#f4f7f9',
+      '--surface': '#ffffff',
+      '--surface-elevated': '#eaf0f4',
+      '--border': '#d3dfe8',
+      '--border-bright': '#a8bfcf',
+      '--ink': '#0b1924',
+      '--ink-muted': '#4b6375',
+      '--ink-faint': '#98abb9',
+      '--cyan': '#008799',
+      '--cyan-glow': 'rgba(0, 135, 153, 0.12)',
+      '--amber': '#c97200',
+      '--amber-glow': 'rgba(201, 114, 0, 0.12)',
+      '--green': '#0a8e5c',
+      '--red': '#d62828',
+      '--grid': 'rgba(0, 135, 153, 0.05)',
+      '--card-shadow': '0 4px 20px rgba(11, 25, 36, 0.06)',
+    },
+  ),
+
   // Reset & Base
   css('*').styles(
     boxSizing: BoxSizing.borderBox,
@@ -37,22 +72,24 @@ List<StyleRule> get appStyles => [
     padding: .zero,
   ),
 
+  css('html').styles(
+    raw: {'scroll-behavior': 'smooth'},
+  ),
+
   css('body').styles(
     overflow: Overflow.only(x: Overflow.clip),
     fontFamily: const .list([FontFamily('Inter'), FontFamilies.sansSerif]),
     fontSize: 15.px,
     lineHeight: 1.6.em,
-    transition: const Transition('background', duration: Duration(milliseconds: 200)),
-  ),
-
-  // Theme Coloring (Dark / Light)
-  css('[data-theme="dark"] body').styles(
-    backgroundColor: AppColors.bgDark,
-    color: AppColors.inkDark,
-  ),
-  css('[data-theme="light"] body').styles(
-    backgroundColor: AppColors.bgLight,
-    color: AppColors.inkLight,
+    color: AppColors.ink,
+    backgroundColor: AppColors.bg,
+    raw: {
+      'background-image':
+          'linear-gradient(to right, var(--grid) 1px, transparent 1px), linear-gradient(to bottom, var(--grid) 1px, transparent 1px)',
+      'background-size': '32px 32px',
+      '-webkit-font-smoothing': 'antialiased',
+      'transition': 'background 0.2s, color 0.2s',
+    },
   ),
 
   // Typography helpers
@@ -70,9 +107,11 @@ List<StyleRule> get appStyles => [
   css('.blueprint-box', [
     css('&').styles(
       position: Position.relative(),
+      border: Border.all(color: AppColors.border, width: 1.px),
+      backgroundColor: AppColors.surface,
     ),
     css('&::before, &::after').styles(
-      content: '""',
+      content: '',
       position: Position.absolute(),
       width: 6.px,
       height: 6.px,
@@ -94,15 +133,6 @@ List<StyleRule> get appStyles => [
     ),
   ]),
 
-  css('[data-theme="dark"] .blueprint-box').styles(
-    backgroundColor: AppColors.surfaceDark,
-    border: Border.all(color: AppColors.borderDark, width: 1.px),
-  ),
-  css('[data-theme="light"] .blueprint-box').styles(
-    backgroundColor: AppColors.surfaceLight,
-    border: Border.all(color: AppColors.borderLight, width: 1.px),
-  ),
-
   // Layout Container & Divider
   css('.wrap').styles(
     maxWidth: 1140.px,
@@ -116,12 +146,11 @@ List<StyleRule> get appStyles => [
     maxWidth: 1140.px,
     margin: .symmetric(vertical: 80.px, horizontal: .auto),
     display: Display.block,
-  ),
-  css('[data-theme="dark"] .rule').styles(
-    backgroundColor: AppColors.borderDark,
-  ),
-  css('[data-theme="light"] .rule').styles(
-    backgroundColor: AppColors.borderLight,
+    raw: {
+      'background':
+          'linear-gradient(90deg, transparent, var(--border) 15%, var(--border-bright) 50%, var(--border) 85%, transparent)',
+      'width': 'calc(100% - 48px)',
+    },
   ),
 
   // Navbar
@@ -130,24 +159,19 @@ List<StyleRule> get appStyles => [
     zIndex: ZIndex(1000),
     width: 100.percent,
     backdropFilter: Filter.blur(16.px),
+    border: Border.only(
+      bottom: BorderSide.solid(color: AppColors.border, width: 1.px),
+    ),
     shadow: BoxShadow(
       offsetX: 0.px,
       offsetY: 4.px,
       blur: 16.px,
       color: Color('rgba(0, 0, 0, 0.08)'),
     ),
-  ),
-  css('[data-theme="dark"] header').styles(
-    backgroundColor: Color('rgba(7, 11, 14, 0.88)'),
-    border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px),
-    ),
-  ),
-  css('[data-theme="light"] header').styles(
-    backgroundColor: Color('rgba(244, 247, 249, 0.88)'),
-    border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px),
-    ),
+    raw: {
+      'background': 'color-mix(in srgb, var(--bg) 88%, transparent)',
+      '-webkit-backdrop-filter': 'blur(16px)',
+    },
   ),
 
   css('.nav-inner').styles(
@@ -162,26 +186,19 @@ List<StyleRule> get appStyles => [
     alignItems: AlignItems.center,
     gap: Gap(column: 10.px),
     textDecoration: TextDecoration.none,
+    color: AppColors.ink,
     fontWeight: FontWeight.w700,
     fontSize: 1.15.rem,
     letterSpacing: (-0.02).em,
   ),
-  css('[data-theme="dark"] .brand').styles(color: AppColors.inkDark),
-  css('[data-theme="light"] .brand').styles(color: AppColors.inkLight),
 
   css('.brand-badge').styles(
     fontSize: 0.7.rem,
     padding: .symmetric(vertical: 2.px, horizontal: 7.px),
+    border: Border.all(color: AppColors.borderBright, width: 1.px),
+    backgroundColor: AppColors.surfaceElevated,
     color: AppColors.cyan,
     radius: BorderRadius.circular(2.px),
-  ),
-  css('[data-theme="dark"] .brand-badge').styles(
-    backgroundColor: AppColors.surfaceElevatedDark,
-    border: Border.all(color: AppColors.borderBrightDark, width: 1.px),
-  ),
-  css('[data-theme="light"] .brand-badge').styles(
-    backgroundColor: AppColors.surfaceElevatedLight,
-    border: Border.all(color: AppColors.borderBrightLight, width: 1.px),
   ),
 
   css('.nav-links', [
@@ -192,6 +209,7 @@ List<StyleRule> get appStyles => [
       fontSize: 0.85.rem,
     ),
     css('a').styles(
+      color: AppColors.inkMuted,
       textDecoration: TextDecoration.none,
       transition: const Transition('color', duration: Duration(milliseconds: 150)),
     ),
@@ -199,10 +217,11 @@ List<StyleRule> get appStyles => [
       color: AppColors.cyan,
     ),
   ]),
-  css('[data-theme="dark"] .nav-links a').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .nav-links a').styles(color: AppColors.inkMutedLight),
 
   css('.theme-toggle').styles(
+    backgroundColor: AppColors.surfaceElevated,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    color: AppColors.ink,
     padding: .symmetric(vertical: 6.px, horizontal: 12.px),
     radius: BorderRadius.circular(4.px),
     cursor: Cursor.pointer,
@@ -211,16 +230,6 @@ List<StyleRule> get appStyles => [
     alignItems: AlignItems.center,
     gap: Gap(column: 6.px),
     transition: const Transition('all', duration: Duration(milliseconds: 150)),
-  ),
-  css('[data-theme="dark"] .theme-toggle').styles(
-    backgroundColor: AppColors.surfaceElevatedDark,
-    border: Border.all(color: AppColors.borderDark, width: 1.px),
-    color: AppColors.inkDark,
-  ),
-  css('[data-theme="light"] .theme-toggle').styles(
-    backgroundColor: AppColors.surfaceElevatedLight,
-    border: Border.all(color: AppColors.borderLight, width: 1.px),
-    color: AppColors.inkLight,
   ),
   css('.theme-toggle:hover').styles(
     color: AppColors.cyan,
@@ -245,20 +254,19 @@ List<StyleRule> get appStyles => [
     textTransform: TextTransform.upperCase,
     margin: .only(bottom: 24.px),
     radius: BorderRadius.circular(2.px),
-    border: Border.all(color: Color('rgba(0, 240, 255, 0.35)'), width: 1.px),
+    raw: {
+      'border': '1px solid color-mix(in srgb, var(--cyan) 35%, transparent)',
+    },
   ),
   css('.telemetry-tag::before').styles(
-    content: '""',
+    content: '',
     width: 6.px,
     height: 6.px,
     backgroundColor: AppColors.cyan,
     radius: BorderRadius.circular(50.percent),
-    shadow: BoxShadow(
-      offsetX: 0.px,
-      offsetY: 0.px,
-      blur: 8.px,
-      color: AppColors.cyan,
-    ),
+    raw: {
+      'box-shadow': '0 0 8px var(--cyan)',
+    },
   ),
 
   css('.hero h1').styles(
@@ -278,26 +286,19 @@ List<StyleRule> get appStyles => [
     fontSize: 1.15.rem,
     lineHeight: 1.6.em,
     maxWidth: 780.px,
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .hero-tagline').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .hero-tagline').styles(color: AppColors.inkMutedLight),
 
   // Command bar
   css('.cmd-bar').styles(
     display: Display.inlineFlex,
     alignItems: AlignItems.center,
     gap: Gap(column: 12.px),
+    backgroundColor: AppColors.surface,
+    border: Border.all(color: AppColors.border, width: 1.px),
     padding: .symmetric(vertical: 8.px, horizontal: 14.px),
     margin: .only(top: 28.px),
     radius: BorderRadius.circular(4.px),
-  ),
-  css('[data-theme="dark"] .cmd-bar').styles(
-    backgroundColor: AppColors.surfaceDark,
-    border: Border.all(color: AppColors.borderDark, width: 1.px),
-  ),
-  css('[data-theme="light"] .cmd-bar').styles(
-    backgroundColor: AppColors.surfaceLight,
-    border: Border.all(color: AppColors.borderLight, width: 1.px),
   ),
   css('.cmd-bar code').styles(
     color: AppColors.cyan,
@@ -305,27 +306,19 @@ List<StyleRule> get appStyles => [
   ),
 
   css('.copy-btn').styles(
+    backgroundColor: AppColors.surfaceElevated,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    color: AppColors.inkMuted,
     padding: .symmetric(vertical: 5.px, horizontal: 10.px),
     fontSize: 0.75.rem,
     cursor: Cursor.pointer,
     radius: BorderRadius.circular(2.px),
     transition: const Transition('all', duration: Duration(milliseconds: 150)),
   ),
-  css('[data-theme="dark"] .copy-btn').styles(
-    backgroundColor: AppColors.surfaceElevatedDark,
-    border: Border.all(color: AppColors.borderDark, width: 1.px),
-    color: AppColors.inkMutedDark,
-  ),
-  css('[data-theme="light"] .copy-btn').styles(
-    backgroundColor: AppColors.surfaceElevatedLight,
-    border: Border.all(color: AppColors.borderLight, width: 1.px),
-    color: AppColors.inkMutedLight,
-  ),
   css('.copy-btn:hover').styles(
+    color: AppColors.ink,
     border: Border.all(color: AppColors.cyan, width: 1.px),
   ),
-  css('[data-theme="dark"] .copy-btn:hover').styles(color: AppColors.inkDark),
-  css('[data-theme="light"] .copy-btn:hover').styles(color: AppColors.inkLight),
 
   // CTA Buttons
   css('.cta-group').styles(
@@ -352,25 +345,16 @@ List<StyleRule> get appStyles => [
     border: Border.all(color: AppColors.cyan, width: 1.px),
   ),
   css('.btn-cyan:hover').styles(
-    shadow: BoxShadow(
-      offsetX: 0.px,
-      offsetY: 0.px,
-      blur: 16.px,
-      color: AppColors.cyanGlow,
-    ),
+    transform: Transform.translate(y: (-1).px),
+    raw: {
+      'box-shadow': '0 0 16px var(--cyan-glow)',
+    },
   ),
   css('.btn-outline').styles(
+    backgroundColor: AppColors.surface,
+    color: AppColors.ink,
+    border: Border.all(color: AppColors.borderBright, width: 1.px),
     textDecoration: TextDecoration.none,
-  ),
-  css('[data-theme="dark"] .btn-outline').styles(
-    backgroundColor: AppColors.surfaceDark,
-    color: AppColors.inkDark,
-    border: Border.all(color: AppColors.borderBrightDark, width: 1.px),
-  ),
-  css('[data-theme="light"] .btn-outline').styles(
-    backgroundColor: AppColors.surfaceLight,
-    color: AppColors.inkLight,
-    border: Border.all(color: AppColors.borderBrightLight, width: 1.px),
   ),
   css('.btn-outline:hover').styles(
     color: AppColors.cyan,
@@ -389,15 +373,8 @@ List<StyleRule> get appStyles => [
     alignItems: AlignItems.center,
     margin: .only(bottom: 20.px),
     padding: .only(bottom: 12.px),
-  ),
-  css('[data-theme="dark"] .workbench-header').styles(
     border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px),
-    ),
-  ),
-  css('[data-theme="light"] .workbench-header').styles(
-    border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px),
+      bottom: BorderSide.solid(color: AppColors.border, width: 1.px),
     ),
   ),
 
@@ -405,9 +382,8 @@ List<StyleRule> get appStyles => [
     fontSize: 0.8.rem,
     textTransform: TextTransform.upperCase,
     letterSpacing: 0.1.em,
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .workbench-title').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .workbench-title').styles(color: AppColors.inkMutedLight),
 
   css('.optics-canvas').styles(
     width: 100.percent,
@@ -424,6 +400,13 @@ List<StyleRule> get appStyles => [
     cursor: Cursor.pointer,
     transition: const Transition('all', duration: Duration(milliseconds: 200)),
   ),
+  css('.node-btn:hover circle, .node-btn.active circle, .node-btn:hover ellipse, .node-btn.active ellipse').styles(
+    raw: {
+      'stroke': 'var(--cyan)',
+      'stroke-width': '3px',
+      'filter': 'drop-shadow(0 0 8px var(--cyan))',
+    },
+  ),
 
   css('.beam-status').styles(
     margin: .only(top: 16.px),
@@ -434,14 +417,8 @@ List<StyleRule> get appStyles => [
     justifyContent: JustifyContent.spaceBetween,
     flexWrap: FlexWrap.wrap,
     gap: Gap(row: 10.px, column: 10.px),
-  ),
-  css('[data-theme="dark"] .beam-status').styles(
-    backgroundColor: AppColors.surfaceElevatedDark,
-    border: Border.all(color: AppColors.borderDark, width: 1.px),
-  ),
-  css('[data-theme="light"] .beam-status').styles(
-    backgroundColor: AppColors.surfaceElevatedLight,
-    border: Border.all(color: AppColors.borderLight, width: 1.px),
+    backgroundColor: AppColors.surfaceElevated,
+    border: Border.all(color: AppColors.border, width: 1.px),
   ),
 
   // Section Headings
@@ -466,9 +443,8 @@ List<StyleRule> get appStyles => [
     margin: .only(top: 12.px),
     fontSize: 1.02.rem,
     maxWidth: 780.px,
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .section-lede').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .section-lede').styles(color: AppColors.inkMutedLight),
 
   // Blueprint Invariants Grid
   css('.blueprint-grid').styles(
@@ -490,21 +466,12 @@ List<StyleRule> get appStyles => [
     display: Display.flex,
     flexDirection: FlexDirection.column,
     justifyContent: JustifyContent.spaceBetween,
+    backgroundColor: AppColors.surface,
+    border: Border.all(color: AppColors.border, width: 1.px),
     transition: const Transition('border-color', duration: Duration(milliseconds: 150)),
   ),
-  css('[data-theme="dark"] .grid-card').styles(
-    backgroundColor: AppColors.surfaceDark,
-    border: Border.all(color: AppColors.borderDark, width: 1.px),
-  ),
-  css('[data-theme="light"] .grid-card').styles(
-    backgroundColor: AppColors.surfaceLight,
-    border: Border.all(color: AppColors.borderLight, width: 1.px),
-  ),
-  css('[data-theme="dark"] .grid-card:hover').styles(
-    border: Border.all(color: AppColors.borderBrightDark, width: 1.px),
-  ),
-  css('[data-theme="light"] .grid-card:hover').styles(
-    border: Border.all(color: AppColors.borderBrightLight, width: 1.px),
+  css('.grid-card:hover').styles(
+    border: Border.all(color: AppColors.borderBright, width: 1.px),
   ),
 
   css('.card-num').styles(
@@ -518,32 +485,24 @@ List<StyleRule> get appStyles => [
     fontSize: 1.05.rem,
     fontWeight: FontWeight.w600,
     margin: .only(bottom: 10.px),
+    color: AppColors.ink,
   ),
-  css('[data-theme="dark"] .card-h').styles(color: AppColors.inkDark),
-  css('[data-theme="light"] .card-h').styles(color: AppColors.inkLight),
 
   css('.card-p').styles(
     fontSize: 0.88.rem,
     margin: .only(bottom: 16.px),
     lineHeight: 1.5.em,
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .card-p').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .card-p').styles(color: AppColors.inkMutedLight),
 
   css('.card-diff').styles(
     padding: .symmetric(vertical: 10.px, horizontal: 14.px),
     fontSize: 0.82.rem,
+    backgroundColor: AppColors.surfaceElevated,
+    color: AppColors.ink,
     border: Border.only(
       left: BorderSide.solid(color: AppColors.cyan, width: 2.px),
     ),
-  ),
-  css('[data-theme="dark"] .card-diff').styles(
-    backgroundColor: AppColors.surfaceElevatedDark,
-    color: AppColors.inkDark,
-  ),
-  css('[data-theme="light"] .card-diff').styles(
-    backgroundColor: AppColors.surfaceElevatedLight,
-    color: AppColors.inkLight,
   ),
 
   // Benchmark HUD & Charts
@@ -563,14 +522,8 @@ List<StyleRule> get appStyles => [
   css('.stat-tile').styles(
     padding: .symmetric(vertical: 22.px, horizontal: 24.px),
     radius: BorderRadius.circular(4.px),
-  ),
-  css('[data-theme="dark"] .stat-tile').styles(
-    backgroundColor: AppColors.surfaceDark,
-    border: Border.all(color: AppColors.borderDark, width: 1.px),
-  ),
-  css('[data-theme="light"] .stat-tile').styles(
-    backgroundColor: AppColors.surfaceLight,
-    border: Border.all(color: AppColors.borderLight, width: 1.px),
+    backgroundColor: AppColors.surface,
+    border: Border.all(color: AppColors.border, width: 1.px),
   ),
 
   css('.stat-big').styles(
@@ -588,33 +541,24 @@ List<StyleRule> get appStyles => [
     margin: .only(top: 10.px),
     fontSize: 0.84.rem,
     lineHeight: 1.45.em,
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .stat-desc').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .stat-desc').styles(color: AppColors.inkMutedLight),
 
   css('.chart-panel').styles(
     margin: .only(top: 28.px),
     radius: BorderRadius.circular(4.px),
     padding: .all(24.px),
     overflow: Overflow.only(x: Overflow.auto),
-  ),
-  css('[data-theme="dark"] .chart-panel').styles(
-    border: Border.all(color: AppColors.borderDark, width: 1.px),
-    backgroundColor: AppColors.surfaceDark,
-  ),
-  css('[data-theme="light"] .chart-panel').styles(
-    border: Border.all(color: AppColors.borderLight, width: 1.px),
-    backgroundColor: AppColors.surfaceLight,
+    backgroundColor: AppColors.surface,
+    border: Border.all(color: AppColors.border, width: 1.px),
   ),
 
   css('.chart-title').styles(
     fontSize: 0.88.rem,
     margin: .only(bottom: 16.px),
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .chart-title').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .chart-title').styles(color: AppColors.inkMutedLight),
-  css('[data-theme="dark"] .chart-title b').styles(color: AppColors.inkDark),
-  css('[data-theme="light"] .chart-title b').styles(color: AppColors.inkLight),
+  css('.chart-title b').styles(color: AppColors.ink),
 
   css('.chart-panel svg').styles(
     display: Display.block,
@@ -636,36 +580,22 @@ List<StyleRule> get appStyles => [
     width: 100.percent,
     fontSize: 0.88.rem,
     radius: BorderRadius.circular(4.px),
-  ),
-  css('[data-theme="dark"] table.spec').styles(
-    backgroundColor: AppColors.surfaceDark,
-    border: Border.all(color: AppColors.borderDark, width: 1.px),
-  ),
-  css('[data-theme="light"] table.spec').styles(
-    backgroundColor: AppColors.surfaceLight,
-    border: Border.all(color: AppColors.borderLight, width: 1.px),
+    backgroundColor: AppColors.surface,
+    border: Border.all(color: AppColors.border, width: 1.px),
   ),
   css('table.spec caption').styles(
     textAlign: TextAlign.left,
     fontSize: 0.82.rem,
     margin: .only(bottom: 10.px),
     fontFamily: const .list([FontFamily('JetBrains Mono'), FontFamilies.monospace]),
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] table.spec caption').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] table.spec caption').styles(color: AppColors.inkMutedLight),
 
   css('table.spec th, table.spec td').styles(
     textAlign: TextAlign.left,
     padding: .symmetric(vertical: 12.px, horizontal: 16.px),
-  ),
-  css('[data-theme="dark"] table.spec th, [data-theme="dark"] table.spec td').styles(
     border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px),
-    ),
-  ),
-  css('[data-theme="light"] table.spec th, [data-theme="light"] table.spec td').styles(
-    border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px),
+      bottom: BorderSide.solid(color: AppColors.border, width: 1.px),
     ),
   ),
 
@@ -674,19 +604,10 @@ List<StyleRule> get appStyles => [
     fontSize: 0.72.rem,
     letterSpacing: 0.08.em,
     textTransform: TextTransform.upperCase,
-  ),
-  css('[data-theme="dark"] table.spec thead th').styles(
-    color: AppColors.inkMutedDark,
-    backgroundColor: AppColors.surfaceElevatedDark,
+    color: AppColors.inkMuted,
+    backgroundColor: AppColors.surfaceElevated,
     border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderBrightDark, width: 1.px),
-    ),
-  ),
-  css('[data-theme="light"] table.spec thead th').styles(
-    color: AppColors.inkMutedLight,
-    backgroundColor: AppColors.surfaceElevatedLight,
-    border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderBrightLight, width: 1.px),
+      bottom: BorderSide.solid(color: AppColors.borderBright, width: 1.px),
     ),
   ),
 
@@ -694,20 +615,16 @@ List<StyleRule> get appStyles => [
     textAlign: TextAlign.right,
     fontFamily: const .list([FontFamily('JetBrains Mono'), FontFamilies.monospace]),
   ),
-  css('[data-theme="dark"] table.spec tbody tr:hover, [data-theme="dark"] table.matrix tbody tr:hover').styles(
-    backgroundColor: AppColors.surfaceElevatedDark,
-  ),
-  css('[data-theme="light"] table.spec tbody tr:hover, [data-theme="light"] table.matrix tbody tr:hover').styles(
-    backgroundColor: AppColors.surfaceElevatedLight,
+  css('table.spec tbody tr:hover, table.matrix tbody tr:hover').styles(
+    backgroundColor: AppColors.surfaceElevated,
   ),
 
   css('.note').styles(
     fontSize: 0.82.rem,
     margin: .only(top: 14.px),
     lineHeight: 1.5.em,
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .note').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .note').styles(color: AppColors.inkMutedLight),
 
   // Matrix
   css('table.matrix').styles(
@@ -716,26 +633,13 @@ List<StyleRule> get appStyles => [
     fontSize: 0.88.rem,
     minWidth: 720.px,
     radius: BorderRadius.circular(4.px),
-  ),
-  css('[data-theme="dark"] table.matrix').styles(
-    backgroundColor: AppColors.surfaceDark,
-    border: Border.all(color: AppColors.borderDark, width: 1.px),
-  ),
-  css('[data-theme="light"] table.matrix').styles(
-    backgroundColor: AppColors.surfaceLight,
-    border: Border.all(color: AppColors.borderLight, width: 1.px),
+    backgroundColor: AppColors.surface,
+    border: Border.all(color: AppColors.border, width: 1.px),
   ),
   css('table.matrix th, table.matrix td').styles(
     padding: .symmetric(vertical: 12.px, horizontal: 14.px),
-  ),
-  css('[data-theme="dark"] table.matrix th, [data-theme="dark"] table.matrix td').styles(
     border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px),
-    ),
-  ),
-  css('[data-theme="light"] table.matrix th, [data-theme="light"] table.matrix td').styles(
-    border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px),
+      bottom: BorderSide.solid(color: AppColors.border, width: 1.px),
     ),
   ),
   css('table.matrix thead th').styles(
@@ -744,19 +648,10 @@ List<StyleRule> get appStyles => [
     letterSpacing: 0.06.em,
     textTransform: TextTransform.upperCase,
     textAlign: TextAlign.center,
-  ),
-  css('[data-theme="dark"] table.matrix thead th').styles(
-    color: AppColors.inkMutedDark,
-    backgroundColor: AppColors.surfaceElevatedDark,
+    color: AppColors.inkMuted,
+    backgroundColor: AppColors.surfaceElevated,
     border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderBrightDark, width: 1.px),
-    ),
-  ),
-  css('[data-theme="light"] table.matrix thead th').styles(
-    color: AppColors.inkMutedLight,
-    backgroundColor: AppColors.surfaceElevatedLight,
-    border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderBrightLight, width: 1.px),
+      bottom: BorderSide.solid(color: AppColors.borderBright, width: 1.px),
     ),
   ),
   css('table.matrix thead th:first-child').styles(
@@ -783,30 +678,23 @@ List<StyleRule> get appStyles => [
     fontWeight: FontWeight.w700,
   ),
   css('.no').styles(
-    color: AppColors.inkMutedDark,
+    color: AppColors.inkMuted,
   ),
   css('.matrix-legend').styles(
     margin: .only(top: 12.px),
     fontSize: 0.8.rem,
     display: Display.flex,
     gap: Gap(column: 20.px),
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .matrix-legend').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .matrix-legend').styles(color: AppColors.inkMutedLight),
 
   // Code Container
   css('.code-container').styles(
     margin: .only(top: 36.px),
     radius: BorderRadius.circular(4.px),
     overflow: Overflow.hidden,
-  ),
-  css('[data-theme="dark"] .code-container').styles(
-    backgroundColor: AppColors.surfaceDark,
-    border: Border.all(color: AppColors.borderDark, width: 1.px),
-  ),
-  css('[data-theme="light"] .code-container').styles(
-    backgroundColor: AppColors.surfaceLight,
-    border: Border.all(color: AppColors.borderLight, width: 1.px),
+    backgroundColor: AppColors.surface,
+    border: Border.all(color: AppColors.border, width: 1.px),
   ),
 
   css('.code-header-bar').styles(
@@ -814,17 +702,9 @@ List<StyleRule> get appStyles => [
     alignItems: AlignItems.center,
     justifyContent: JustifyContent.spaceBetween,
     padding: .symmetric(vertical: 4.px, horizontal: 8.px),
-  ),
-  css('[data-theme="dark"] .code-header-bar').styles(
-    backgroundColor: AppColors.surfaceElevatedDark,
+    backgroundColor: AppColors.surfaceElevated,
     border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderDark, width: 1.px),
-    ),
-  ),
-  css('[data-theme="light"] .code-header-bar').styles(
-    backgroundColor: AppColors.surfaceElevatedLight,
-    border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.borderLight, width: 1.px),
+      bottom: BorderSide.solid(color: AppColors.border, width: 1.px),
     ),
   ),
 
@@ -840,11 +720,11 @@ List<StyleRule> get appStyles => [
     cursor: Cursor.pointer,
     radius: BorderRadius.circular(3.px),
     transition: const Transition('all', duration: Duration(milliseconds: 150)),
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .tab-btn').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .tab-btn').styles(color: AppColors.inkMutedLight),
 
   css('.tab-btn.active').styles(
+    backgroundColor: AppColors.surface,
     color: AppColors.cyan,
     fontWeight: FontWeight.w600,
     shadow: BoxShadow(
@@ -854,17 +734,14 @@ List<StyleRule> get appStyles => [
       color: Color('rgba(0, 0, 0, 0.2)'),
     ),
   ),
-  css('[data-theme="dark"] .tab-btn.active').styles(backgroundColor: AppColors.surfaceDark),
-  css('[data-theme="light"] .tab-btn.active').styles(backgroundColor: AppColors.surfaceLight),
 
   css('.code-content').styles(
     padding: .all(24.px),
     overflow: Overflow.only(x: Overflow.auto),
     fontSize: 0.88.rem,
     lineHeight: 1.68.em,
+    backgroundColor: AppColors.bg,
   ),
-  css('[data-theme="dark"] .code-content').styles(backgroundColor: AppColors.bgDark),
-  css('[data-theme="light"] .code-content').styles(backgroundColor: AppColors.bgLight),
 
   // Topology Stack
   css('.topology-grid').styles(
@@ -883,22 +760,12 @@ List<StyleRule> get appStyles => [
   css('.topology-card').styles(
     padding: .symmetric(vertical: 16.px, horizontal: 20.px),
     radius: BorderRadius.circular(4.px),
-  ),
-  css('[data-theme="dark"] .topology-card').styles(
-    backgroundColor: AppColors.surfaceDark,
-    border: Border.all(color: AppColors.borderDark, width: 1.px),
-  ),
-  css('[data-theme="light"] .topology-card').styles(
-    backgroundColor: AppColors.surfaceLight,
-    border: Border.all(color: AppColors.borderLight, width: 1.px),
+    backgroundColor: AppColors.surface,
+    border: Border.all(color: AppColors.border, width: 1.px),
   ),
 
-  css('[data-theme="dark"] .topology-card.flutter-layer').styles(
-    backgroundColor: AppColors.surfaceElevatedDark,
-    border: Border.all(color: AppColors.cyan, width: 1.px),
-  ),
-  css('[data-theme="light"] .topology-card.flutter-layer').styles(
-    backgroundColor: AppColors.surfaceElevatedLight,
+  css('.topology-card.flutter-layer').styles(
+    backgroundColor: AppColors.surfaceElevated,
     border: Border.all(color: AppColors.cyan, width: 1.px),
   ),
 
@@ -911,25 +778,16 @@ List<StyleRule> get appStyles => [
   css('.topology-desc').styles(
     fontSize: 0.82.rem,
     lineHeight: 1.45.em,
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .topology-desc').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .topology-desc').styles(color: AppColors.inkMutedLight),
 
   // Footer
   css('footer').styles(
     margin: .only(top: 80.px),
     padding: .only(top: 56.px, bottom: 72.px),
-  ),
-  css('[data-theme="dark"] footer').styles(
-    backgroundColor: AppColors.surfaceDark,
+    backgroundColor: AppColors.surface,
     border: Border.only(
-      top: BorderSide.solid(color: AppColors.borderDark, width: 1.px),
-    ),
-  ),
-  css('[data-theme="light"] footer').styles(
-    backgroundColor: AppColors.surfaceLight,
-    border: Border.only(
-      top: BorderSide.solid(color: AppColors.borderLight, width: 1.px),
+      top: BorderSide.solid(color: AppColors.border, width: 1.px),
     ),
   ),
 
@@ -941,21 +799,18 @@ List<StyleRule> get appStyles => [
     flexWrap: FlexWrap.wrap,
     gap: Gap(row: 16.px, column: 16.px),
     fontSize: 0.82.rem,
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .footer-bottom').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .footer-bottom').styles(color: AppColors.inkMutedLight),
 
-  // Semantic Utility Classes (Replacing Raw Style Attributes)
+  // Semantic Utility Classes
   css('.workbench-subtitle').styles(
     fontSize: 0.76.rem,
     color: AppColors.cyan,
   ),
   css('.beam-label').styles(
     fontSize: 0.82.rem,
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .beam-label').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .beam-label').styles(color: AppColors.inkMutedLight),
-
   css('.beam-path').styles(
     color: AppColors.cyan,
     fontWeight: FontWeight.w600,
@@ -971,10 +826,7 @@ List<StyleRule> get appStyles => [
     fontWeight: FontWeight.w600,
   ),
 
-  css('.syntax-comment').styles(),
-  css('[data-theme="dark"] .syntax-comment').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .syntax-comment').styles(color: AppColors.inkMutedLight),
-
+  css('.syntax-comment').styles(color: AppColors.inkMuted),
   css('.syntax-keyword').styles(color: AppColors.cyan),
   css('.syntax-string').styles(color: AppColors.amber),
   css('.syntax-success').styles(color: AppColors.green),
@@ -984,16 +836,15 @@ List<StyleRule> get appStyles => [
   css('.mt-24').styles(margin: .only(top: 24.px)),
   css('.code-filename').styles(
     fontSize: 0.8.rem,
+    color: AppColors.inkMuted,
   ),
-  css('[data-theme="dark"] .code-filename').styles(color: AppColors.inkMutedDark),
-  css('[data-theme="light"] .code-filename').styles(color: AppColors.inkMutedLight),
 
   css('.footer-links').styles(
     display: Display.flex,
     gap: Gap(column: 16.px),
   ),
   css('.footer-link').styles(
-    color: Color('inherit'),
+    color: AppColors.inkMuted,
     textDecoration: const TextDecoration(line: TextDecorationLine.none),
   ),
 
@@ -1022,6 +873,9 @@ List<StyleRule> get appStyles => [
     css('.rule').styles(
       margin: .symmetric(vertical: 44.px, horizontal: .auto),
       maxWidth: 100.percent,
+      raw: {
+        'width': 'calc(100% - 32px)',
+      },
     ),
     css('section').styles(
       padding: .only(top: 48.px, bottom: 38.px),
@@ -1044,6 +898,10 @@ List<StyleRule> get appStyles => [
       gap: Gap(column: 14.px),
       padding: .only(top: 2.px, bottom: 6.px),
       fontSize: 0.8.rem,
+      raw: {
+        '-webkit-overflow-scrolling': 'touch',
+        'scrollbar-width': 'none',
+      },
     ),
     css('.nav-links a, .nav-links .theme-toggle').styles(
       whiteSpace: WhiteSpace.noWrap,
@@ -1089,6 +947,10 @@ List<StyleRule> get appStyles => [
       overflow: Overflow.only(x: Overflow.auto),
       whiteSpace: WhiteSpace.noWrap,
       flex: Flex(grow: 1),
+      raw: {
+        '-webkit-overflow-scrolling': 'touch',
+        'scrollbar-width': 'none',
+      },
     ),
     css('.cmd-bar .copy-btn').styles(
       flex: Flex(shrink: 0),
@@ -1218,14 +1080,8 @@ List<StyleRule> get appStyles => [
       width: 100.percent,
       maxWidth: 100.percent,
       radius: BorderRadius.circular(4.px),
+      border: Border.all(color: AppColors.border, width: 1.px),
     ),
-    css('[data-theme="dark"] .table-scroll').styles(
-      border: Border.all(color: AppColors.borderDark, width: 1.px),
-    ),
-    css('[data-theme="light"] .table-scroll').styles(
-      border: Border.all(color: AppColors.borderLight, width: 1.px),
-    ),
-
     css('table.spec, table.matrix').styles(
       border: Border.unset,
       margin: .only(top: 0.px),
