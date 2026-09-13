@@ -911,6 +911,52 @@ List<StyleRule> get appStyles => [
   css('[data-theme="dark"] .footer-bottom').styles(color: AppColors.inkMutedDark),
   css('[data-theme="light"] .footer-bottom').styles(color: AppColors.inkMutedLight),
 
+  // Semantic Utility Classes (Replacing Raw Style Attributes)
+  css('.workbench-subtitle').styles(
+    fontSize: 0.76.rem,
+    color: AppColors.cyan,
+  ),
+  css('.beam-label').styles(
+    fontSize: 0.82.rem,
+  ),
+  css('[data-theme="dark"] .beam-label').styles(color: AppColors.inkMutedDark),
+  css('[data-theme="light"] .beam-label').styles(color: AppColors.inkMutedLight),
+
+  css('.beam-path').styles(
+    color: AppColors.cyan,
+    fontWeight: FontWeight.w600,
+    margin: .only(left: 8.px),
+  ),
+  css('.beam-type').styles(
+    color: AppColors.amber,
+    fontWeight: FontWeight.w600,
+    margin: .only(left: 8.px),
+  ),
+  css('.beam-verified').styles(
+    color: AppColors.green,
+    fontWeight: FontWeight.w600,
+  ),
+
+  css('.syntax-comment').styles(),
+  css('[data-theme="dark"] .syntax-comment').styles(color: AppColors.inkMutedDark),
+  css('[data-theme="light"] .syntax-comment').styles(color: AppColors.inkMutedLight),
+
+  css('.syntax-keyword').styles(color: AppColors.cyan),
+  css('.syntax-string').styles(color: AppColors.amber),
+  css('.syntax-success').styles(color: AppColors.green),
+  css('.text-cyan').styles(color: AppColors.cyan),
+  css('.text-red').styles(color: AppColors.red),
+  css('.font-semibold').styles(fontWeight: FontWeight.w600),
+
+  css('.footer-links').styles(
+    display: Display.flex,
+    gap: Gap(column: 16.px),
+  ),
+  css('.footer-link').styles(
+    color: Color('inherit'),
+    textDecoration: const TextDecoration(line: TextDecorationLine.none),
+  ),
+
   // =========================================================================
   // Responsive Media Queries (Tablets & Mobile)
   // =========================================================================

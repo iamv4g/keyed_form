@@ -17,17 +17,6 @@ analyzer:
 #   exclude:
 #     - path/to/excluded/files/**
 
-# Jaspr has a custom analyzer plugin 'jaspr_lints', which is enabled here.
-#
-# You can toggle Jaspr specific lint rules in the 'diagnostics' section below.
-plugins:
-  jaspr_lints:
-    version: ^0.7.2
-    diagnostics:
-      prefer_html_components: true
-      sort_children_last: true
-      styles_ordering: false
-
 # Uncomment the following section to enable or disable additional rules.
 
 # linter:
