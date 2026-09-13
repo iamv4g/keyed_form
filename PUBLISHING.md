@@ -103,6 +103,27 @@ Push every tag created above in one go, once all six packages are confirmed
 live — not incrementally after each one, so a mid-sequence publish failure
 doesn't leave a tag on git for a version that never made it to pub.dev.
 
+Then create a GitHub Release for each tag, using that version's own
+`CHANGELOG.md` section as the release notes:
+
+```bash
+for pkg in keyed_lens keyed_form_core keyed_form_schema keyed_form_gen keyed_form keyed_form_flutter; do
+  version=$(grep '^version:' "packages/$pkg/pubspec.yaml" | awk '{print $2}')
+  notes=$(awk -v v="$version" '
+    $0 == "## " v { flag=1; next }
+    /^## /        { flag=0 }
+    flag
+  ' "packages/$pkg/CHANGELOG.md")
+  gh release create "$pkg-v$version" --title "$pkg v$version" --notes "$notes"
+done
+```
+
+This assumes each package's `CHANGELOG.md` has a `## <version>` heading for
+exactly the version being released (true today; stays true as long as
+["Cutting a later release"](#cutting-a-later-release-v011-after-v010-is-out)
+below is followed). For a one-off release, skip the loop and run the same
+`gh release create` line for just that package.
+
 ## Cutting a later release (v0.1.1+, after v0.1.0 is out)
 
 - Only the packages that actually changed need a new version — a package
