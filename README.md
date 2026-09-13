@@ -33,6 +33,8 @@ dart analyze                 # or flutter analyze, for keyed_form_flutter
 dart test                    # per package; keyed_form_flutter needs flutter test
 ```
 
+See [`PUBLISHING.md`](PUBLISHING.md) for the pub.dev release process.
+
 ## Examples
 
 The same "Kyoto tour" runs through every package, bottom to top:
