@@ -572,16 +572,28 @@ List<StyleRule> get appStyles => [
   ),
 
   // Tables
+  css('table').styles(
+    raw: {
+      'border-collapse': 'collapse',
+      'border-spacing': '0',
+    },
+  ),
+
   css('.table-scroll').styles(
     overflow: Overflow.only(x: Overflow.auto),
     margin: .only(top: 24.px),
   ),
   css('table.spec').styles(
     width: 100.percent,
-    fontSize: 0.88.rem,
-    radius: BorderRadius.circular(4.px),
-    backgroundColor: AppColors.surface,
     border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(4.px),
+    overflow: Overflow.hidden,
+    fontSize: 0.88.rem,
+    backgroundColor: AppColors.surface,
+    raw: {
+      'border-collapse': 'collapse',
+      'border-spacing': '0',
+    },
   ),
   css('table.spec caption').styles(
     textAlign: TextAlign.left,
@@ -629,12 +641,16 @@ List<StyleRule> get appStyles => [
   // Matrix
   css('table.matrix').styles(
     width: 100.percent,
-    margin: .only(top: 24.px),
-    fontSize: 0.88.rem,
     minWidth: 720.px,
-    radius: BorderRadius.circular(4.px),
-    backgroundColor: AppColors.surface,
+    margin: .only(top: 24.px),
     border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(4.px),
+    fontSize: 0.88.rem,
+    backgroundColor: AppColors.surface,
+    raw: {
+      'border-collapse': 'collapse',
+      'border-spacing': '0',
+    },
   ),
   css('table.matrix th, table.matrix td').styles(
     padding: .symmetric(vertical: 12.px, horizontal: 14.px),
@@ -1086,6 +1102,10 @@ List<StyleRule> get appStyles => [
       border: Border.unset,
       margin: .only(top: 0.px),
       fontSize: 0.78.rem,
+      raw: {
+        'border-collapse': 'collapse',
+        'border-spacing': '0',
+      },
     ),
     css('table.spec th, table.spec td, table.matrix th, table.matrix td').styles(
       padding: .symmetric(vertical: 8.px, horizontal: 10.px),
