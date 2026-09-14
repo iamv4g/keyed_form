@@ -17,9 +17,26 @@ class _ThemeToggleState extends State<ThemeToggle> {
   void initState() {
     super.initState();
     if (kIsWeb) {
-      final current = web.document.documentElement?.getAttribute('data-theme');
-      if (current != null) {
-        _isDark = current == 'dark';
+      String? savedTheme;
+      try {
+        savedTheme = web.window.localStorage.getItem('theme');
+      } catch (_) {}
+
+      if (savedTheme != null && savedTheme.isNotEmpty) {
+        _isDark = savedTheme == 'dark';
+      } else {
+        final current = web.document.documentElement?.getAttribute('data-theme');
+        if (current != null && current.isNotEmpty) {
+          _isDark = current == 'dark';
+        } else {
+          final isDarkScheme = web.window.matchMedia('(prefers-color-scheme: dark)').matches;
+          final isLightScheme = web.window.matchMedia('(prefers-color-scheme: light)').matches;
+          if (isLightScheme && !isDarkScheme) {
+            _isDark = false;
+          } else {
+            _isDark = true;
+          }
+        }
       }
     }
   }
@@ -28,6 +45,9 @@ class _ThemeToggleState extends State<ThemeToggle> {
     if (kIsWeb) {
       final next = _isDark ? 'light' : 'dark';
       web.document.documentElement?.setAttribute('data-theme', next);
+      try {
+        web.window.localStorage.setItem('theme', next);
+      } catch (_) {}
       setState(() {
         _isDark = !_isDark;
       });

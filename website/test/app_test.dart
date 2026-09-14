@@ -124,13 +124,21 @@ void main() {
 
       // Basic Document Structure
       expect(content, contains('<!DOCTYPE html>'));
-      expect(content, contains('<html lang="en" data-theme="dark">'));
+      expect(content, contains('<html lang="en">'));
+      expect(content, isNot(contains('<html lang="en" data-theme="dark">')));
       expect(
         content,
         contains(
           '<title>keyed_form — typed, O(1) Flutter forms built on keyed optics</title>',
         ),
       );
+
+      // System Theme & Preference restore script
+      expect(content, contains('localStorage.getItem(\'theme\')'));
+      expect(content, contains('@media all and (prefers-color-scheme: light)'));
+      expect(content, contains('@media all and (prefers-color-scheme: dark)'));
+      expect(content, contains(':root:not([data-theme="dark"])'));
+      expect(content, contains(':root:not([data-theme="light"])'));
 
       // Critical sections present
       expect(content, contains('id="optics"'));

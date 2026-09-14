@@ -30,7 +30,6 @@ void main() {
         'twitter:card': 'summary_large_image',
       },
       head: [
-        const Document.html(attributes: {'data-theme': 'dark'}),
         link(
           rel: 'icon',
           href:
@@ -46,6 +45,10 @@ void main() {
           rel: 'stylesheet',
           href:
               'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap',
+        ),
+        script(
+          content:
+              "try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}",
         ),
       ],
       body: const App(),
