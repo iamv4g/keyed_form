@@ -16,7 +16,6 @@ void main() {
 
       // Brand & Navigation
       expect(find.textContaining('keyed_form'), findsComponents);
-      expect(find.text('v0.1.0'), findsOneComponent);
       expect(find.text('Optics'), findsOneComponent);
       expect(find.text('Invariants'), findsOneComponent);
       expect(find.text('Telemetry'), findsOneComponent);
@@ -45,7 +44,7 @@ void main() {
       tester.pumpComponent(const Navbar());
 
       expect(find.textContaining('keyed_form'), findsOneComponent);
-      expect(find.text('v0.1.0'), findsOneComponent);
+      expect(find.text('v0.1.0'), findsNothing);
       expect(find.text('☼ LIGHT'), findsOneComponent);
     });
 

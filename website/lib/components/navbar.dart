@@ -29,10 +29,7 @@ class Navbar extends StatelessComponent {
               line(x1: '20', y1: '12', x2: '22', y2: '12', []),
             ],
           ),
-          .text(' keyed_form '),
-          span(classes: 'brand-badge mono', [
-            .text('v0.1.0'),
-          ]),
+          .text(' keyed_form'),
         ]),
         div(classes: 'nav-links mono', [
           a(href: '#optics', [.text('Optics')]),
