@@ -9,7 +9,6 @@ import 'components/matrix_section.dart';
 import 'components/navbar.dart';
 import 'components/telemetry_section.dart';
 import 'components/topology_section.dart';
-import 'styles/theme.dart';
 
 class App extends StatelessComponent {
   const App({super.key});
@@ -33,6 +32,4 @@ class App extends StatelessComponent {
     ]);
   }
 
-  @css
-  static List<StyleRule> get styles => appStyles;
 }

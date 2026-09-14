@@ -159,6 +159,14 @@ void main() {
       final jsFile = File('build/jaspr/main.client.dart.js');
       expect(jsFile.existsSync(), isTrue);
       expect(jsFile.lengthSync(), greaterThan(10000));
+
+      // Mobile Responsive & Overflow Containment verification
+      expect(content, contains('@media screen and (max-width: 768px)'));
+      expect(content, contains('overflow-x: clip'));
+      expect(content, contains('word-break: break-all'));
+      expect(content, contains('flex: 1'));
+      expect(content, contains('min-width: 0'));
+      expect(content, contains('border-collapse: collapse'));
     });
   });
 }

@@ -73,11 +73,15 @@ List<StyleRule> get appStyles => [
   ),
 
   css('html').styles(
-    raw: {'scroll-behavior': 'smooth'},
+    raw: {
+      'scroll-behavior': 'smooth',
+      'overflow-x': 'hidden',
+    },
   ),
 
   css('body').styles(
     overflow: Overflow.only(x: Overflow.clip),
+    maxWidth: 100.percent,
     fontFamily: const .list([FontFamily('Inter'), FontFamilies.sansSerif]),
     fontSize: 15.px,
     lineHeight: 1.6.em,
@@ -89,6 +93,13 @@ List<StyleRule> get appStyles => [
       'background-size': '32px 32px',
       '-webkit-font-smoothing': 'antialiased',
       'transition': 'background 0.2s, color 0.2s',
+      'overflow-x': 'clip',
+    },
+  ),
+
+  css('section, [id]').styles(
+    raw: {
+      'scroll-margin-top': '80px',
     },
   ),
 
@@ -857,7 +868,8 @@ List<StyleRule> get appStyles => [
 
   css('.footer-links').styles(
     display: Display.flex,
-    gap: Gap(column: 16.px),
+    flexWrap: FlexWrap.wrap,
+    gap: Gap(row: 8.px, column: 16.px),
   ),
   css('.footer-link').styles(
     color: AppColors.inkMuted,
@@ -879,11 +891,23 @@ List<StyleRule> get appStyles => [
   ]),
 
   css.media(MediaQuery.screen(maxWidth: 768.px), [
-    css('body').styles(
+    css('html, body').styles(
       overflow: Overflow.only(x: Overflow.clip),
       width: 100.percent,
+      maxWidth: 100.percent,
+      raw: {
+        'overflow-x': 'clip',
+      },
+    ),
+    css('section, [id]').styles(
+      raw: {
+        'scroll-margin-top': '74px',
+      },
     ),
     css('.wrap').styles(
+      width: 100.percent,
+      maxWidth: 100.percent,
+      boxSizing: BoxSizing.borderBox,
       padding: .symmetric(horizontal: 16.px),
     ),
     css('.rule').styles(
@@ -894,7 +918,7 @@ List<StyleRule> get appStyles => [
       },
     ),
     css('section').styles(
-      padding: .only(top: 48.px, bottom: 38.px),
+      padding: .only(top: 32.px, bottom: 38.px),
     ),
 
     // Navbar Mobile
@@ -910,14 +934,19 @@ List<StyleRule> get appStyles => [
     ),
     css('.nav-links').styles(
       width: 100.percent,
+      maxWidth: 100.percent,
       overflow: Overflow.only(x: Overflow.auto),
       gap: Gap(column: 14.px),
       padding: .only(top: 2.px, bottom: 6.px),
       fontSize: 0.8.rem,
       raw: {
+        'min-width': '0',
         '-webkit-overflow-scrolling': 'touch',
         'scrollbar-width': 'none',
       },
+    ),
+    css('.nav-links::-webkit-scrollbar').styles(
+      raw: {'display': 'none'},
     ),
     css('.nav-links a, .nav-links .theme-toggle').styles(
       whiteSpace: WhiteSpace.noWrap,
@@ -939,7 +968,9 @@ List<StyleRule> get appStyles => [
     css('.hero h1').styles(
       lineHeight: 1.15.em,
       maxWidth: 100.percent,
-      fontSize: 2.2.rem,
+      raw: {
+        'font-size': 'clamp(1.85rem, 7.5vw, 2.75rem)',
+      },
     ),
     css('.hero-tagline').styles(
       fontSize: 0.98.rem,
@@ -962,11 +993,16 @@ List<StyleRule> get appStyles => [
       fontSize: 0.74.rem,
       overflow: Overflow.only(x: Overflow.auto),
       whiteSpace: WhiteSpace.noWrap,
-      flex: Flex(grow: 1),
+      minWidth: 0.px,
       raw: {
+        'flex': '1',
+        'min-width': '0',
         '-webkit-overflow-scrolling': 'touch',
         'scrollbar-width': 'none',
       },
+    ),
+    css('.cmd-bar code::-webkit-scrollbar').styles(
+      raw: {'display': 'none'},
     ),
     css('.cmd-bar .copy-btn').styles(
       flex: Flex(shrink: 0),
@@ -1002,8 +1038,13 @@ List<StyleRule> get appStyles => [
     ),
     css('.optics-canvas').styles(
       width: 100.percent,
+      maxWidth: 100.percent,
+      boxSizing: BoxSizing.borderBox,
       overflow: Overflow.only(x: Overflow.auto),
       padding: .only(bottom: 6.px),
+      raw: {
+        '-webkit-overflow-scrolling': 'touch',
+      },
     ),
     css('.optics-canvas svg').styles(
       minWidth: 640.px,
@@ -1020,6 +1061,9 @@ List<StyleRule> get appStyles => [
     ),
     css('.beam-status div').styles(
       width: 100.percent,
+      raw: {
+        'word-break': 'break-all',
+      },
     ),
 
     // Section Mobile
@@ -1082,7 +1126,13 @@ List<StyleRule> get appStyles => [
     css('.chart-panel').styles(
       margin: .only(top: 20.px),
       padding: .symmetric(vertical: 16.px, horizontal: 12.px),
+      width: 100.percent,
+      maxWidth: 100.percent,
+      boxSizing: BoxSizing.borderBox,
       overflow: Overflow.only(x: Overflow.auto),
+      raw: {
+        '-webkit-overflow-scrolling': 'touch',
+      },
     ),
     css('.chart-panel svg').styles(
       minWidth: 480.px,
@@ -1095,8 +1145,12 @@ List<StyleRule> get appStyles => [
       margin: .only(top: 18.px),
       width: 100.percent,
       maxWidth: 100.percent,
+      boxSizing: BoxSizing.borderBox,
       radius: BorderRadius.circular(4.px),
       border: Border.all(color: AppColors.border, width: 1.px),
+      raw: {
+        '-webkit-overflow-scrolling': 'touch',
+      },
     ),
     css('table.spec, table.matrix').styles(
       border: Border.unset,
@@ -1116,7 +1170,9 @@ List<StyleRule> get appStyles => [
     ),
     css('td.feat').styles(
       fontSize: 0.78.rem,
-      maxWidth: 180.px,
+      raw: {
+        'max-width': '20ch',
+      },
     ),
     css('.matrix-legend').styles(
       flexWrap: FlexWrap.wrap,
@@ -1136,9 +1192,20 @@ List<StyleRule> get appStyles => [
       padding: .all(8.px),
     ),
     css('.code-tabs').styles(
+      width: 100.percent,
+      maxWidth: 100.percent,
+      minWidth: 0.px,
       overflow: Overflow.only(x: Overflow.auto),
       whiteSpace: WhiteSpace.noWrap,
       padding: .only(bottom: 4.px),
+      raw: {
+        'min-width': '0',
+        '-webkit-overflow-scrolling': 'touch',
+        'scrollbar-width': 'none',
+      },
+    ),
+    css('.code-tabs::-webkit-scrollbar').styles(
+      raw: {'display': 'none'},
     ),
     css('.tab-btn').styles(
       padding: .symmetric(vertical: 8.px, horizontal: 12.px),
@@ -1154,6 +1221,10 @@ List<StyleRule> get appStyles => [
       padding: .symmetric(vertical: 16.px, horizontal: 14.px),
       fontSize: 0.78.rem,
       lineHeight: 1.55.em,
+      overflow: Overflow.only(x: Overflow.auto),
+      raw: {
+        '-webkit-overflow-scrolling': 'touch',
+      },
     ),
 
     // Topology Grid Mobile

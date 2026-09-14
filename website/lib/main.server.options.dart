@@ -10,7 +10,6 @@ import 'package:website/components/copy_button.dart' as _copy_button;
 import 'package:website/components/optics_raytracer.dart' as _optics_raytracer;
 import 'package:website/components/theme_toggle.dart' as _theme_toggle;
 import 'package:website/styles/theme.dart' as _theme;
-import 'package:website/app.dart' as _app;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -44,7 +43,7 @@ ServerOptions get defaultServerOptions => ServerOptions(
       'theme_toggle',
     ),
   },
-  styles: () => [..._theme.appStyles, ..._app.App.styles],
+  styles: () => [..._theme.appStyles],
 );
 
 Map<String, Object?> __copy_buttonCopyButton(_copy_button.CopyButton c) => {
