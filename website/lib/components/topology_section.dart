@@ -1,8 +1,6 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
-import 'copy_button.dart';
-
 class TopologySection extends StatelessComponent {
   const TopologySection({super.key});
 
@@ -69,24 +67,6 @@ class TopologySection extends StatelessComponent {
             .text(
               'The Flutter binding layer: KeyedForm, KeyedFormField, KeyedFieldList, KeyedTextBinding.',
             ),
-          ]),
-        ]),
-      ]),
-      div(classes: 'blueprint-box code-container mt-24', [
-        div(classes: 'code-header-bar mono', [
-          span(classes: 'code-filename mono', [.text('pubspec.yaml')]),
-          const CopyButton(
-            text:
-                'dependencies:\n  keyed_form_flutter: ^0.1.0\n  keyed_form_schema: ^0.1.0\n\ndev_dependencies:\n  build_runner: ^2.15.0\n  keyed_form_gen: ^0.1.0',
-            label: 'COPY DEPS',
-          ),
-        ]),
-        div(classes: 'code-content mono', [
-          pre([
-            span(classes: 'syntax-comment', [.text('dependencies:\n')]),
-            .text('  keyed_form_flutter: ^0.1.0\n  keyed_form_schema: ^0.1.0\n\n'),
-            span(classes: 'syntax-comment', [.text('dev_dependencies:\n')]),
-            .text('  build_runner: ^2.15.0\n  keyed_form_gen: ^0.1.0'),
           ]),
         ]),
       ]),

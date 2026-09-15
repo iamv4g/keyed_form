@@ -32,11 +32,9 @@ class Navbar extends StatelessComponent {
           .text(' keyed_form'),
         ]),
         div(classes: 'nav-links mono', [
-          a(href: '#optics', [.text('Optics')]),
+          a(classes: 'nav-docs-btn', href: '/docs', [.text('DOCS')]),
           a(href: '#problems', [.text('Invariants')]),
-          a(href: '#benchmarks', [.text('Telemetry')]),
-          a(href: '#matrix', [.text('Matrix')]),
-          a(href: '#code', [.text('Code')]),
+          a(href: '#benchmarks', [.text('Benchmarks')]),
           a(href: '#packages', [.text('Architecture')]),
           a(
             href: 'https://pub.dev/packages/keyed_form_flutter',
