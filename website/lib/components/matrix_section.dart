@@ -15,7 +15,7 @@ class MatrixSection extends StatelessComponent {
       ]),
       p(classes: 'section-lede', [
         .text(
-          'Direct capability comparison across major Flutter form packages.',
+          'Direct capability comparison across the major Flutter form architectures.',
         ),
       ]),
       div(classes: 'table-scroll', [
@@ -25,9 +25,9 @@ class MatrixSection extends StatelessComponent {
               th([.text('Architectural Feature')]),
               th(classes: 'us', [.text('keyed_form')]),
               th([.text('Flutter Form')]),
-              th([.text('reactive_forms')]),
-              th([.text('form_builder')]),
-              th([.text('formz')]),
+              th([.text('String-Keyed Reactive')]),
+              th([.text('Declarative Builder')]),
+              th([.text('Sealed-State Validator')]),
             ]),
           ]),
           tbody([

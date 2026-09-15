@@ -17,6 +17,7 @@ void main() {
 
   runApp(
     Document(
+      base: '/',
       title: 'keyed_form — typed, O(1) Flutter forms built on keyed optics',
       lang: 'en',
       meta: {
@@ -24,7 +25,7 @@ void main() {
             "keyed_form gives every field a stable, typed, serializable identity — dynamic lists survive reorders, rebuilds stay O(1) at any form size, and a form's state is a plain immutable value you can test without a widget.",
         'og:title': 'keyed_form — typed, O(1) Flutter forms on keyed optics',
         'og:description':
-            'Typed, O(1) Flutter forms built on keyed optics. Benchmarked against reactive_forms, flutter_form_builder and formz.',
+            'Typed, O(1) Flutter forms built on keyed optics. Verified in a reproducible open-source benchmark harness against three alternative Flutter form architectures — string-keyed controllers, declarative builders, and sealed-state validators.',
         'og:type': 'website',
         'og:url': 'https://iamv4g.github.io/keyed_form/',
         'twitter:card': 'summary_large_image',

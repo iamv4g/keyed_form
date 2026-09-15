@@ -18,15 +18,10 @@ class _OpticsRaytracerState extends State<OpticsRaytracer> {
       type: 'TourSchema',
       desc: 'Root Data Schema',
     ),
-    'lens1': (
+    'row': (
       path: 'TourFields.stop(ref)',
-      type: 'AffineLens<TourSchema, StopSchema>',
-      desc: 'Affine List Element Lens',
-    ),
-    'lens2': (
-      path: 'TourFields.stop(ref).nights',
-      type: 'Lens<StopSchema, int>',
-      desc: 'Direct Property Focus',
+      type: 'StopFieldRefs',
+      desc: 'Keyed Row Reference (UUID-backed, affine)',
     ),
     'target': (
       path: 'TourFields.stop(ref).nights',
@@ -51,7 +46,7 @@ class _OpticsRaytracerState extends State<OpticsRaytracer> {
           .text('// LIVE RESOLUTION ENGINE'),
         ]),
         span(classes: 'workbench-subtitle mono', [
-          .text('INTERACTIVE LENS RAYTRACER'),
+          .text('INTERACTIVE FIELD RAYTRACER'),
         ]),
       ]),
       div(classes: 'optics-canvas', [
@@ -59,7 +54,7 @@ class _OpticsRaytracerState extends State<OpticsRaytracer> {
           viewBox: '0 0 800 160',
           attributes: {
             'role': 'img',
-            'aria-label': 'Field reference optical resolution raytracer',
+            'aria-label': 'Field reference resolution raytracer',
           },
           [
             Component.element(
@@ -180,14 +175,14 @@ class _OpticsRaytracerState extends State<OpticsRaytracer> {
                 ),
               ],
             ),
-            // Lens 1: Affine Stop Lens
+            // Row Node: keyed list-row field group
             Component.element(
               tag: 'g',
-              classes: 'node-btn${_selectedId == 'lens1' ? ' active' : ''}',
-              events: {'click': (_) => _selectNode('lens1')},
+              classes: 'node-btn${_selectedId == 'row' ? ' active' : ''}',
+              events: {'click': (_) => _selectNode('row')},
               children: [
                 ellipse(
-                  cx: '320',
+                  cx: '400',
                   cy: '80',
                   rx: '12',
                   ry: '32',
@@ -201,19 +196,19 @@ class _OpticsRaytracerState extends State<OpticsRaytracer> {
                 Component.element(
                   tag: 'text',
                   attributes: {
-                    'x': '320',
+                    'x': '400',
                     'y': '85',
                     'text-anchor': 'middle',
                     'font-size': '11',
                     'fill': 'var(--cyan)',
                     'font-family': 'JetBrains Mono',
                   },
-                  children: [.text('λ')],
+                  children: [.text('#')],
                 ),
                 Component.element(
                   tag: 'text',
                   attributes: {
-                    'x': '320',
+                    'x': '400',
                     'y': '128',
                     'text-anchor': 'middle',
                     'font-size': '12',
@@ -225,7 +220,7 @@ class _OpticsRaytracerState extends State<OpticsRaytracer> {
                 Component.element(
                   tag: 'text',
                   attributes: {
-                    'x': '320',
+                    'x': '400',
                     'y': '144',
                     'text-anchor': 'middle',
                     'font-size': '9',
@@ -233,62 +228,6 @@ class _OpticsRaytracerState extends State<OpticsRaytracer> {
                     'font-family': 'JetBrains Mono',
                   },
                   children: [.text('UUID keyed')],
-                ),
-              ],
-            ),
-            // Lens 2: Property Lens
-            Component.element(
-              tag: 'g',
-              classes: 'node-btn${_selectedId == 'lens2' ? ' active' : ''}',
-              events: {'click': (_) => _selectNode('lens2')},
-              children: [
-                ellipse(
-                  cx: '520',
-                  cy: '80',
-                  rx: '10',
-                  ry: '26',
-                  attributes: {
-                    'fill': 'var(--surface-elevated)',
-                    'stroke': 'var(--cyan)',
-                    'stroke-width': '2',
-                  },
-                  [],
-                ),
-                Component.element(
-                  tag: 'text',
-                  attributes: {
-                    'x': '520',
-                    'y': '85',
-                    'text-anchor': 'middle',
-                    'font-size': '11',
-                    'fill': 'var(--cyan)',
-                    'font-family': 'JetBrains Mono',
-                  },
-                  children: [.text('π')],
-                ),
-                Component.element(
-                  tag: 'text',
-                  attributes: {
-                    'x': '520',
-                    'y': '125',
-                    'text-anchor': 'middle',
-                    'font-size': '12',
-                    'fill': 'var(--cyan)',
-                    'font-family': 'JetBrains Mono',
-                  },
-                  children: [.text('.nights')],
-                ),
-                Component.element(
-                  tag: 'text',
-                  attributes: {
-                    'x': '520',
-                    'y': '141',
-                    'text-anchor': 'middle',
-                    'font-size': '9',
-                    'fill': 'var(--ink-muted)',
-                    'font-family': 'JetBrains Mono',
-                  },
-                  children: [.text('property')],
                 ),
               ],
             ),
@@ -315,6 +254,18 @@ class _OpticsRaytracerState extends State<OpticsRaytracer> {
                   r: '5',
                   attributes: {'fill': 'var(--amber)'},
                   [],
+                ),
+                Component.element(
+                  tag: 'text',
+                  attributes: {
+                    'x': '720',
+                    'y': '55',
+                    'text-anchor': 'middle',
+                    'font-size': '12',
+                    'fill': 'var(--amber)',
+                    'font-family': 'JetBrains Mono',
+                  },
+                  children: [.text('.nights')],
                 ),
                 Component.element(
                   tag: 'text',

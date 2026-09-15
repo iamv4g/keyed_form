@@ -39,14 +39,14 @@ class TelemetrySection extends StatelessComponent {
         ]),
         div(classes: 'blueprint-box stat-tile', [
           div(classes: 'stat-big mono', [
-            .text('7µs '),
-            span(classes: 'stat-bad', [.text('2,334µs')]),
+            .text('2µs '),
+            span(classes: 'stat-bad', [.text('30µs')]),
           ]),
           div(classes: 'stat-desc mono', [
             .text('Latency to commit one field update at 100 rows — '),
             strong([.text('keyed_form')]),
-            .text(' vs FormGroup/FormControl ('),
-            strong([.text('333× faster')]),
+            .text(' vs a string-keyed reactive controller ('),
+            strong([.text('15× faster')]),
             .text(').'),
           ]),
         ]),
@@ -201,7 +201,7 @@ class TelemetrySection extends StatelessComponent {
                 ),
               ],
             ),
-            // reactive_forms: 45 -> 200
+            // string-keyed reactive: 45 -> 200
             Component.element(
               tag: 'g',
               children: [
@@ -222,11 +222,11 @@ class TelemetrySection extends StatelessComponent {
                     'font-size': '12',
                     'fill': 'var(--ink-muted)',
                   },
-                  children: [.text('45 · reactive_forms')],
+                  children: [.text('45 · string-keyed reactive')],
                 ),
               ],
             ),
-            // formz + bloc: 44 -> 199
+            // sealed-state validator: 44 -> 199
             Component.element(
               tag: 'g',
               children: [
@@ -247,11 +247,11 @@ class TelemetrySection extends StatelessComponent {
                     'font-size': '12',
                     'fill': 'var(--ink-muted)',
                   },
-                  children: [.text('44 · formz + flutter_bloc')],
+                  children: [.text('44 · sealed-state validator')],
                 ),
               ],
             ),
-            // flutter_form_builder: 6021 -> 445
+            // declarative builder: 6021 -> 445
             Component.element(
               tag: 'g',
               children: [
@@ -273,7 +273,7 @@ class TelemetrySection extends StatelessComponent {
                     'fill': '#fff',
                     'font-weight': '600',
                   },
-                  children: [.text('6,021 · flutter_form_builder')],
+                  children: [.text('6,021 · declarative builder')],
                 ),
               ],
             ),
@@ -301,10 +301,9 @@ class TelemetrySection extends StatelessComponent {
             tr([
               td([
                 strong(classes: 'text-cyan', [.text('keyed_form')]),
-                .text(' (scoped optics read)'),
               ]),
               td(classes: 'num text-cyan font-semibold', [
-                .text('7.00 µs'),
+                .text('2.00 µs'),
               ]),
               td(classes: 'num', [.text('0.01 µs')]),
               td(classes: 'num', [.text('0.00 µs')]),
@@ -313,17 +312,17 @@ class TelemetrySection extends StatelessComponent {
               ]),
             ]),
             tr([
-              td([.text('reactive_forms')]),
-              td(classes: 'num text-red', [.text('2,334.00 µs')]),
+              td([.text('String-Keyed Reactive')]),
+              td(classes: 'num text-red', [.text('30.00 µs')]),
               td(classes: 'num', [.text('0.00 µs')]),
               td(classes: 'num', [.text('0.00 µs')]),
-              td(classes: 'num', [.text('102.00 µs')]),
+              td(classes: 'num', [.text('108.00 µs')]),
             ]),
             tr([
-              td([.text('formz')]),
-              td(classes: 'num', [.text('4.00 µs')]),
+              td([.text('Sealed-State Validator')]),
+              td(classes: 'num', [.text('0.00 µs')]),
               td(classes: 'num', [.text('0.02 µs')]),
-              td(classes: 'num', [.text('2.66 µs')]),
+              td(classes: 'num', [.text('2.85 µs')]),
               td(classes: 'num', [.text('0.00 µs')]),
             ]),
           ]),
@@ -331,7 +330,7 @@ class TelemetrySection extends StatelessComponent {
       ]),
       p(classes: 'note mono', [
         .text(
-          '*Note: formz ships no form controller or widget tree binding — its "commit" measures only a single Input\'s isolated validation, which is why row/list state management remains user code to implement. Full methodology and reproducible harnesses: ',
+          '*Note: the sealed-state validator architecture ships no form controller or widget tree binding — its "commit" measures only a single Input\'s isolated validation, which is why row/list state management remains user code to implement. Full methodology and reproducible harnesses: ',
         ),
         code(classes: 'mono', [.text('benchmark/README.md')]),
         .text('.'),
