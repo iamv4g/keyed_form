@@ -32,7 +32,7 @@ class Navbar extends StatelessComponent {
           .text(' keyed_form'),
         ]),
         div(classes: 'nav-links mono', [
-          a(classes: 'nav-docs-btn', href: '/docs', [.text('DOCS')]),
+          a(href: '/docs', [.text('Docs')]),
           a(href: '#problems', [.text('Invariants')]),
           a(href: '#benchmarks', [.text('Benchmarks')]),
           a(href: '#packages', [.text('Architecture')]),

@@ -1,26 +1,24 @@
 import 'dart:io';
 
 import 'package:jaspr_test/jaspr_test.dart';
-import 'package:website/app.dart';
 import 'package:website/components/code_section.dart';
 import 'package:website/components/hero_section.dart';
 import 'package:website/components/navbar.dart';
 import 'package:website/components/optics_raytracer.dart';
+import 'package:website/pages/docs_page.dart';
+import 'package:website/pages/landing_page.dart';
 
 void main() {
   group('Website Component Tests', () {
     testComponents('renders full App with all landing page sections', (
       tester,
     ) async {
-      tester.pumpComponent(const App());
+      tester.pumpComponent(const LandingPage());
 
       // Brand & Navigation
       expect(find.textContaining('keyed_form'), findsComponents);
-      expect(find.text('Optics'), findsOneComponent);
       expect(find.text('Invariants'), findsOneComponent);
-      expect(find.text('Telemetry'), findsOneComponent);
-      expect(find.text('Matrix'), findsOneComponent);
-      expect(find.text('Code'), findsOneComponent);
+      expect(find.text('Benchmarks'), findsOneComponent);
       expect(find.text('Architecture'), findsOneComponent);
 
       // Section Kickers
@@ -40,12 +38,36 @@ void main() {
       );
     });
 
-    testComponents('Navbar renders brand and ThemeToggle', (tester) async {
+    testComponents('Navbar renders brand, Docs button and ThemeToggle', (tester) async {
       tester.pumpComponent(const Navbar());
 
       expect(find.textContaining('keyed_form'), findsOneComponent);
       expect(find.text('v0.1.0'), findsNothing);
+      expect(find.text('Docs'), findsOneComponent);
       expect(find.text('☼ LIGHT'), findsOneComponent);
+    });
+
+    testComponents('DocsPage renders 6 developer chapters and reassurance callout', (
+      tester,
+    ) async {
+      tester.pumpComponent(const DocsPage());
+
+      // Navigation & Branding
+      expect(find.text('Docs'), findsComponents);
+      expect(find.text('← Home'), findsOneComponent);
+
+      // Section titles
+      expect(find.text('Overview & The Problem with Traditional Forms'), findsOneComponent);
+      expect(find.text('Thinking in Keyed Optics'), findsComponents);
+      expect(find.text('Quickstart in 5 Minutes'), findsOneComponent);
+      expect(find.text('Form Controller & State Lifecycle'), findsOneComponent);
+      expect(find.text('Lazy Scroll, Virtualization & State Preservation'), findsOneComponent);
+      expect(find.text('Real-World Production Recipes'), findsOneComponent);
+      expect(find.text('Testing Without Widgets: Pure Dart in < 2ms'), findsOneComponent);
+      expect(find.text('API Reference'), findsComponents);
+
+      // Reassurance Callout
+      expect(find.textContaining('Đừng lo lắng về Optics / Lenses!'), findsOneComponent);
     });
 
     testComponents('OpticsRaytracer starts with target node active and updates', (
