@@ -56,6 +56,7 @@ const docsNavGroups = <NavGroup>[
       NavLinkItem(title: 'Backend API Error Mapping', href: '#recipe-backend-errors'),
       NavLinkItem(title: 'Cascading Dropdowns', href: '#recipe-cascading'),
       NavLinkItem(title: 'Custom UI Controls', href: '#recipe-custom-controls'),
+      NavLinkItem(title: 'Discriminated Unions', href: '#recipe-discriminated-unions'),
     ],
   ),
   NavGroup(

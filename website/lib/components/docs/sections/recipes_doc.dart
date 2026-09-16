@@ -321,6 +321,135 @@ KeyedFormField<OrderSchema, int>(
           ),
         ]),
       ),
+
+      // ---------------------------------------------------------------------
+      // Recipe 5: Discriminated Unions
+      // ---------------------------------------------------------------------
+      div(id: 'recipe-discriminated-unions', classes: 'docs-anchor', []),
+      h3(classes: 'docs-h3 display', [.text('Recipe 5: Discriminated Unions (Sum-Type Rows)')]),
+      p([
+        .text(
+          'A day in an itinerary can hold different kinds of activities — sightseeing needs a place, a meal needs a restaurant. Declare it with `ks.discriminatedUnion`, keyed on a tag field:',
+        ),
+      ]),
+      const DocsCodeBlock(
+        title: 'lib/itinerary/itinerary_schema.dart',
+        language: 'dart',
+        rawSnippet: '''final _itinerarySchema = ks.object({
+  'days': ks.list(
+    ks.object(className: 'DaySchema', {
+      'label': ks.string(error: .text('Give the day a label')).min(1),
+      'activities': ks.list(
+        ks.discriminatedUnion('kind', {
+          'sightseeing': ks.object({
+            'place': ks.string(error: .text('Where to?')).min(1),
+          }),
+          'meal': ks.object({
+            'restaurant': ks.string(error: .text('Which restaurant?')).min(1),
+          }),
+        }, className: 'ActivitySchema'),
+      ).min(1, error: .text('Add at least one activity')),
+    }),
+  ).min(1, error: .text('Add at least one day')),
+});''',
+        code: Component.fragment([
+          span(classes: 'syntax-comment', [.text("// The 'kind' field discriminates which shape is present\n")]),
+          .text("'activities': "),
+          span(classes: 'syntax-type', [.text('ks')]),
+          .text('.list(\n  '),
+          span(classes: 'syntax-type', [.text('ks')]),
+          .text('.'),
+          span(classes: 'syntax-fn', [.text('discriminatedUnion')]),
+          .text("(\n    'kind',\n    {\n      "),
+          span(classes: 'syntax-str', [.text("'sightseeing'")]),
+          .text(': '),
+          span(classes: 'syntax-type', [.text('ks')]),
+          .text(".object({'place': "),
+          span(classes: 'syntax-type', [.text('ks')]),
+          .text('.string()}),\n      '),
+          span(classes: 'syntax-str', [.text("'meal'")]),
+          .text(': '),
+          span(classes: 'syntax-type', [.text('ks')]),
+          .text(".object({'restaurant': "),
+          span(classes: 'syntax-type', [.text('ks')]),
+          .text('.string()}),\n    },\n    '),
+          span(classes: 'syntax-arg', [.text('className: ')]),
+          span(classes: 'syntax-str', [.text("'ActivitySchema'")]),
+          .text('\n  ),\n),'),
+        ]),
+      ),
+      p([
+        .text(
+          'The generator emits a `sealed class ActivitySchema` with one subclass per variant, plus a `VariantRef` for each on the generated `_ActivityVariants` (wired through `.asSightseeing` / `.asMeal` accessors). Narrowing is affine: read through the wrong variant\'s accessor and it behaves exactly like a deleted row — `field.value` is `null`, no exception:',
+        ),
+      ]),
+      const DocsCodeBlock(
+        title: 'lib/itinerary/activity_row.dart',
+        language: 'dart',
+        rawSnippet: '''class ActivityRow extends StatelessWidget {
+  const ActivityRow({required this.fields, required this.onChangeKind, super.key});
+
+  final ActivityFieldRefs fields;
+  final ValueChanged<String> onChangeKind;
+
+  @override
+  Widget build(BuildContext context) {
+    // Swapping variants keeps the row's clientId, so the outer
+    // KeyedFieldList's item snapshot has no reason to rebuild this row —
+    // read the live `kind` scoped to just this row instead.
+    return KeyedFormSelector<ItinerarySchema, String?>(
+      selector: (f) => fields.getOrNull(f.value)?.kind,
+      builder: (context, kind, _) {
+        if (kind == null) return const SizedBox.shrink(); // row removed
+        return switch (kind) {
+          'sightseeing' => KeyedFormField.text<ItinerarySchema>(
+            field: fields.asSightseeing.place,
+            builder: (context, f, c) => TextField(controller: c, decoration: InputDecoration(labelText: 'Place', errorText: f.errorText)),
+          ),
+          _ => KeyedFormField.text<ItinerarySchema>(
+            field: fields.asMeal.restaurant,
+            builder: (context, f, c) => TextField(controller: c, decoration: InputDecoration(labelText: 'Restaurant', errorText: f.errorText)),
+          ),
+        };
+      },
+    );
+  }
+}
+
+// Switching variants replaces the whole row with a fresh instance of the
+// target type — same clientId, different shape:
+activityList.updateById(
+  activity.clientId,
+  (current) => kind == 'sightseeing'
+      ? SightseeingActivitySchema.create(clientId: current.clientId)
+      : MealActivitySchema.create(clientId: current.clientId),
+);''',
+        code: Component.fragment([
+          span(classes: 'syntax-comment', [
+            .text(
+              "// Live-read this row's kind — the outer list snapshot doesn't\n// change when only the variant swaps\n",
+            ),
+          ]),
+          span(classes: 'syntax-type', [.text('KeyedFormSelector<ItinerarySchema, String?>')]),
+          .text('(\n  selector: (f) => fields.getOrNull(f.value)?.kind,\n  builder: (context, kind, _) => '),
+          span(classes: 'syntax-kw', [.text('switch ')]),
+          .text('(kind) {\n    '),
+          span(classes: 'syntax-str', [.text("'sightseeing'")]),
+          .text(' => '),
+          span(classes: 'syntax-type', [.text('KeyedFormField')]),
+          .text('.text(field: fields.'),
+          span(classes: 'syntax-fn', [.text('asSightseeing')]),
+          .text('.place, '),
+          span(classes: 'syntax-comment', [.text('/* … */')]),
+          .text('),\n    _ => '),
+          span(classes: 'syntax-type', [.text('KeyedFormField')]),
+          .text('.text(field: fields.'),
+          span(classes: 'syntax-fn', [.text('asMeal')]),
+          .text('.restaurant, '),
+          span(classes: 'syntax-comment', [.text('/* … */')]),
+          .text('),\n  },\n);'),
+        ]),
+      ),
     ]);
   }
 }
