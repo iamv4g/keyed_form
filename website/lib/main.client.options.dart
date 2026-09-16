@@ -6,6 +6,8 @@
 
 import 'package:jaspr/client.dart';
 
+import 'package:website/components/docs/docs_menu_toggle.dart'
+    deferred as _docs_menu_toggle;
 import 'package:website/components/docs/docs_sidebar.dart'
     deferred as _docs_sidebar;
 import 'package:website/components/docs/docs_toc.dart' deferred as _docs_toc;
@@ -46,6 +48,10 @@ ClientOptions get defaultClientOptions => ClientOptions(
         classes: p['classes'] as String,
       ),
       loader: _copy_button.loadLibrary,
+    ),
+    'docs_menu_toggle': ClientLoader(
+      (p) => _docs_menu_toggle.DocsMenuToggle(),
+      loader: _docs_menu_toggle.loadLibrary,
     ),
     'docs_sidebar': ClientLoader(
       (p) => _docs_sidebar.DocsSidebar(),

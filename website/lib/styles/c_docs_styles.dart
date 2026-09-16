@@ -29,6 +29,9 @@ List<StyleRule> get docsStyles => [
     overflow: Overflow.only(y: Overflow.auto),
     padding: .only(right: 12.px),
   ),
+  // The mobile drawer backdrop is only shown via html.docs-menu-open
+  // (responsiveStyles) — hidden here so it's inert at desktop widths.
+  css('.docs-sidebar-backdrop').styles(display: Display.none),
   css('.docs-search-box').styles(
     margin: .only(bottom: 20.px),
   ),

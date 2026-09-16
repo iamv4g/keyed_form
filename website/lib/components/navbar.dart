@@ -2,10 +2,16 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../base_path.dart';
+import 'docs/docs_menu_toggle.dart';
 import 'theme_toggle.dart';
 
 class Navbar extends StatelessComponent {
-  const Navbar({super.key});
+  const Navbar({this.showDocsMenuToggle = false, super.key});
+
+  /// Only DocsPage passes true — the "☰" button that opens the chapter
+  /// drawer. Lives in the sticky Navbar (not the sidebar itself) so it
+  /// stays reachable while scrolled deep into a chapter.
+  final bool showDocsMenuToggle;
 
   @override
   Component build(BuildContext context) {
@@ -33,6 +39,7 @@ class Navbar extends StatelessComponent {
           .text(' keyed_form'),
         ]),
         div(classes: 'nav-links mono', [
+          if (showDocsMenuToggle) const DocsMenuToggle(),
           a(href: '$siteBasePath/docs', [.text('Docs')]),
           a(href: '$siteBasePath/playground', [.text('Playground')]),
           a(href: '$siteBasePath/#problems', [.text('Invariants')]),

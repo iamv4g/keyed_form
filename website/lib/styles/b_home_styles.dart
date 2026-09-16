@@ -35,6 +35,11 @@ List<StyleRule> get homeStyles => [
     height: 64.px,
   ),
 
+  // Only rendered on /docs (Navbar.showDocsMenuToggle) — hidden until the
+  // same breakpoint where the nav wraps (responsiveStyles), so it never
+  // appears next to a full, unwrapped desktop nav.
+  css('.navbar-docs-toggle').styles(display: Display.none),
+
   css('.brand').styles(
     display: Display.flex,
     alignItems: AlignItems.center,

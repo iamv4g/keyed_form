@@ -19,7 +19,7 @@ class DocsPage extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return div(classes: 'docs-page', [
-      const Navbar(),
+      const Navbar(showDocsMenuToggle: true),
       div(classes: 'docs-container', [
         div(classes: 'docs-layout', [
           const DocsSidebar(),
