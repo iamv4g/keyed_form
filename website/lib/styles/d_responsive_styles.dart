@@ -42,9 +42,6 @@ List<StyleRule> get responsiveStyles => [
       ),
       padding: .only(bottom: 20.px),
     ),
-    css('.docs-nav-links').styles(
-      display: Display.none,
-    ),
     css('html, body').styles(
       overflow: Overflow.only(x: Overflow.clip),
       width: 100.percent,

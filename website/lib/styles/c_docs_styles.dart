@@ -2,59 +2,11 @@ import 'package:jaspr/dom.dart';
 
 import 'theme_tokens.dart';
 
-/// Styles specific to the /docs page: its header, sidebar, chapter content,
-/// callouts, code blocks, and the "on this page" TOC.
+/// Styles specific to the /docs page: sidebar, chapter content, callouts,
+/// code blocks, and the "on this page" TOC. The header is the shared
+/// Navbar (b_home_styles.dart) — the same on every page.
 @css
 List<StyleRule> get docsStyles => [
-  css('.docs-header').styles(
-    position: Position.sticky(top: 0.px),
-    zIndex: ZIndex(1000),
-    width: 100.percent,
-    backdropFilter: Filter.blur(16.px),
-    border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.border, width: 1.px),
-    ),
-    raw: {
-      'background': 'color-mix(in srgb, var(--bg) 90%, transparent)',
-      '-webkit-backdrop-filter': 'blur(16px)',
-    },
-  ),
-  css('.docs-nav-inner').styles(
-    display: Display.flex,
-    alignItems: AlignItems.center,
-    justifyContent: JustifyContent.spaceBetween,
-    height: 60.px,
-    maxWidth: 1440.px,
-    margin: .symmetric(horizontal: .auto),
-    padding: .symmetric(horizontal: 24.px),
-  ),
-  css('.docs-nav-left').styles(
-    display: Display.flex,
-    alignItems: AlignItems.center,
-    gap: Gap(column: 16.px),
-  ),
-  css('.docs-nav-right').styles(
-    display: Display.flex,
-    alignItems: AlignItems.center,
-    gap: Gap(column: 20.px),
-  ),
-  css('.docs-nav-links', [
-    css('&').styles(
-      display: Display.flex,
-      alignItems: AlignItems.center,
-      gap: Gap(column: 18.px),
-      fontSize: 0.82.rem,
-    ),
-    css('a').styles(
-      color: AppColors.inkMuted,
-      textDecoration: const TextDecoration(line: TextDecorationLine.none),
-      transition: const Transition('color', duration: Duration(milliseconds: 150)),
-    ),
-    css('a:hover').styles(
-      color: AppColors.cyan,
-    ),
-  ]),
-
   // Docs Layout Container
   css('.docs-container').styles(
     maxWidth: 1440.px,
@@ -72,7 +24,7 @@ List<StyleRule> get docsStyles => [
 
   // Docs Sidebar
   css('.docs-sidebar').styles(
-    position: Position.sticky(top: 84.px),
+    position: Position.sticky(top: 88.px),
     height: Unit.expression('calc(100vh - 100px)'),
     overflow: Overflow.only(y: Overflow.auto),
     padding: .only(right: 12.px),
@@ -303,7 +255,7 @@ List<StyleRule> get docsStyles => [
 
   // Docs TOC
   css('.docs-toc').styles(
-    position: Position.sticky(top: 84.px),
+    position: Position.sticky(top: 88.px),
     height: Unit.expression('calc(100vh - 100px)'),
     overflow: Overflow.only(y: Overflow.auto),
   ),
