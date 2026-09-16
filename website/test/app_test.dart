@@ -52,8 +52,9 @@ void main() {
     ) async {
       tester.pumpComponent(const DocsPage());
 
-      // Navigation & Branding
-      expect(find.text('← Home'), findsOneComponent);
+      // Navigation & Branding — shares the same Navbar as every other page
+      expect(find.text(' keyed_form'), findsOneComponent);
+      expect(find.text('Docs'), findsOneComponent);
 
       // Section titles
       expect(find.text('Overview & The Problem with Traditional Forms'), findsOneComponent);

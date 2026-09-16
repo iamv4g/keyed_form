@@ -8,13 +8,75 @@ import 'theme_tokens.dart';
 @css
 List<StyleRule> get responsiveStyles => [
   css.media(MediaQuery.screen(maxWidth: 992.px), [
+    // The sidebar becomes a drawer at this same breakpoint (below), so it
+    // no longer needs a reserved column — one column for the content.
     css('.docs-layout').styles(
       raw: {
-        'grid-template-columns': '220px minmax(0, 1fr)',
+        'grid-template-columns': '1fr',
       },
     ),
     css('.docs-toc').styles(
       display: Display.none,
+    ),
+
+    // Docs Sidebar Drawer — collapses to a "☰" toggle in the Navbar
+    // (DocsMenuToggle); the nav list becomes a fixed drawer that only
+    // shows once html.docs-menu-open is set, purely via CSS (the toggle
+    // and DocsSidebar are separate hydration islands with no shared
+    // Dart state — see docs_menu_toggle.dart).
+    css('.docs-sidebar').styles(
+      position: Position.static,
+      height: Unit.auto,
+      overflow: Overflow.visible,
+      padding: .only(right: 0.px),
+      margin: .only(bottom: 0.px),
+    ),
+    css('.navbar-docs-toggle').styles(
+      display: Display.inlineFlex,
+      alignItems: AlignItems.center,
+      justifyContent: JustifyContent.center,
+      // The ☰ glyph's own ink sits low in its line box in most fonts —
+      // asymmetric padding (less above, more below) recenters it visually
+      // without changing the button's overall height (top+bottom still 8px).
+      padding: .only(top: 2.px, bottom: 6.px, left: 8.px, right: 8.px),
+      backgroundColor: AppColors.surface,
+      border: Border.all(color: AppColors.border, width: 1.px),
+      color: AppColors.ink,
+      fontSize: 1.1.rem,
+      lineHeight: 1.em,
+      radius: BorderRadius.circular(4.px),
+    ),
+    css('.docs-sidebar-backdrop').styles(
+      display: Display.block,
+      position: Position.fixed(top: 0.px, left: 0.px, right: 0.px, bottom: 0.px),
+      backgroundColor: Color('rgba(0, 0, 0, 0.55)'),
+      zIndex: ZIndex(1150),
+      raw: {
+        'visibility': 'hidden',
+        'opacity': '0',
+        'transition': 'opacity 0.2s, visibility 0.2s',
+      },
+    ),
+    css('.docs-sidebar-panel').styles(
+      position: Position.fixed(top: 0.px, left: 0.px, bottom: 0.px),
+      width: 82.percent,
+      maxWidth: 320.px,
+      height: Unit.expression('100vh'),
+      overflow: Overflow.only(y: Overflow.auto),
+      backgroundColor: AppColors.bg,
+      zIndex: ZIndex(1200),
+      padding: .all(20.px),
+      border: Border.only(
+        right: BorderSide.solid(color: AppColors.border, width: 1.px),
+      ),
+      transform: Transform.translate(x: (-105).percent),
+      transition: const Transition('transform', duration: Duration(milliseconds: 200)),
+    ),
+    css('html.docs-menu-open .docs-sidebar-backdrop').styles(
+      raw: {'visibility': 'visible', 'opacity': '1'},
+    ),
+    css('html.docs-menu-open .docs-sidebar-panel').styles(
+      transform: Transform.translate(x: 0.percent),
     ),
     css('.blueprint-grid').styles(
       gridTemplate: GridTemplate(
@@ -24,58 +86,9 @@ List<StyleRule> get responsiveStyles => [
         ]),
       ),
     ),
-  ]),
 
-  css.media(MediaQuery.screen(maxWidth: 768.px), [
-    css('.docs-layout').styles(
-      raw: {
-        'grid-template-columns': '1fr',
-      },
-    ),
-    css('.docs-sidebar').styles(
-      position: Position.relative(top: 0.px),
-      height: Unit.auto,
-      maxHeight: 320.px,
-      margin: .only(bottom: 24.px),
-      border: Border.only(
-        bottom: BorderSide.solid(color: AppColors.border, width: 1.px),
-      ),
-      padding: .only(bottom: 20.px),
-    ),
-    css('.docs-nav-links').styles(
-      display: Display.none,
-    ),
-    css('html, body').styles(
-      overflow: Overflow.only(x: Overflow.clip),
-      width: 100.percent,
-      maxWidth: 100.percent,
-      raw: {
-        'overflow-x': 'clip',
-      },
-    ),
-    css('section, [id]').styles(
-      raw: {
-        'scroll-margin-top': '74px',
-      },
-    ),
-    css('.wrap').styles(
-      width: 100.percent,
-      maxWidth: 100.percent,
-      boxSizing: BoxSizing.borderBox,
-      padding: .symmetric(horizontal: 16.px),
-    ),
-    css('.rule').styles(
-      margin: .symmetric(vertical: 44.px, horizontal: .auto),
-      maxWidth: 100.percent,
-      raw: {
-        'width': 'calc(100% - 32px)',
-      },
-    ),
-    css('section').styles(
-      padding: .only(top: 32.px, bottom: 38.px),
-    ),
-
-    // Navbar Mobile
+    // Navbar — wraps starting here (not 768px): the full link set overlaps
+    // the brand/theme-toggle well above phone widths, around 800-900px.
     css('.nav-inner').styles(
       height: Unit.auto,
       minHeight: 56.px,
@@ -105,6 +118,38 @@ List<StyleRule> get responsiveStyles => [
     css('.nav-links a, .nav-links .theme-toggle').styles(
       whiteSpace: WhiteSpace.noWrap,
       flex: Flex(shrink: 0),
+    ),
+  ]),
+
+  css.media(MediaQuery.screen(maxWidth: 768.px), [
+    css('html, body').styles(
+      overflow: Overflow.only(x: Overflow.clip),
+      width: 100.percent,
+      maxWidth: 100.percent,
+      raw: {
+        'overflow-x': 'clip',
+      },
+    ),
+    css('section, [id]').styles(
+      raw: {
+        'scroll-margin-top': '74px',
+      },
+    ),
+    css('.wrap').styles(
+      width: 100.percent,
+      maxWidth: 100.percent,
+      boxSizing: BoxSizing.borderBox,
+      padding: .symmetric(horizontal: 16.px),
+    ),
+    css('.rule').styles(
+      margin: .symmetric(vertical: 44.px, horizontal: .auto),
+      maxWidth: 100.percent,
+      raw: {
+        'width': 'calc(100% - 32px)',
+      },
+    ),
+    css('section').styles(
+      padding: .only(top: 32.px, bottom: 38.px),
     ),
 
     // Hero Mobile

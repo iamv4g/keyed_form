@@ -1,7 +1,6 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
-import '../components/docs/docs_navbar.dart';
 import '../components/docs/docs_sidebar.dart';
 import '../components/docs/docs_toc.dart';
 import '../components/docs/sections/benchmarks_doc.dart';
@@ -12,6 +11,7 @@ import '../components/docs/sections/reference_doc.dart';
 import '../components/docs/sections/testing_doc.dart';
 import '../components/docs/sections/virtualization_doc.dart';
 import '../components/footer.dart';
+import '../components/navbar.dart';
 
 class DocsPage extends StatelessComponent {
   const DocsPage({super.key});
@@ -19,7 +19,7 @@ class DocsPage extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return div(classes: 'docs-page', [
-      const DocsNavbar(),
+      const Navbar(showDocsMenuToggle: true),
       div(classes: 'docs-container', [
         div(classes: 'docs-layout', [
           const DocsSidebar(),

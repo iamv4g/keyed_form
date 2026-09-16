@@ -56,7 +56,7 @@ jobs:
       # *.kfg.dart is committed (repo convention), so no separate
       # build_runner step is needed before this.
       - name: Build static site
-        run: dart run jaspr_cli:jaspr build --verbose
+        run: dart run jaspr_cli:jaspr build --verbose --dart-define=SITE_BASE_PATH=/keyed_form
         working-directory: website
 
       - name: Verify build output

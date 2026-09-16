@@ -5,6 +5,8 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/server.dart';
+import 'package:website/components/docs/docs_menu_toggle.dart'
+    as _docs_menu_toggle;
 import 'package:website/components/docs/docs_sidebar.dart' as _docs_sidebar;
 import 'package:website/components/docs/docs_toc.dart' as _docs_toc;
 import 'package:website/components/playground/playground_demo.dart'
@@ -47,6 +49,8 @@ ServerOptions get defaultServerOptions => ServerOptions(
       'copy_button',
       params: __copy_buttonCopyButton,
     ),
+    _docs_menu_toggle.DocsMenuToggle:
+        ClientTarget<_docs_menu_toggle.DocsMenuToggle>('docs_menu_toggle'),
     _docs_sidebar.DocsSidebar: ClientTarget<_docs_sidebar.DocsSidebar>(
       'docs_sidebar',
     ),
