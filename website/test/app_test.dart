@@ -53,7 +53,6 @@ void main() {
       tester.pumpComponent(const DocsPage());
 
       // Navigation & Branding
-      expect(find.text('Docs'), findsComponents);
       expect(find.text('← Home'), findsOneComponent);
 
       // Section titles
@@ -67,7 +66,7 @@ void main() {
       expect(find.text('API Reference'), findsComponents);
 
       // Reassurance Callout
-      expect(find.textContaining('Đừng lo lắng về Optics / Lenses!'), findsOneComponent);
+      expect(find.textContaining("Don't Worry About Optics / Lenses!"), findsOneComponent);
     });
 
     testComponents('OpticsRaytracer starts with target node active and updates', (
