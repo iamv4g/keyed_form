@@ -38,6 +38,7 @@ const docsNavGroups = <NavGroup>[
       NavLinkItem(title: 'Field Handles & Mutations', href: '#field-handles'),
       NavLinkItem(title: 'Cross-Field Relations', href: '#relations'),
       NavLinkItem(title: 'Declarative & Async Validation', href: '#validation'),
+      NavLinkItem(title: 'Reading Form State Reactively', href: '#reactive-reads'),
     ],
   ),
   NavGroup(

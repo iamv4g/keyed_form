@@ -307,6 +307,82 @@ form.setServerErrorPaths({
           .text(',\n});'),
         ]),
       ),
+
+      // ---------------------------------------------------------------------
+      // 2.5 Reading Form State Reactively
+      // ---------------------------------------------------------------------
+      div(id: 'reactive-reads', classes: 'docs-anchor', []),
+      span(classes: 'section-kicker mono mt-24', [.text('// 02.5 · REACTIVE READS')]),
+      h2(classes: 'docs-h2 display', [.text('Reading Form State Outside a Field')]),
+      p([
+        .text(
+          "`KeyedFormField` covers the common case — one field, one widget. But sometimes you need to read a slice of form state somewhere that isn't itself an input: a computed total in an app bar, a whole section that only appears when a checkbox is on. For that, keyed_form installs a hidden reactive scope under `KeyedForm` that a few `BuildContext` extensions and widgets read from, so a widget depends on exactly the slice it needs instead of the whole form.",
+        ),
+      ]),
+      ul(classes: 'docs-list', [
+        li([
+          code([.text('context.watchForm<Root>()')]),
+          .text(' — the whole draft; rebuilds on any change to it. The blunt instrument — prefer a narrower read below when you can.'),
+        ]),
+        li([
+          code([.text('context.watchField<Root, V>(ref)')]),
+          .text(" — one field's current value; rebuilds only when it changes. Its error/dirty state live on the controller, not here — pair it with `selectForm` for those."),
+        ]),
+        li([
+          code([.text('context.selectForm<Root, T>(selector, {equals})')]),
+          .text(' — a derived slice; rebuilds only when `selector(form)` changes (`==` by default, or a custom `equals` for a collection). The selector must not write to the controller.'),
+        ]),
+        li([
+          code([.text('KeyedFormSelector<Root, T>({selector, builder, child})')]),
+          .text(
+            ' — the widget form of `selectForm`, for scoping the rebuild to a subtree instead of lifting the read into an expensive parent `build()`. `child` is a subtree that doesn\'t depend on the slice — built once and handed to `builder` un-rebuilt.',
+          ),
+        ]),
+        li([
+          code([.text('KeyedFormBuilder<Root>({builder})')]),
+          .text(
+            ' — rebuilds on every controller change, no matter what. The whole-form escape hatch for something that genuinely needs everything (a debug state inspector) — reach for the scoped options above first.',
+          ),
+        ]),
+      ]),
+      p([
+        .text(
+          'All five require calling from inside `build()`, under a `KeyedForm<Root>` ancestor, and none may be called from inside another selector\'s callback (nesting throws in debug mode). A derived total shown outside any field looks like this:',
+        ),
+      ]),
+      const DocsCodeBlock(
+        title: 'lib/invoice/invoice_total_bar.dart',
+        language: 'dart',
+        rawSnippet: '''class InvoiceTotalBar extends StatelessWidget {
+  const InvoiceTotalBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Rebuilds only when the computed total actually changes, not on every
+    // keystroke in an unrelated field.
+    final total = context.selectForm<InvoiceSchema, num>(
+      (form) => form.value.lineItems.fold(0, (sum, i) => sum + i.quantity * i.unitPrice),
+    );
+
+    return BottomAppBar(
+      child: Text('Total: \$total'),
+    );
+  }
+}''',
+        code: Component.fragment([
+          span(classes: 'syntax-comment', [.text('// Rebuilds only when the computed total changes\n')]),
+          span(classes: 'syntax-kw', [.text('final ')]),
+          .text('total = context.'),
+          span(classes: 'syntax-fn', [.text('selectForm')]),
+          .text('<'),
+          span(classes: 'syntax-type', [.text('InvoiceSchema')]),
+          .text(', '),
+          span(classes: 'syntax-type', [.text('num')]),
+          .text('>(\n  (form) => form.value.lineItems.fold('),
+          span(classes: 'syntax-num', [.text('0')]),
+          .text(', (sum, i) => sum + i.quantity * i.unitPrice),\n);'),
+        ]),
+      ),
     ]);
   }
 }
