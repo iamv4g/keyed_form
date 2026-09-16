@@ -5,6 +5,8 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/server.dart';
+import 'package:website/components/docs/docs_sidebar.dart' as _docs_sidebar;
+import 'package:website/components/docs/docs_toc.dart' as _docs_toc;
 import 'package:website/components/code_section.dart' as _code_section;
 import 'package:website/components/copy_button.dart' as _copy_button;
 import 'package:website/components/optics_raytracer.dart' as _optics_raytracer;
@@ -37,6 +39,10 @@ ServerOptions get defaultServerOptions => ServerOptions(
       'copy_button',
       params: __copy_buttonCopyButton,
     ),
+    _docs_sidebar.DocsSidebar: ClientTarget<_docs_sidebar.DocsSidebar>(
+      'docs_sidebar',
+    ),
+    _docs_toc.DocsToc: ClientTarget<_docs_toc.DocsToc>('docs_toc'),
     _optics_raytracer.OpticsRaytracer:
         ClientTarget<_optics_raytracer.OpticsRaytracer>('optics_raytracer'),
     _theme_toggle.ThemeToggle: ClientTarget<_theme_toggle.ThemeToggle>(

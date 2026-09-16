@@ -6,6 +6,9 @@
 
 import 'package:jaspr/client.dart';
 
+import 'package:website/components/docs/docs_sidebar.dart'
+    deferred as _docs_sidebar;
+import 'package:website/components/docs/docs_toc.dart' deferred as _docs_toc;
 import 'package:website/components/code_section.dart' deferred as _code_section;
 import 'package:website/components/copy_button.dart' deferred as _copy_button;
 import 'package:website/components/optics_raytracer.dart'
@@ -41,6 +44,14 @@ ClientOptions get defaultClientOptions => ClientOptions(
         classes: p['classes'] as String,
       ),
       loader: _copy_button.loadLibrary,
+    ),
+    'docs_sidebar': ClientLoader(
+      (p) => _docs_sidebar.DocsSidebar(),
+      loader: _docs_sidebar.loadLibrary,
+    ),
+    'docs_toc': ClientLoader(
+      (p) => _docs_toc.DocsToc(),
+      loader: _docs_toc.loadLibrary,
     ),
     'optics_raytracer': ClientLoader(
       (p) => _optics_raytracer.OpticsRaytracer(),
