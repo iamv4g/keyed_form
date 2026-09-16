@@ -3,6 +3,7 @@ import 'package:jaspr_router/jaspr_router.dart';
 
 import 'pages/docs_page.dart';
 import 'pages/landing_page.dart';
+import 'pages/playground_page.dart';
 
 class App extends StatelessComponent {
   const App({super.key});
@@ -20,6 +21,11 @@ class App extends StatelessComponent {
           path: '/docs',
           title: 'Documentation · keyed_form — typed, O(1) Flutter forms on keyed optics',
           builder: (context, state) => const DocsPage(),
+        ),
+        Route(
+          path: '/playground',
+          title: 'Playground · keyed_form — typed, O(1) Flutter forms on keyed optics',
+          builder: (context, state) => const PlaygroundPage(),
         ),
       ],
     );

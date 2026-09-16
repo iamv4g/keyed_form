@@ -9,6 +9,8 @@ import 'package:jaspr/client.dart';
 import 'package:website/components/docs/docs_sidebar.dart'
     deferred as _docs_sidebar;
 import 'package:website/components/docs/docs_toc.dart' deferred as _docs_toc;
+import 'package:website/components/playground/playground_demo.dart'
+    deferred as _playground_demo;
 import 'package:website/components/code_section.dart' deferred as _code_section;
 import 'package:website/components/copy_button.dart' deferred as _copy_button;
 import 'package:website/components/optics_raytracer.dart'
@@ -56,6 +58,10 @@ ClientOptions get defaultClientOptions => ClientOptions(
     'optics_raytracer': ClientLoader(
       (p) => _optics_raytracer.OpticsRaytracer(),
       loader: _optics_raytracer.loadLibrary,
+    ),
+    'playground_demo': ClientLoader(
+      (p) => _playground_demo.PlaygroundDemo(),
+      loader: _playground_demo.loadLibrary,
     ),
     'theme_toggle': ClientLoader(
       (p) => _theme_toggle.ThemeToggle(),

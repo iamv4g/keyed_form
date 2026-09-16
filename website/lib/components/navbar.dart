@@ -10,7 +10,7 @@ class Navbar extends StatelessComponent {
   Component build(BuildContext context) {
     return header([
       div(classes: 'wrap nav-inner', [
-        a(classes: 'brand display', href: '#', [
+        a(classes: 'brand display', href: '/', [
           svg(
             viewBox: '0 0 24 24',
             attributes: {
@@ -33,9 +33,10 @@ class Navbar extends StatelessComponent {
         ]),
         div(classes: 'nav-links mono', [
           a(href: '/docs', [.text('Docs')]),
-          a(href: '#problems', [.text('Invariants')]),
-          a(href: '#benchmarks', [.text('Benchmarks')]),
-          a(href: '#packages', [.text('Architecture')]),
+          a(href: '/playground', [.text('Playground')]),
+          a(href: '/#problems', [.text('Invariants')]),
+          a(href: '/#benchmarks', [.text('Benchmarks')]),
+          a(href: '/#packages', [.text('Architecture')]),
           a(
             href: 'https://pub.dev/packages/keyed_form_flutter',
             target: Target.blank,

@@ -7,6 +7,8 @@
 import 'package:jaspr/server.dart';
 import 'package:website/components/docs/docs_sidebar.dart' as _docs_sidebar;
 import 'package:website/components/docs/docs_toc.dart' as _docs_toc;
+import 'package:website/components/playground/playground_demo.dart'
+    as _playground_demo;
 import 'package:website/components/code_section.dart' as _code_section;
 import 'package:website/components/copy_button.dart' as _copy_button;
 import 'package:website/components/optics_raytracer.dart' as _optics_raytracer;
@@ -16,6 +18,8 @@ import 'package:website/styles/b_home_styles.dart' as _b_home_styles;
 import 'package:website/styles/c_docs_styles.dart' as _c_docs_styles;
 import 'package:website/styles/d_responsive_styles.dart'
     as _d_responsive_styles;
+import 'package:website/styles/e_playground_styles.dart'
+    as _e_playground_styles;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -49,6 +53,8 @@ ServerOptions get defaultServerOptions => ServerOptions(
     _docs_toc.DocsToc: ClientTarget<_docs_toc.DocsToc>('docs_toc'),
     _optics_raytracer.OpticsRaytracer:
         ClientTarget<_optics_raytracer.OpticsRaytracer>('optics_raytracer'),
+    _playground_demo.PlaygroundDemo:
+        ClientTarget<_playground_demo.PlaygroundDemo>('playground_demo'),
     _theme_toggle.ThemeToggle: ClientTarget<_theme_toggle.ThemeToggle>(
       'theme_toggle',
     ),
@@ -58,6 +64,7 @@ ServerOptions get defaultServerOptions => ServerOptions(
     ..._b_home_styles.homeStyles,
     ..._c_docs_styles.docsStyles,
     ..._d_responsive_styles.responsiveStyles,
+    ..._e_playground_styles.playgroundStyles,
   ],
 );
 
