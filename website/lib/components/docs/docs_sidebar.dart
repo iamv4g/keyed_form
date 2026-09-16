@@ -1,6 +1,7 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../../base_path.dart';
 import 'docs_nav_data.dart';
 
 @client
@@ -52,7 +53,7 @@ class _DocsSidebarState extends State<DocsSidebar> {
               ul(classes: 'docs-nav-list', [
                 for (final item in matchingItems)
                   li(classes: 'docs-nav-item', [
-                    a(classes: 'docs-nav-link', href: '/docs${item.href}', [
+                    a(classes: 'docs-nav-link', href: '$siteBasePath/docs${item.href}', [
                       span(classes: 'nav-title', [.text(item.title)]),
                       if (item.badge case final badge?) span(classes: 'nav-badge mono', [.text(badge)]),
                     ]),

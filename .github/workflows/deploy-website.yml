@@ -1,0 +1,91 @@
+name: Deploy website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - website/**
+      - packages/keyed_form/**
+      - packages/keyed_form_schema/**
+      - packages/keyed_form_gen/**
+      - packages/keyed_lens/**
+      - packages/keyed_form_core/**
+      - .github/workflows/deploy-website.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Cache pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      # website is a pure-Dart workspace member, but the workspace also
+      # contains keyed_form_flutter, so resolving needs the Flutter SDK
+      # present (same reasoning as ci.yml).
+      - name: Resolve workspace dependencies
+        run: flutter pub get
+
+      # jaspr_cli is a dev dependency (not globally activated) so it and the
+      # build_runner daemon it starts resolve through pubspec.lock and run
+      # under the Flutter-pinned Dart — avoids daemon handshake breaks from
+      # an unpinned global CLI drifting from the SDK.
+      # *.kfg.dart is committed (repo convention), so no separate
+      # build_runner step is needed before this.
+      - name: Build static site
+        run: dart run jaspr_cli:jaspr build --verbose
+        working-directory: website
+
+      - name: Verify build output
+        working-directory: website/build/jaspr
+        run: |
+          set -e
+          test -f index.html || { echo "ERROR: index.html not found"; exit 1; }
+          test -f docs/index.html || { echo "ERROR: docs page not found"; exit 1; }
+          test -f playground/index.html || { echo "ERROR: playground page not found"; exit 1; }
+          test -f main.client.dart.js || { echo "ERROR: client bundle not found"; exit 1; }
+          grep -q '<base href="/keyed_form/"/>' index.html || { echo "ERROR: base href not rewritten to /keyed_form/"; exit 1; }
+          echo "Build output OK"
+
+      # Disables Jekyll processing on GitHub Pages, which otherwise ignores
+      # dotfiles/dot-directories by default (the build emits .dart_tool/ and
+      # .build.manifest alongside the site).
+      - name: Disable Jekyll processing
+        run: touch website/build/jaspr/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/build/jaspr
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

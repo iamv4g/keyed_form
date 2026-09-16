@@ -1,6 +1,7 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../../base_path.dart';
 import '../theme_toggle.dart';
 
 class DocsNavbar extends StatelessComponent {
@@ -13,7 +14,7 @@ class DocsNavbar extends StatelessComponent {
         div(classes: 'docs-nav-left', [
           a(
             classes: 'brand display',
-            href: '/',
+            href: '$siteBasePath/',
             attributes: {'aria-label': 'Return to keyed_form home'},
             [
               svg(
@@ -40,7 +41,7 @@ class DocsNavbar extends StatelessComponent {
             ],
           ),
           div(classes: 'docs-nav-links', [
-            a(href: '/', [.text('← Home')]),
+            a(href: '$siteBasePath/', [.text('← Home')]),
           ]),
         ]),
         div(classes: 'docs-nav-right', [

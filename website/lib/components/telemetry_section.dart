@@ -1,6 +1,8 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../base_path.dart';
+
 class TelemetrySection extends StatelessComponent {
   const TelemetrySection({super.key});
 
@@ -61,7 +63,7 @@ class TelemetrySection extends StatelessComponent {
       ]),
       p(classes: 'note mono', [
         .text('Full scenario sweep, widget-rebuild tables, and reproduction steps: '),
-        a(href: '/docs#benchmarks-methodology', [.text('Benchmarks & Methodology →')]),
+        a(href: '$siteBasePath/docs#benchmarks-methodology', [.text('Benchmarks & Methodology →')]),
       ]),
     ]);
   }

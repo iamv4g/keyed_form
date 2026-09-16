@@ -8,6 +8,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 
 import 'app.dart';
+import 'base_path.dart';
 import 'main.server.options.dart';
 
 void main() {
@@ -17,7 +18,7 @@ void main() {
 
   runApp(
     Document(
-      base: '/',
+      base: '$siteBasePath/',
       title: 'keyed_form — typed, O(1) Flutter forms built on keyed optics',
       lang: 'en',
       meta: {

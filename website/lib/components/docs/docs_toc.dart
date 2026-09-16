@@ -3,6 +3,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
+import '../../base_path.dart';
 import 'docs_nav_data.dart';
 
 /// "ON THIS PAGE" — unlike [DocsSidebar] (the full site map), this only shows
@@ -76,7 +77,7 @@ class _DocsTocState extends State<DocsToc> {
         for (final item in group.items)
           li([
             a(
-              href: '/docs${item.href}',
+              href: '$siteBasePath/docs${item.href}',
               classes: item.href == _activeHref ? 'active' : '',
               [.text(item.title)],
             ),
