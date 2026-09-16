@@ -129,6 +129,39 @@ class GettingStartedDoc extends StatelessComponent {
         ]),
       ]),
 
+      div(id: 'fieldref-shapes', classes: 'docs-anchor', []),
+      h3(classes: 'docs-h3 display mt-24', [.text('The Three Shapes of a FieldRef')]),
+      p([
+        .text(
+          "Not every coordinate is guaranteed to resolve — a row can be deleted out from under it, a nested object can be null, a union can be the wrong variant. Rather than hiding that behind a runtime crash, keyed_form encodes it in the type itself:",
+        ),
+      ]),
+      ul(classes: 'docs-list', [
+        li([
+          code([.text('FieldRef<Root, V>')]),
+          .text(
+            ' — the default, and the one you\'ll see most: this coordinate might not resolve. Anything reached through a list row or a nullable nested object composes into a plain `FieldRef`, because that row or object might not exist anymore. This is why `form.field(ref).value` is typed `V?` even when your schema declares the field non-nullable — the value itself can\'t be null, but the row holding it might be gone.',
+          ),
+        ]),
+        li([
+          code([.text('StrictFieldRef<Root, V>')]),
+          .text(
+            " — generated for every plain field directly on your schema's root (like `LoginFields.email`): it always resolves. A chain built entirely from strict segments stays strict end to end, which is exactly why `handle.value` for a flat field never surprises you with an unexpected null.",
+          ),
+        ]),
+        li([
+          code([.text('VariantRef<Sum, Variant>')]),
+          .text(
+            ' — resolves only while the value currently *is* that variant of a discriminated union, composed through `.narrow()`. Read through it while the value is a different variant and it behaves exactly like a FieldRef whose row was deleted: no value, no crash.',
+          ),
+        ]),
+      ]),
+      p([
+        .text(
+          "You never have to pick one of these by hand — the generator infers the strictest shape it can for every coordinate it produces. The payoff is that a mistake like treating a list-row field as guaranteed-present is a compile error, not a 2am crash report.",
+        ),
+      ]),
+
       const DocsCallout(
         type: CalloutType.reassurance,
         title: "Don't Worry About Optics / Lenses! Learn the Standard Form Vocabulary Instead",

@@ -26,6 +26,7 @@ const docsNavGroups = <NavGroup>[
     items: [
       NavLinkItem(title: 'Overview & Problem', href: '#overview'),
       NavLinkItem(title: 'Thinking in Keyed Optics', href: '#mental-model', badge: 'REASSURANCE'),
+      NavLinkItem(title: 'The Three Shapes of FieldRef', href: '#fieldref-shapes'),
       NavLinkItem(title: 'Quickstart in 5 Min', href: '#quickstart'),
     ],
   ),
