@@ -236,6 +236,87 @@ final testSchema = ks.object({
 
       expect(classes.first.refinements, isEmpty);
     });
+
+    test('a path into a nested object resolves through its fields', () {
+      const source = '''
+final testSchema = ks.object({
+  'stop': ks.object({
+    'city': ks.string(),
+  }),
+}).refine(
+  (data) => true,
+  error: KSError.text('bad city'),
+  path: 'stop.city',
+);
+''';
+      final unit = parseString(content: source).unit;
+      final decl = unit.declarations.first as TopLevelVariableDeclaration;
+      final classes = parser.parseElement(
+        _FakeElement('testSchema'),
+        decl,
+        compilationUnit: unit,
+      );
+
+      expect(classes.first.refinements.single.path, 'stop.city');
+    });
+
+    test('an unknown path fails the build with a did-you-mean suggestion', () {
+      const source = '''
+final testSchema = ks.object({
+  'confirm': ks.string(),
+}).refine(
+  (data) => true,
+  error: KSError.text('bad'),
+  path: 'confrim',
+);
+''';
+      final unit = parseString(content: source).unit;
+      final decl = unit.declarations.first as TopLevelVariableDeclaration;
+
+      expect(
+        () => parser.parseElement(
+          _FakeElement('testSchema'),
+          decl,
+          compilationUnit: unit,
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            allOf(contains("'confrim'"), contains("Did you mean 'confirm'?")),
+          ),
+        ),
+      );
+    });
+
+    test('an unrelated path fails the build without a false suggestion', () {
+      const source = '''
+final testSchema = ks.object({
+  'confirm': ks.string(),
+}).refine(
+  (data) => true,
+  error: KSError.text('bad'),
+  path: 'totallyUnrelatedField',
+);
+''';
+      final unit = parseString(content: source).unit;
+      final decl = unit.declarations.first as TopLevelVariableDeclaration;
+
+      expect(
+        () => parser.parseElement(
+          _FakeElement('testSchema'),
+          decl,
+          compilationUnit: unit,
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            isNot(contains('Did you mean')),
+          ),
+        ),
+      );
+    });
   });
 
   group('discriminatedUnion parsing', () {

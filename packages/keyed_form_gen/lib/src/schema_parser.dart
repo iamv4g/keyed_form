@@ -271,6 +271,7 @@ class SchemaParser {
             }
           }
           if (message != null && path != null) {
+            _checkRefinePath(path, fields, parsedClass.name);
             parsedClass.refinements.add((
               testCode: mArgs.first.toSource(),
               message: message,
@@ -802,4 +803,75 @@ class SchemaParser {
       }
     }
   }
+}
+
+/// Validates a `refine(path: ...)` string against the object's declared
+/// fields — a plain name (`'stops'`) or a dotted path descending into
+/// nested objects (`'stops.city'`). A path that doesn't resolve to a real
+/// field is a silent no-op at runtime (the refinement's error never
+/// attaches to anything), so this fails the build instead, naming the
+/// first segment that doesn't match and, if a nearby field name exists,
+/// suggesting it.
+void _checkRefinePath(
+  String path,
+  List<ParsedField> rootFields,
+  String className,
+) {
+  var candidates = rootFields;
+  var scopeName = className;
+  for (final segment in path.split('.')) {
+    final match = candidates.where((f) => f.name == segment).firstOrNull;
+    if (match == null) {
+      final names = candidates.map((f) => f.name).toList()..sort();
+      final guess = _closestFieldName(segment, names);
+      throw StateError(
+        "keyed_form_gen: refine(path: '$path') does not match any field of "
+        '$scopeName (has: ${names.join(', ')}).'
+        "${guess != null ? " Did you mean '$guess'?" : ''}",
+      );
+    }
+    candidates = match.nestedClass?.fields ?? const [];
+    scopeName = match.nestedClass?.name ?? match.name;
+  }
+}
+
+/// The nearest [names] entry to [target] by case-insensitive edit distance,
+/// or `null` if none is close enough to be a plausible typo fix rather than
+/// an unrelated field.
+String? _closestFieldName(String target, List<String> names) {
+  String? best;
+  var bestDistance = 1 << 30;
+  for (final name in names) {
+    final distance = _editDistance(target.toLowerCase(), name.toLowerCase());
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = name;
+    }
+  }
+  final maxAllowed = (target.length / 2).ceil().clamp(1, 4);
+  return bestDistance <= maxAllowed ? best : null;
+}
+
+/// Plain Levenshtein edit distance between [a] and [b].
+int _editDistance(String a, String b) {
+  final dp = List.generate(a.length + 1, (_) => List.filled(b.length + 1, 0));
+  for (var i = 0; i <= a.length; i++) {
+    dp[i][0] = i;
+  }
+  for (var j = 0; j <= b.length; j++) {
+    dp[0][j] = j;
+  }
+  for (var i = 1; i <= a.length; i++) {
+    for (var j = 1; j <= b.length; j++) {
+      dp[i][j] = a[i - 1] == b[j - 1]
+          ? dp[i - 1][j - 1]
+          : 1 +
+                [
+                  dp[i - 1][j],
+                  dp[i][j - 1],
+                  dp[i - 1][j - 1],
+                ].reduce((x, y) => x < y ? x : y);
+    }
+  }
+  return dp[a.length][b.length];
 }

@@ -1,3 +1,12 @@
+## 0.2.0
+
+- `refine(path: ...)` is now checked against the schema's declared fields at
+  generation time, including dotted paths into nested objects
+  (`'stop.city'`). A path that doesn't resolve to a real field used to be a
+  silent no-op — the refinement's error never attached to any field — so it
+  now fails the build instead, naming the closest field if one looks like a
+  typo.
+
 ## 0.1.0
 
 Initial release.
