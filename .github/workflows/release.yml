@@ -11,6 +11,21 @@ on:
   push:
     tags:
       - '*-v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: >-
+          Tag to simulate, e.g. keyed_form_gen-v0.1.0. CHANGELOG.md is read
+          from the branch this workflow runs on, not that tag's own commit —
+          fine for exercising the parse/extract logic, not for cutting a
+          release of an old version.
+        required: true
+        type: string
+      dry_run:
+        description: Print what would be released instead of creating it
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -24,7 +39,11 @@ jobs:
       - name: Parse tag
         id: tag
         run: |
-          tag="${GITHUB_REF#refs/tags/}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ inputs.tag }}"
+          else
+            tag="${GITHUB_REF#refs/tags/}"
+          fi
           package="${tag%-v*}"
           version="${tag##*-v}"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
@@ -57,6 +76,11 @@ jobs:
         run: |
           if gh release view "${{ steps.tag.outputs.tag }}" >/dev/null 2>&1; then
             echo "release ${{ steps.tag.outputs.tag }} already exists, skipping"
+            exit 0
+          fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "dry run — would create '${{ steps.tag.outputs.tag }}' titled '${{ steps.tag.outputs.package }} v${{ steps.tag.outputs.version }}' with notes:"
+            cat /tmp/release-notes.md
             exit 0
           fi
           gh release create "${{ steps.tag.outputs.tag }}" \
