@@ -1,0 +1,65 @@
+name: Release
+
+# Fires per package tag (`<package>-vX.Y.Z`, e.g. `keyed_form_gen-v0.2.0`) and
+# turns it into a GitHub Release whose notes are that package's matching
+# `## X.Y.Z` CHANGELOG section. Every release is created with `--latest=false`
+# — six independently-versioned packages share one repo-wide "Latest" pill,
+# so it can never mean anything correct here; per-package current version
+# lives in the pub.dev badge instead.
+
+on:
+  push:
+    tags:
+      - '*-v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse tag
+        id: tag
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          package="${tag%-v*}"
+          version="${tag##*-v}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Extract CHANGELOG section
+        id: notes
+        run: |
+          changelog="packages/${{ steps.tag.outputs.package }}/CHANGELOG.md"
+          if [ ! -f "$changelog" ]; then
+            echo "::error::no CHANGELOG.md at $changelog for tag ${{ steps.tag.outputs.tag }}"
+            exit 1
+          fi
+
+          awk -v ver="${{ steps.tag.outputs.version }}" '
+            found && /^## / { exit }
+            found { print }
+            $0 == "## " ver { found=1 }
+          ' "$changelog" > /tmp/release-notes.md
+
+          if [ ! -s /tmp/release-notes.md ]; then
+            echo "::error::no '## ${{ steps.tag.outputs.version }}' section in $changelog"
+            exit 1
+          fi
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${{ steps.tag.outputs.tag }}" >/dev/null 2>&1; then
+            echo "release ${{ steps.tag.outputs.tag }} already exists, skipping"
+            exit 0
+          fi
+          gh release create "${{ steps.tag.outputs.tag }}" \
+            --title "${{ steps.tag.outputs.package }} v${{ steps.tag.outputs.version }}" \
+            --notes-file /tmp/release-notes.md \
+            --latest=false
