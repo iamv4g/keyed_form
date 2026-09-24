@@ -2,6 +2,8 @@
 
 A typed form library for Flutter, built on keyed optics.
 
+**[Docs & Playground →](https://iamv4g.github.io/keyed_form/)**
+
 A Dart pub workspace of six packages:
 
 ```
