@@ -3,7 +3,7 @@ description: >-
   build_runner code generator for keyed_form_schema: turns a schema into
   immutable data models, keyed_form_core field references and type-safe
   validation functions.
-version: 0.1.0
+version: 0.2.0
 
 homepage: https://github.com/iamv4g/keyed_form
 repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_gen
