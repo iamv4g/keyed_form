@@ -1,8 +1,11 @@
 name: CI
 
+# pull_request only — a PR's head commit already gets checked here before
+# merge, so a push:branches:[main] trigger would just re-run the identical
+# tree a second time right after merge. Relies on branch protection requiring
+# this check and disallowing direct pushes to main; a commit landing on main
+# any other way gets no CI coverage.
 on:
-  push:
-    branches: [main]
   pull_request:
 
 jobs:
