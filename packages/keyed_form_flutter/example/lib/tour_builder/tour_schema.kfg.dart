@@ -219,7 +219,7 @@ abstract final class TourFields {
       );
 
   /// Field references for the `stops` row identified by `stopClientId`.
-  /// Affine — reads null / writes are a no-op if that row no longer exists.
+  /// Reads null / writes are a no-op if that row no longer exists.
   static StopFieldRefs stop({required String stopClientId}) =>
       StopFieldRefs(stops.at(stopClientId, (x) => x.clientId == stopClientId));
 }

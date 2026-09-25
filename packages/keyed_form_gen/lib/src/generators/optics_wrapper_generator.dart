@@ -177,7 +177,7 @@ void _emitUnionWrapper(
     w.writeln();
     w.writeln(
       '  /// Narrows to the `${entry.key}` variant '
-      '([${variantClass.name}]) — affine: null / no-op when this '
+      '([${variantClass.name}]) — null / no-op when this '
       '${unionClass.name} is a different variant.',
     );
     w.writeln('  $variantWrapper get as${capitalize(entry.key)} =>');
@@ -261,8 +261,7 @@ void generateNestedNavigators({
     final navDoc =
         '  /// Field references for the `${field.name}` row identified by '
         '`${navName}ClientId`.\n'
-        '  /// Affine — reads null / writes are a no-op if that row no longer '
-        'exists.';
+        '  /// Reads null / writes are a no-op if that row no longer exists.';
 
     if (pathSegs.isEmpty) {
       buffer.writeln();

@@ -132,7 +132,7 @@ abstract final class InvoiceFields {
       );
 
   /// Field references for the `lineItems` row identified by `lineItemClientId`.
-  /// Affine — reads null / writes are a no-op if that row no longer exists.
+  /// Reads null / writes are a no-op if that row no longer exists.
   static LineItemFieldRefs lineItem({required String lineItemClientId}) =>
       LineItemFieldRefs(
         lineItems.at(lineItemClientId, (x) => x.clientId == lineItemClientId),

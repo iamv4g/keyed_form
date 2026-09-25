@@ -207,7 +207,7 @@ abstract final class TourFields {
       );
 
   /// Field references for the `hotels` row identified by `hotelClientId`.
-  /// Affine — reads null / writes are a no-op if that row no longer exists.
+  /// Reads null / writes are a no-op if that row no longer exists.
   static HotelFieldRefs hotel({required String hotelClientId}) =>
       HotelFieldRefs(
         hotels.at(hotelClientId, (x) => x.clientId == hotelClientId),

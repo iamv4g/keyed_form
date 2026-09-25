@@ -113,7 +113,7 @@ abstract final class ItineraryFields {
       );
 
   /// Field references for the `days` row identified by `dayClientId`.
-  /// Affine — reads null / writes are a no-op if that row no longer exists.
+  /// Reads null / writes are a no-op if that row no longer exists.
   static DayFieldRefs day({required String dayClientId}) =>
       DayFieldRefs(days.at(dayClientId, (x) => x.clientId == dayClientId));
 
@@ -123,7 +123,7 @@ abstract final class ItineraryFields {
   }) => day(dayClientId: dayClientId).asFieldRef.then(DayFields.activities);
 
   /// Field references for the `activities` row identified by `activityClientId`.
-  /// Affine — reads null / writes are a no-op if that row no longer exists.
+  /// Reads null / writes are a no-op if that row no longer exists.
   static ActivityFieldRefs activity({
     required String dayClientId,
     required String activityClientId,
@@ -148,11 +148,11 @@ final class ActivityFieldRefs
     extends DelegatingFieldRef<ItinerarySchema, ActivitySchema> {
   ActivityFieldRefs(super.inner);
 
-  /// Narrows to the `sightseeing` variant ([SightseeingActivitySchema]) — affine: null / no-op when this ActivitySchema is a different variant.
+  /// Narrows to the `sightseeing` variant ([SightseeingActivitySchema]) — null / no-op when this ActivitySchema is a different variant.
   SightseeingActivityFieldRefs get asSightseeing =>
       SightseeingActivityFieldRefs(inner.narrow(_ActivityVariants.sightseeing));
 
-  /// Narrows to the `meal` variant ([MealActivitySchema]) — affine: null / no-op when this ActivitySchema is a different variant.
+  /// Narrows to the `meal` variant ([MealActivitySchema]) — null / no-op when this ActivitySchema is a different variant.
   MealActivityFieldRefs get asMeal =>
       MealActivityFieldRefs(inner.narrow(_ActivityVariants.meal));
 }

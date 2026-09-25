@@ -14,6 +14,10 @@
   typedef is gone. Re-run `build_runner build` and update call sites
   accordingly.
 
+- Generated doc comments no longer say "affine" — the form layer doesn't
+  use `keyed_lens` vocabulary, so a row accessor's doc now just says its
+  read/write is a no-op when the row doesn't exist.
+
 ## 0.1.0
 
 Initial release.

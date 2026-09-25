@@ -115,7 +115,7 @@ abstract final class PackingFields {
       );
 
   /// Field references for the `items` row identified by `itemClientId`.
-  /// Affine — reads null / writes are a no-op if that row no longer exists.
+  /// Reads null / writes are a no-op if that row no longer exists.
   static ItemFieldRefs item({required String itemClientId}) =>
       ItemFieldRefs(items.at(itemClientId, (x) => x.clientId == itemClientId));
 }
