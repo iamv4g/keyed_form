@@ -576,9 +576,7 @@ class DataClassGenerator {
     // 8. Generate Fields container class
     final fieldsName = getFieldsClassName(name, suffix);
     final wrappers = StringBuffer();
-    final typedefs = StringBuffer();
     final emittedWrappers = <String>{};
-    final emittedRefs = <String>{};
     buffer.writeln('abstract final class $fieldsName {');
 
     for (final f in parsedClass.fields) {
@@ -628,9 +626,7 @@ class DataClassGenerator {
       generateNestedNavigators(
         buffer: buffer,
         wrappers: wrappers,
-        typedefs: typedefs,
         emittedWrappers: emittedWrappers,
-        emittedRefs: emittedRefs,
         rootClassName: name,
         currentClass: parsedClass,
         pathSegs: const [],
@@ -642,9 +638,6 @@ class DataClassGenerator {
     buffer.writeln('}');
     buffer.writeln();
 
-    // `<Accessor>Ref` record typedefs, then the FieldRef wrapper classes.
-    buffer.write(typedefs);
-    if (typedefs.isNotEmpty) buffer.writeln();
     buffer.write(wrappers);
 
     return buffer.toString();

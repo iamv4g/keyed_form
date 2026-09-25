@@ -114,15 +114,11 @@ abstract final class PackingFields {
         set: (x, v) => x.copyWith(items: v),
       );
 
-  /// Field references for the `items` row identified by [at].
+  /// Field references for the `items` row identified by `itemClientId`.
   /// Affine — reads null / writes are a no-op if that row no longer exists.
-  static ItemFieldRefs item(ItemRef at) =>
-      ItemFieldRefs(items.at(at.item, (x) => x.clientId == at.item));
+  static ItemFieldRefs item({required String itemClientId}) =>
+      ItemFieldRefs(items.at(itemClientId, (x) => x.clientId == itemClientId));
 }
-
-/// Identifies one `items` row by its clientId path: `item` = a `PackingItemSchema.clientId`.
-/// Build it from your row objects, e.g. `(item: …)`.
-typedef ItemRef = ({String item});
 
 /// Field references for a [PackingItemSchema] within [PackingSchema].
 final class ItemFieldRefs

@@ -7,6 +7,13 @@
   now fails the build instead, naming the closest field if one looks like a
   typo.
 
+- Generated list-row accessors (`<Root>Fields.<accessor>(...)`) now take
+  named `<field>ClientId` parameters instead of an `<Accessor>Ref` record —
+  `TourFields.stop(stopClientId: id)` instead of
+  `final ref = (stop: id); TourFields.stop(ref)`. The `<Accessor>Ref`
+  typedef is gone. Re-run `build_runner build` and update call sites
+  accordingly.
+
 ## 0.1.0
 
 Initial release.

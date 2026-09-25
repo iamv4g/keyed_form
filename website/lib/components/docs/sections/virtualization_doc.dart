@@ -105,7 +105,6 @@ class VirtualizationDoc extends StatelessComponent {
           itemCount: stops.length,
           itemBuilder: (context, index) {
             final stop = stops[index];
-            final stopRef = (stop: stop.clientId);
 
             return Card(
               key: ValueKey(stop.clientId), // Permanent identity via clientId
@@ -116,7 +115,7 @@ class VirtualizationDoc extends StatelessComponent {
                   children: [
                     Expanded(
                       child: KeyedFormField.text<TourSchema>(
-                        field: TourFields.stop(stopRef).city,
+                        field: TourFields.stop(stopClientId: stop.clientId).city,
                         builder: (context, f, textController) => TextField(
                           controller: textController,
                           onTapOutside: (_) => f.onBlur(),
@@ -158,9 +157,7 @@ class VirtualizationDoc extends StatelessComponent {
             '.stops,\n  builder: (context, stops, list) => ListView.builder(\n    itemCount: stops.length,\n    itemBuilder: (context, index) {\n      ',
           ),
           span(classes: 'syntax-kw', [.text('final ')]),
-          .text('stop = stops[index];\n      '),
-          span(classes: 'syntax-kw', [.text('final ')]),
-          .text('stopRef = (stop: stop.clientId);\n\n      '),
+          .text('stop = stops[index];\n\n      '),
           span(classes: 'syntax-kw', [.text('return ')]),
           span(classes: 'syntax-type', [.text('Card')]),
           .text('(\n        key: '),
@@ -172,7 +169,7 @@ class VirtualizationDoc extends StatelessComponent {
           .text('.text<TourSchema>(\n              field: '),
           span(classes: 'syntax-type', [.text('TourFields')]),
           .text(
-            '.stop(stopRef).city,\n              builder: (context, f, textController) => TextField(\n                controller: textController,\n                onTapOutside: (_) => f.onBlur(),\n                decoration: InputDecoration(errorText: f.errorText),\n              ),\n            ),\n          ),\n          IconButton(\n            icon: const Icon(Icons.delete_outline),\n            onPressed: () => list.',
+            '.stop(stopClientId: stop.clientId).city,\n              builder: (context, f, textController) => TextField(\n                controller: textController,\n                onTapOutside: (_) => f.onBlur(),\n                decoration: InputDecoration(errorText: f.errorText),\n              ),\n            ),\n          ),\n          IconButton(\n            icon: const Icon(Icons.delete_outline),\n            onPressed: () => list.',
           ),
           span(classes: 'syntax-fn', [.text('removeById')]),
           .text('(stop.clientId),\n          ),\n        ]),\n      );\n    },\n  ),\n);'),

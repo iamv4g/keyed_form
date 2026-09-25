@@ -42,13 +42,18 @@ String _singularizeField(String name) {
   return name;
 }
 
-String _recordType(List<String> segs) =>
-    '({${segs.map((s) => 'String $s').join(', ')}})';
-
 String wrapperClassName(String accessorName) =>
     '${capitalize(accessorName)}FieldRefs';
 
-String _refTypeName(String accessorName) => '${capitalize(accessorName)}Ref';
+/// `{required String fooClientId, required String barClientId}` — one
+/// named clientId parameter per accumulated path segment.
+String _paramsFor(List<String> segs) =>
+    segs.map((s) => 'required String ${s}ClientId').join(', ');
+
+/// `fooClientId: fooClientId, barClientId: barClientId` — forwards the same
+/// named parameters to a parent-level accessor call.
+String _argsFor(List<String> segs) =>
+    segs.map((s) => '${s}ClientId: ${s}ClientId').join(', ');
 
 /// Emits one leaf getter per scalar / nested-object field of [fieldsName]
 /// onto a wrapper whose composed reference is `inner` (a `FieldRef<Root,
@@ -231,15 +236,13 @@ void _emitVariantWrapper(
 }
 
 /// Emits, onto the root `<Root>Fields` class, a `static` navigator per list
-/// field at every depth. Each navigator takes a `<Accessor>Ref` record of
-/// client-id strings and returns a `<Accessor>FieldRefs` wrapper. The
-/// `<Accessor>Ref` typedefs are appended after the class via [typedefs].
+/// field at every depth. Each navigator takes one named `<field>ClientId`
+/// parameter per accumulated path segment and returns a `<Accessor>FieldRefs`
+/// wrapper.
 void generateNestedNavigators({
   required StringBuffer buffer,
   required StringBuffer wrappers,
-  required StringBuffer typedefs,
   required Set<String> emittedWrappers,
-  required Set<String> emittedRefs,
   required String rootClassName,
   required ParsedClass currentClass,
   required List<String> pathSegs,
@@ -252,62 +255,48 @@ void generateNestedNavigators({
     final itemClass = field.nestedClass!;
     final navName = uncapitalize(_singularizeField(field.name));
     final segs = [...pathSegs, navName];
-    final segClasses = [...ancestorClasses, itemClass];
-    final refType = _refTypeName(navName);
     final wrapperName = wrapperClassName(navName);
-    final matcher = '(x) => x.clientId == at.$navName';
-
-    if (emittedRefs.add(refType)) {
-      final pairs = [
-        for (var i = 0; i < segs.length; i++)
-          '`${segs[i]}` = a `${segClasses[i].name}.clientId`',
-      ].join(', ');
-      typedefs.writeln(
-        '/// Identifies one `${field.name}` row by its clientId path: $pairs.',
-      );
-      typedefs.writeln(
-        "/// Build it from your row objects, e.g. "
-        "`(${segs.map((s) => '$s: …').join(', ')})`.",
-      );
-      typedefs.writeln('typedef $refType = ${_recordType(segs)};');
-    }
+    final matcher = '(x) => x.clientId == ${navName}ClientId';
 
     final navDoc =
         '  /// Field references for the `${field.name}` row identified by '
-        '[at].\n'
+        '`${navName}ClientId`.\n'
         '  /// Affine — reads null / writes are a no-op if that row no longer '
         'exists.';
 
     if (pathSegs.isEmpty) {
       buffer.writeln();
       buffer.writeln(navDoc);
-      buffer.writeln('  static $wrapperName $navName($refType at) =>');
       buffer.writeln(
-        '      $wrapperName(${field.name}.at(at.$navName, $matcher));',
+        '  static $wrapperName $navName({${_paramsFor(segs)}}) =>',
+      );
+      buffer.writeln(
+        '      $wrapperName(${field.name}.at(${navName}ClientId, $matcher));',
       );
     } else {
       final parentSeg = pathSegs.last;
       final parentClass = ancestorClasses.last;
       final parentFieldsName = getFieldsClassName(parentClass.name, suffix);
       final listAccessorName = '$parentSeg${capitalize(field.name)}';
-      final parentArgs = pathSegs.map((s) => '$s: at.$s').join(', ');
       buffer.writeln();
       buffer.writeln(
-        '  /// The `${field.name}` list on the `$parentSeg` row [at] '
-        'addresses.',
+        '  /// The `${field.name}` list on the `$parentSeg` row identified '
+        'by `${parentSeg}ClientId`.',
       );
       buffer.writeln(
         '  static FieldRef<$rootClassName, List<${itemClass.name}>> '
-        '$listAccessorName(${_refTypeName(parentSeg)} at) =>',
+        '$listAccessorName({${_paramsFor(pathSegs)}}) =>',
       );
       buffer.writeln(
-        '      $parentSeg(at).asFieldRef.then($parentFieldsName.${field.name});',
+        '      $parentSeg(${_argsFor(pathSegs)}).asFieldRef.then($parentFieldsName.${field.name});',
       );
       buffer.writeln();
       buffer.writeln(navDoc);
-      buffer.writeln('  static $wrapperName $navName($refType at) =>');
       buffer.writeln(
-        '      $wrapperName($listAccessorName(($parentArgs)).at(at.$navName, $matcher));',
+        '  static $wrapperName $navName({${_paramsFor(segs)}}) =>',
+      );
+      buffer.writeln(
+        '      $wrapperName($listAccessorName(${_argsFor(pathSegs)}).at(${navName}ClientId, $matcher));',
       );
     }
 
@@ -334,9 +323,7 @@ void generateNestedNavigators({
     generateNestedNavigators(
       buffer: buffer,
       wrappers: wrappers,
-      typedefs: typedefs,
       emittedWrappers: emittedWrappers,
-      emittedRefs: emittedRefs,
       rootClassName: rootClassName,
       currentClass: itemClass,
       pathSegs: segs,

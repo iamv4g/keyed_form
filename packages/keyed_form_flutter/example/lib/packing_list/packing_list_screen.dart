@@ -62,7 +62,9 @@ class _PackingListScreenState extends State<PackingListScreen> {
                     for (var i = 0; i < items.length; i++)
                       _PackingRow(
                         key: ValueKey(items[i].clientId),
-                        fields: PackingFields.item((item: items[i].clientId)),
+                        fields: PackingFields.item(
+                          itemClientId: items[i].clientId,
+                        ),
                         canMoveUp: i > 0,
                         canMoveDown: i < items.length - 1,
                         onMoveUp: () => list.move(i, i - 1),

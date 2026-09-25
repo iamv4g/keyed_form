@@ -81,12 +81,11 @@ part of 'tour_schema.dart';
 
 abstract final class TourFields {
   static StrictFieldRef<TourSchema, String> get title => ...;
-  static StopFieldRefs stop(StopRef at) => ...;
+  static StopFieldRefs stop({required String stopClientId}) => ...;
 }
 
 // Anywhere in your application:
-final ref = (stop: itemKey);
-form.field(TourFields.stop(ref).nights).set(4);   // 100% Typo-Proof''',
+form.field(TourFields.stop(stopClientId: itemKey).nights).set(4);   // 100% Typo-Proof''',
   ];
 
   void _copy() {
@@ -270,14 +269,16 @@ form.field(TourFields.stop(ref).nights).set(4);   // 100% Typo-Proof''',
               .text(' title => ...;\n'),
               .text('  '),
               span(classes: 'syntax-keyword', [.text('static')]),
-              .text(' StopFieldRefs stop(StopRef at) => ...;\n'),
+              .text(
+                ' StopFieldRefs stop({required String stopClientId}) => ...;\n',
+              ),
               .text('}\n\n'),
               span(classes: 'syntax-comment', [
                 .text('// Anywhere in your application:\n'),
               ]),
-              span(classes: 'syntax-keyword', [.text('final')]),
-              .text(' ref = (stop: itemKey);\n'),
-              .text('form.field(TourFields.stop(ref).nights).set(4);   '),
+              .text(
+                'form.field(TourFields.stop(stopClientId: itemKey).nights).set(4);   ',
+              ),
               span(classes: 'syntax-success', [.text('// 100% Typo-Proof')]),
             ]),
           ]),

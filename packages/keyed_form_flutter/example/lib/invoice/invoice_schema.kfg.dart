@@ -131,16 +131,13 @@ abstract final class InvoiceFields {
         set: (x, v) => x.copyWith(total: v),
       );
 
-  /// Field references for the `lineItems` row identified by [at].
+  /// Field references for the `lineItems` row identified by `lineItemClientId`.
   /// Affine — reads null / writes are a no-op if that row no longer exists.
-  static LineItemFieldRefs lineItem(LineItemRef at) => LineItemFieldRefs(
-    lineItems.at(at.lineItem, (x) => x.clientId == at.lineItem),
-  );
+  static LineItemFieldRefs lineItem({required String lineItemClientId}) =>
+      LineItemFieldRefs(
+        lineItems.at(lineItemClientId, (x) => x.clientId == lineItemClientId),
+      );
 }
-
-/// Identifies one `lineItems` row by its clientId path: `lineItem` = a `LineItemSchema.clientId`.
-/// Build it from your row objects, e.g. `(lineItem: …)`.
-typedef LineItemRef = ({String lineItem});
 
 /// Field references for a [LineItemSchema] within [InvoiceSchema].
 final class LineItemFieldRefs

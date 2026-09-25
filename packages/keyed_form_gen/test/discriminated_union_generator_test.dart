@@ -205,35 +205,59 @@ void main() {
 
       final code = dataClassGen.generate(rootClass);
 
-      // Navigators keyed by field name, taking an inline ({String seg,…}) record.
-      expect(code, contains('static DayFieldRefs day(DayRef at) =>'));
+      // Navigators keyed by field name, taking named `<field>ClientId` params.
       expect(
         code,
-        contains('DayFieldRefs(days.at(at.day, (x) => x.clientId == at.day))'),
+        contains('static DayFieldRefs day({required String dayClientId}) =>'),
       );
-      expect(code, contains('static GroupFieldRefs group(GroupRef at) =>'));
       expect(
         code,
-        contains('static SectionFieldRefs section(SectionRef at) =>'),
+        contains(
+          'DayFieldRefs(days.at(dayClientId, (x) => x.clientId == dayClientId))',
+        ),
+      );
+      expect(
+        code,
+        contains(
+          'static GroupFieldRefs group({required String dayClientId, required String groupClientId}) =>',
+        ),
+      );
+      expect(
+        code,
+        contains(
+          'static SectionFieldRefs section({required String dayClientId, required String groupClientId, required String sectionClientId}) =>',
+        ),
       );
 
       // Intermediate list accessors compose through `.asFieldRef` — the
-      // parent navigator (`day(at)`, `group(at)`, …) returns a
+      // parent navigator (`day(...)`, `group(...)`, …) returns a
       // DelegatingFieldRef subclass, and calling `.then()` directly on that
       // resolves to the raw AffineLens method (returning an AffineLens, not
       // a FieldRef) rather than the FieldRef extension type's `.then()`.
       // Regression coverage: this used to be generated without
       // `.asFieldRef`, which type-checks in this string-based test but fails
       // `dart analyze` on the real output with `return_of_invalid_type`.
-      expect(code, contains('day(at).asFieldRef.then(DayFields.groups)'));
-      expect(code, contains('group(at).asFieldRef.then(GroupFields.sections)'));
       expect(
         code,
-        contains('section(at).asFieldRef.then(SectionFields.admissions)'),
+        contains('day(dayClientId: dayClientId).asFieldRef.then(DayFields.groups)'),
       );
       expect(
         code,
-        contains('static AdmissionFieldRefs admission(AdmissionRef at) =>'),
+        contains(
+          'group(dayClientId: dayClientId, groupClientId: groupClientId).asFieldRef.then(GroupFields.sections)',
+        ),
+      );
+      expect(
+        code,
+        contains(
+          'section(dayClientId: dayClientId, groupClientId: groupClientId, sectionClientId: sectionClientId).asFieldRef.then(SectionFields.admissions)',
+        ),
+      );
+      expect(
+        code,
+        contains(
+          'static AdmissionFieldRefs admission({required String dayClientId, required String groupClientId, required String sectionClientId, required String admissionClientId}) =>',
+        ),
       );
 
       // Leaf getters live on the wrapper.
@@ -252,14 +276,9 @@ void main() {
         ),
       );
 
-      // No generated ClientId / Ref types anymore.
-      expect(code, contains('typedef DayRef = ({String day});'));
-      expect(
-        code,
-        contains(
-          'typedef AdmissionRef = ({String day, String group, String section, String admission});',
-        ),
-      );
+      // No `<Accessor>Ref` record typedefs anymore.
+      expect(code, isNot(contains('typedef DayRef')));
+      expect(code, isNot(contains('typedef AdmissionRef')));
       expect(code, isNot(contains('extension type const')));
     });
 

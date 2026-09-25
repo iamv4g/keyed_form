@@ -112,32 +112,27 @@ abstract final class ItineraryFields {
         set: (x, v) => x.copyWith(days: v),
       );
 
-  /// Field references for the `days` row identified by [at].
+  /// Field references for the `days` row identified by `dayClientId`.
   /// Affine — reads null / writes are a no-op if that row no longer exists.
-  static DayFieldRefs day(DayRef at) =>
-      DayFieldRefs(days.at(at.day, (x) => x.clientId == at.day));
+  static DayFieldRefs day({required String dayClientId}) =>
+      DayFieldRefs(days.at(dayClientId, (x) => x.clientId == dayClientId));
 
-  /// The `activities` list on the `day` row [at] addresses.
-  static FieldRef<ItinerarySchema, List<ActivitySchema>> dayActivities(
-    DayRef at,
-  ) => day(at).asFieldRef.then(DayFields.activities);
+  /// The `activities` list on the `day` row identified by `dayClientId`.
+  static FieldRef<ItinerarySchema, List<ActivitySchema>> dayActivities({
+    required String dayClientId,
+  }) => day(dayClientId: dayClientId).asFieldRef.then(DayFields.activities);
 
-  /// Field references for the `activities` row identified by [at].
+  /// Field references for the `activities` row identified by `activityClientId`.
   /// Affine — reads null / writes are a no-op if that row no longer exists.
-  static ActivityFieldRefs activity(ActivityRef at) => ActivityFieldRefs(
-    dayActivities((
-      day: at.day,
-    )).at(at.activity, (x) => x.clientId == at.activity),
+  static ActivityFieldRefs activity({
+    required String dayClientId,
+    required String activityClientId,
+  }) => ActivityFieldRefs(
+    dayActivities(
+      dayClientId: dayClientId,
+    ).at(activityClientId, (x) => x.clientId == activityClientId),
   );
 }
-
-/// Identifies one `days` row by its clientId path: `day` = a `DaySchema.clientId`.
-/// Build it from your row objects, e.g. `(day: …)`.
-typedef DayRef = ({String day});
-
-/// Identifies one `activities` row by its clientId path: `day` = a `DaySchema.clientId`, `activity` = a `ActivitySchema.clientId`.
-/// Build it from your row objects, e.g. `(day: …, activity: …)`.
-typedef ActivityRef = ({String day, String activity});
 
 /// Field references for a [DaySchema] within [ItinerarySchema].
 final class DayFieldRefs

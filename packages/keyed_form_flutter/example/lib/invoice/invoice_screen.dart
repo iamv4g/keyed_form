@@ -104,7 +104,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                   for (final item in items)
                     _LineItemRow(
                       key: ValueKey(item.clientId),
-                      fields: InvoiceFields.lineItem((lineItem: item.clientId)),
+                      fields: InvoiceFields.lineItem(
+                        lineItemClientId: item.clientId,
+                      ),
                       onRemove: items.length > 1
                           ? () => list.removeById(item.clientId)
                           : null,

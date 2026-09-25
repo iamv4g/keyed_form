@@ -26,26 +26,27 @@ void main() {
           hotels: [hotel1, hotel2],
         );
 
-        final hotel1Ref = (hotel: hotel1.clientId);
         expect(
-          TourFields.hotel(hotel1Ref).hotelName.getOrNull(tour),
+          TourFields.hotel(hotelClientId: hotel1.clientId).hotelName.getOrNull(tour),
           'Kyoto Grand Hotel',
         );
-        expect(TourFields.hotel(hotel1Ref).hotelPrice.getOrNull(tour), '20000');
+        expect(
+          TourFields.hotel(hotelClientId: hotel1.clientId).hotelPrice.getOrNull(tour),
+          '20000',
+        );
         expect(HotelFields.hotelName.get(hotel1), 'Kyoto Grand Hotel');
 
-        final hotel2Ref = (hotel: hotel2.clientId);
         expect(
-          TourFields.hotel(hotel2Ref).hotelName.getOrNull(tour),
+          TourFields.hotel(hotelClientId: hotel2.clientId).hotelName.getOrNull(tour),
           'Osaka Royal Hotel',
         );
 
         // Edit via the wrapper's leaf FieldRef
         tour = TourFields.hotel(
-          hotel1Ref,
+          hotelClientId: hotel1.clientId,
         ).hotelName.set(tour, 'Kyoto Grand Hotel (Renovated)');
         expect(
-          TourFields.hotel(hotel1Ref).hotelName.getOrNull(tour),
+          TourFields.hotel(hotelClientId: hotel1.clientId).hotelName.getOrNull(tour),
           'Kyoto Grand Hotel (Renovated)',
         );
       },

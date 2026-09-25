@@ -218,15 +218,11 @@ abstract final class TourFields {
         set: (x, v) => x.copyWith(notes: v),
       );
 
-  /// Field references for the `stops` row identified by [at].
+  /// Field references for the `stops` row identified by `stopClientId`.
   /// Affine — reads null / writes are a no-op if that row no longer exists.
-  static StopFieldRefs stop(StopRef at) =>
-      StopFieldRefs(stops.at(at.stop, (x) => x.clientId == at.stop));
+  static StopFieldRefs stop({required String stopClientId}) =>
+      StopFieldRefs(stops.at(stopClientId, (x) => x.clientId == stopClientId));
 }
-
-/// Identifies one `stops` row by its clientId path: `stop` = a `StopSchema.clientId`.
-/// Build it from your row objects, e.g. `(stop: …)`.
-typedef StopRef = ({String stop});
 
 /// Field references for a [StopSchema] within [TourSchema].
 final class StopFieldRefs extends DelegatingFieldRef<TourSchema, StopSchema> {

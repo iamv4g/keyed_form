@@ -206,15 +206,13 @@ abstract final class TourFields {
         set: (x, v) => x.copyWith(ownerNote: v),
       );
 
-  /// Field references for the `hotels` row identified by [at].
+  /// Field references for the `hotels` row identified by `hotelClientId`.
   /// Affine — reads null / writes are a no-op if that row no longer exists.
-  static HotelFieldRefs hotel(HotelRef at) =>
-      HotelFieldRefs(hotels.at(at.hotel, (x) => x.clientId == at.hotel));
+  static HotelFieldRefs hotel({required String hotelClientId}) =>
+      HotelFieldRefs(
+        hotels.at(hotelClientId, (x) => x.clientId == hotelClientId),
+      );
 }
-
-/// Identifies one `hotels` row by its clientId path: `hotel` = a `HotelSchema.clientId`.
-/// Build it from your row objects, e.g. `(hotel: …)`.
-typedef HotelRef = ({String hotel});
 
 /// Field references for a [HotelSchema] within [TourSchema].
 final class HotelFieldRefs extends DelegatingFieldRef<TourSchema, HotelSchema> {
