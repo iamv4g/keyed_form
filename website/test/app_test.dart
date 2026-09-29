@@ -6,6 +6,7 @@ import 'package:website/code/code_tabs.dart';
 import 'package:website/code/highlight.dart';
 import 'package:website/components/agent_skill_section.dart';
 import 'package:website/components/demo/hero_login_demo.dart';
+import 'package:website/components/docs/package_topology.dart';
 import 'package:website/components/feature_grid.dart';
 import 'package:website/components/footer.dart';
 import 'package:website/components/hero_section.dart';
@@ -15,6 +16,7 @@ import 'package:website/components/telemetry_section.dart';
 import 'package:website/components/navbar.dart';
 import 'package:website/pages/docs_page.dart';
 import 'package:website/pages/landing_page.dart';
+import 'package:website/package_versions.dart';
 
 void main() {
   setUpAll(initHighlighter);
@@ -36,7 +38,6 @@ void main() {
       expect(find.text('// THE MODEL'), findsOneComponent);
       expect(find.text('// AGENT SKILL'), findsOneComponent);
       expect(find.text('// DYNAMIC LISTS'), findsOneComponent);
-      expect(find.text('// WORKSPACE TOPOLOGY'), findsOneComponent);
 
       // Closing CTA + footer
       expect(find.text('Your next form is one schema away.'), findsOneComponent);
@@ -165,6 +166,22 @@ void main() {
       expect(find.textContaining('v0.'), findsNothing);
     });
 
+    testComponents('PackageTopology shows each package with its own version', (tester) async {
+      tester.pumpComponent(
+        const PackageVersions(
+          versions: {'keyed_form_gen': '0.2.0', 'keyed_form_flutter': '0.1.0'},
+          child: PackageTopology(),
+        ),
+      );
+
+      expect(find.text('keyed_form_gen'), findsOneComponent);
+      expect(find.text('v0.2.0'), findsOneComponent);
+      expect(find.text('v0.1.0'), findsOneComponent);
+      // No version known → no chip, rather than a wrong one.
+      expect(find.text('keyed_lens'), findsOneComponent);
+      expect(find.textContaining(RegExp(r'^v\d')), findsNComponents(2));
+    });
+
     testComponents('HeroSection renders headline, command bar and CTAs', (tester) async {
       tester.pumpComponent(const HeroSection());
 
@@ -250,7 +267,6 @@ void main() {
       expect(content, contains('id="features"'));
       expect(content, contains('id="benchmarks"'));
       expect(content, contains('id="model"'));
-      expect(content, contains('id="packages"'));
 
       // Client hydration script present
       expect(content, contains('src="main.client.dart.js"'));

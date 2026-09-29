@@ -548,7 +548,7 @@ List<StyleRule> get homeStyles => [
   ),
   css('.section-link:hover').styles(raw: {'text-decoration': 'underline'}),
 
-  // Topology Stack
+  // Package topology (docs Package Architecture section)
   css('.topology-grid').styles(
     display: Display.grid,
     gap: Gap(row: 12.px, column: 12.px),
@@ -563,10 +563,31 @@ List<StyleRule> get homeStyles => [
     ),
   ),
   css('.topology-card').styles(
+    display: Display.block,
     padding: .symmetric(vertical: 16.px, horizontal: 20.px),
     radius: BorderRadius.circular(4.px),
     backgroundColor: AppColors.surface,
     border: Border.all(color: AppColors.border, width: 1.px),
+    textDecoration: TextDecoration.none,
+    transition: const Transition('border-color', duration: Duration(milliseconds: 150)),
+  ),
+  css('.topology-card:hover').styles(
+    border: Border.all(color: AppColors.cyan, width: 1.px),
+  ),
+  css('.topology-head').styles(
+    display: Display.flex,
+    justifyContent: JustifyContent.spaceBetween,
+    alignItems: AlignItems.baseline,
+    gap: Gap(column: 8.px),
+    margin: .only(bottom: 6.px),
+  ),
+  css('.topology-version').styles(
+    fontSize: 0.72.rem,
+    padding: .symmetric(vertical: 1.px, horizontal: 6.px),
+    color: AppColors.inkMuted,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(999.px),
+    whiteSpace: WhiteSpace.noWrap,
   ),
 
   css('.topology-card.flutter-layer').styles(
@@ -578,7 +599,6 @@ List<StyleRule> get homeStyles => [
     fontSize: 0.92.rem,
     fontWeight: FontWeight.w600,
     color: AppColors.cyan,
-    margin: .only(bottom: 6.px),
   ),
   css('.topology-desc').styles(
     fontSize: 0.82.rem,

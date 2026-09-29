@@ -10,7 +10,6 @@ import '../components/lists_section.dart';
 import '../components/model_section.dart';
 import '../components/navbar.dart';
 import '../components/telemetry_section.dart';
-import '../components/topology_section.dart';
 
 class LandingPage extends StatelessComponent {
   const LandingPage({super.key});
@@ -30,8 +29,6 @@ class LandingPage extends StatelessComponent {
       const TelemetrySection(),
       const hr(classes: 'rule'),
       const FeatureGrid(),
-      const hr(classes: 'rule'),
-      const TopologySection(),
       const hr(classes: 'rule'),
       const ClosingCta(),
       const Footer(),
