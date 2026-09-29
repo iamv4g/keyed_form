@@ -8,6 +8,7 @@ import 'package:website/code/highlight.dart';
 import 'package:website/components/agent_skill_section.dart';
 import 'package:website/components/demo/hero_login_demo.dart';
 import 'package:website/components/docs/package_topology.dart';
+import 'package:website/components/docs_header.dart';
 import 'package:website/components/feature_grid.dart';
 import 'package:website/components/footer.dart';
 import 'package:website/components/hero_section.dart';
@@ -17,6 +18,7 @@ import 'package:website/components/telemetry_section.dart';
 import 'package:website/components/navbar.dart';
 import 'package:website/pages/docs_page.dart';
 import 'package:website/docs_content/docs_nav.dart';
+import 'package:website/docs_content/search_index.dart';
 import 'package:website/example_sources.dart';
 import 'package:website/pages/landing_page.dart';
 import 'package:website/package_versions.dart';
@@ -185,6 +187,20 @@ void main() {
       expect(find.textContaining(RegExp(r'^v\d')), findsNComponents(2));
     });
 
+    testComponents('DocsHeader: search, GitHub, theme; tabs mark the current section', (tester) async {
+      tester.pumpComponent(
+        DocsSearchIndex(
+          entries: readDocsSearchIndex(),
+          child: const DocsHeader(section: 'playground'),
+        ),
+      );
+
+      expect(find.text('Search'), findsOneComponent);
+      expect(find.text('Docs'), findsOneComponent);
+      expect(find.text('Playground'), findsOneComponent);
+      expect(find.text('pub.dev ↗'), findsNothing);
+    });
+
     testComponents('HeroSection renders headline, command bar and CTAs', (tester) async {
       tester.pumpComponent(const HeroSection());
 
@@ -258,6 +274,14 @@ void main() {
         );
       });
     }
+  });
+
+  test('search index has an entry per page and per section', () {
+    final entries = readDocsSearchIndex();
+    expect(entries.where((e) => e['section']!.isEmpty).length, docsPages.length);
+    final requirements = entries.firstWhere((e) => e['section'] == 'Requirements');
+    expect(requirements['url'], endsWith('/docs/installation#requirements'));
+    expect(requirements['text'], contains('Dart 3.10'));
   });
 
   test('docs nav lists exactly the Markdown pages under content/docs', () {

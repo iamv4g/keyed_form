@@ -17,8 +17,7 @@ void closeDocsMenu() {
   web.document.dispatchEvent(web.Event(docsMenuCloseEvent));
 }
 
-/// The "☰" button embedded in the shared Navbar, shown only on /docs at
-/// mobile widths (see [Navbar.docs]).
+/// The sidebar toggle in the docs header's tab row, shown on narrow screens.
 @client
 class DocsMenuToggle extends StatefulComponent {
   const DocsMenuToggle({super.key});
@@ -59,10 +58,28 @@ class _DocsMenuToggleState extends State<DocsMenuToggle> {
   Component build(BuildContext context) {
     return button(
       type: ButtonType.button,
-      classes: 'navbar-docs-toggle mono',
-      attributes: {'aria-label': _open ? 'Close chapters menu' : 'Open chapters menu'},
+      classes: 'sidebar-trigger',
+      attributes: {'aria-label': _open ? 'Close sidebar' : 'Open sidebar'},
       onClick: _toggle,
-      [.text('☰')],
+      [
+        svg(
+          viewBox: '0 0 24 24',
+          width: 16.px,
+          height: 16.px,
+          attributes: {
+            'fill': 'none',
+            'stroke': 'currentColor',
+            'stroke-width': '2',
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+            'aria-hidden': 'true',
+          },
+          [
+            rect(x: '3', y: '3', width: '18', height: '18', attributes: {'rx': '2'}, []),
+            path(d: 'M9 3v18', []),
+          ],
+        ),
+      ],
     );
   }
 }

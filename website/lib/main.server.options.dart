@@ -14,6 +14,7 @@ import 'package:website/components/docs/docs_menu_backdrop.dart'
     as _docs_menu_backdrop;
 import 'package:website/components/docs/docs_menu_toggle.dart'
     as _docs_menu_toggle;
+import 'package:website/components/docs/docs_search.dart' as _docs_search;
 import 'package:website/components/docs/docs_sidebar.dart' as _docs_sidebar;
 import 'package:website/components/docs/docs_toc.dart' as _docs_toc;
 import 'package:website/components/playground/playground_demo.dart'
@@ -29,6 +30,8 @@ import 'package:website/styles/e_playground_styles.dart'
     as _e_playground_styles;
 import 'package:website/styles/f_code_styles.dart' as _f_code_styles;
 import 'package:website/styles/g_markdown_styles.dart' as _g_markdown_styles;
+import 'package:website/styles/h_docs_header_styles.dart'
+    as _h_docs_header_styles;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -66,6 +69,10 @@ ServerOptions get defaultServerOptions => ServerOptions(
         ),
     _docs_menu_toggle.DocsMenuToggle:
         ClientTarget<_docs_menu_toggle.DocsMenuToggle>('docs_menu_toggle'),
+    _docs_search.DocsSearch: ClientTarget<_docs_search.DocsSearch>(
+      'docs_search',
+      params: __docs_searchDocsSearch,
+    ),
     _docs_sidebar.DocsSidebar: ClientTarget<_docs_sidebar.DocsSidebar>(
       'docs_sidebar',
     ),
@@ -84,6 +91,7 @@ ServerOptions get defaultServerOptions => ServerOptions(
     ..._e_playground_styles.playgroundStyles,
     ..._f_code_styles.codeStyles,
     ..._g_markdown_styles.markdownStyles,
+    ..._h_docs_header_styles.docsHeaderStyles,
   ],
 );
 
@@ -91,4 +99,7 @@ Map<String, Object?> __copy_buttonCopyButton(_copy_button.CopyButton c) => {
   'text': c.text,
   'label': c.label,
   'classes': c.classes,
+};
+Map<String, Object?> __docs_searchDocsSearch(_docs_search.DocsSearch c) => {
+  'entries': c.entries,
 };

@@ -11,6 +11,6 @@ class DocsMenuBackdrop extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return div(classes: 'docs-sidebar-backdrop', events: {'click': (_) => closeDocsMenu()}, []);
+    return div(classes: 'md-backdrop', events: {'click': (_) => closeDocsMenu()}, []);
   }
 }

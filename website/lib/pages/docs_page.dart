@@ -11,7 +11,7 @@ import '../components/docs/sections/reference_doc.dart';
 import '../components/docs/sections/testing_doc.dart';
 import '../components/docs/sections/virtualization_doc.dart';
 import '../components/footer.dart';
-import '../components/navbar.dart';
+import '../components/docs_header.dart';
 
 class DocsPage extends StatelessComponent {
   const DocsPage({super.key});
@@ -19,7 +19,7 @@ class DocsPage extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return div(classes: 'docs-page', [
-      const Navbar(docs: true),
+      const DocsHeader(section: 'docs', hasSidebar: true),
       div(classes: 'docs-container', [
         div(classes: 'docs-layout', [
           const DocsSidebar(),

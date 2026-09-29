@@ -3,17 +3,11 @@ import 'package:jaspr/jaspr.dart';
 
 import '../base_path.dart';
 import 'brand_mark.dart';
-import 'docs/docs_menu_toggle.dart';
 import 'icons.dart';
 import 'theme_toggle.dart';
 
 class Navbar extends StatelessComponent {
-  const Navbar({this.docs = false, super.key});
-
-  /// On docs pages: no "Docs" link, and a "☰" at the end that opens the
-  /// chapters drawer. It lives in the sticky navbar so it stays reachable
-  /// while scrolled deep into a page.
-  final bool docs;
+  const Navbar({super.key});
 
   @override
   Component build(BuildContext context) {
@@ -26,19 +20,17 @@ class Navbar extends StatelessComponent {
           ]),
         ]),
         nav(classes: 'nav-links mono', [
-          if (!docs) a(href: '$siteBasePath/docs', [.text('Docs')]),
+          a(href: '$siteBasePath/docs', [.text('Docs')]),
           a(classes: 'nav-playground', href: '$siteBasePath/playground', [.text('Playground')]),
           span(classes: 'nav-divider', attributes: {'aria-hidden': 'true'}, []),
           const SiteIconLinks(),
-          if (docs) const DocsMenuToggle(),
         ]),
       ]),
     ]);
   }
 }
 
-/// pub.dev, GitHub and the theme toggle — in the navbar, and in the docs
-/// drawer's footer on phones.
+/// pub.dev, GitHub and the theme toggle.
 class SiteIconLinks extends StatelessComponent {
   const SiteIconLinks({super.key});
 

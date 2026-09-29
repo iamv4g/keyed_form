@@ -5,7 +5,20 @@ import 'theme_tokens.dart';
 /// Markdown docs pages (`content/docs/`): one idea per page, plain type.
 @css
 List<StyleRule> get markdownStyles => [
+  // Sidebar | content | on-this-page; the header is ~100px tall.
+  css('.md-layout').styles(
+    display: Display.grid,
+    gap: Gap(column: 36.px),
+    padding: .only(top: 32.px, bottom: 64.px),
+    raw: {'grid-template-columns': '240px minmax(0, 1fr) 210px'},
+  ),
   css('.md-sidebar').styles(fontSize: 0.92.rem),
+  css('.md-sidebar-panel').styles(
+    position: Position.sticky(top: 116.px),
+    maxHeight: Unit.expression('calc(100vh - 128px)'),
+    overflow: Overflow.only(y: Overflow.auto),
+  ),
+  css('.md-backdrop').styles(display: Display.none),
   css('.md-sidebar-group').styles(
     margin: .only(top: 20.px, bottom: 8.px),
     fontSize: 0.78.rem,
@@ -61,7 +74,7 @@ List<StyleRule> get markdownStyles => [
     fontSize: 1.5.rem,
     lineHeight: 1.3.em,
     color: AppColors.ink,
-    raw: {'scroll-margin-top': '88px'},
+    raw: {'scroll-margin-top': '116px'},
   ),
   css('.md-content h3').styles(
     margin: .only(top: 32.px, bottom: 8.px),
@@ -160,7 +173,6 @@ List<StyleRule> get markdownStyles => [
   ),
 
   css('.md-toc-mobile').styles(display: Display.none),
-  css('.md-drawer-footer').styles(display: Display.none),
 
   css('.md-toc ul').styles(
     listStyle: ListStyle.none,
@@ -178,7 +190,7 @@ List<StyleRule> get markdownStyles => [
   css('.md-toc a:hover').styles(color: AppColors.cyan),
 
   css.media(MediaQuery.screen(maxWidth: 992.px), [
-    css('.md-layout').styles(raw: {'grid-template-columns': 'minmax(0, 1fr)'}),
+    css('.md-layout').styles(raw: {'grid-template-columns': '220px minmax(0, 1fr)'}),
     css('.md-content').styles(fontSize: 1.rem),
     css('.md-toc-mobile').styles(
       display: Display.block,
@@ -196,24 +208,32 @@ List<StyleRule> get markdownStyles => [
     ),
     css('.md-toc-mobile a').styles(color: AppColors.inkMuted, textDecoration: TextDecoration.none),
   ]),
-  // Phones: the navbar keeps only the brand and ☰; Playground and the
-  // icon links move to the drawer's footer.
-  css.media(MediaQuery.screen(maxWidth: 600.px), [
-    css('.docs-page .nav-links > :not(.navbar-docs-toggle)').styles(display: Display.none),
-    css('.md-drawer-footer').styles(
-      display: Display.flex,
-      alignItems: AlignItems.center,
-      gap: Gap(column: 14.px),
-      margin: .only(top: Unit.auto),
-      padding: .only(top: 16.px),
+  // At md the sidebar becomes a drawer from the left, opened from the
+  // header's tab row (html.docs-menu-open).
+  css.media(MediaQuery.screen(maxWidth: 768.px), [
+    css('.md-layout').styles(raw: {'grid-template-columns': 'minmax(0, 1fr)'}),
+    css('.md-backdrop').styles(
+      display: Display.block,
+      position: Position.fixed(top: 0.px, left: 0.px, right: 0.px, bottom: 0.px),
+      zIndex: ZIndex(1150),
+      backgroundColor: Color('rgba(0, 0, 0, 0.55)'),
+      raw: {'visibility': 'hidden', 'opacity': '0', 'transition': 'opacity 0.2s, visibility 0.2s'},
+    ),
+    css('.md-sidebar-panel').styles(
+      position: Position.fixed(top: 0.px, left: 0.px, bottom: 0.px),
+      zIndex: ZIndex(1200),
+      width: 80.percent,
+      maxWidth: 300.px,
+      maxHeight: Unit.expression('100vh'),
+      padding: .all(20.px),
+      backgroundColor: AppColors.bg,
       border: Border.only(
-        top: BorderSide.solid(color: AppColors.border, width: 1.px),
+        right: BorderSide.solid(color: AppColors.border, width: 1.px),
       ),
+      transform: Transform.translate(x: (-105).percent),
+      transition: const Transition('transform', duration: Duration(milliseconds: 200)),
     ),
-    css('.md-drawer-footer .md-drawer-playground').styles(
-      color: AppColors.ink,
-      textDecoration: TextDecoration.none,
-      raw: {'margin-right': 'auto'},
-    ),
+    css('html.docs-menu-open .md-backdrop').styles(raw: {'visibility': 'visible', 'opacity': '1'}),
+    css('html.docs-menu-open .md-sidebar-panel').styles(transform: Transform.translate(x: 0.percent)),
   ]),
 ];

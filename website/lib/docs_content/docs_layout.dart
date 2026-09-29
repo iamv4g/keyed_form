@@ -4,8 +4,8 @@ import 'package:jaspr_content/jaspr_content.dart';
 
 import '../base_path.dart';
 import '../components/docs/docs_menu_backdrop.dart';
+import '../components/docs_header.dart';
 import '../components/footer.dart';
-import '../components/navbar.dart';
 import 'docs_nav.dart';
 
 const _editBase = 'https://github.com/iamv4g/keyed_form/edit/main/website/content/';
@@ -35,9 +35,9 @@ class KfDocsLayout implements PageLayout {
         title: title == null ? 'Documentation · keyed_form' : '$title · keyed_form',
         meta: {'description': ?description},
       ),
-      const Navbar(docs: true),
+      const DocsHeader(section: 'docs', hasSidebar: true),
       div(classes: 'docs-container', [
-        div(classes: 'docs-layout md-layout', [
+        div(classes: 'md-layout', [
           _Sidebar(current: page.url),
           main_(classes: 'md-content', [
             if (entry != null) span(classes: 'md-eyebrow', [.text(entry.group)]),
@@ -88,8 +88,8 @@ class KfDocsLayout implements PageLayout {
   }
 }
 
-/// The chapters list: a sticky column on desktop, a drawer (opened by the
-/// navbar's ☰) on phones.
+/// The chapters list: a sticky column on wide screens, a drawer from the
+/// left (opened from the header's tab row) on narrow ones.
 class _Sidebar extends StatelessComponent {
   const _Sidebar({required this.current});
 
@@ -98,9 +98,9 @@ class _Sidebar extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     final groups = {for (final entry in docsPages) entry.group};
-    return div(classes: 'docs-sidebar md-sidebar', [
+    return div(classes: 'md-sidebar', [
       const DocsMenuBackdrop(),
-      aside(classes: 'docs-sidebar-panel', [
+      aside(classes: 'md-sidebar-panel', [
         nav([
           for (final group in groups) ...[
             div(classes: 'md-sidebar-group', [.text(group)]),
@@ -115,10 +115,6 @@ class _Sidebar extends StatelessComponent {
                 ]),
             ]),
           ],
-        ]),
-        div(classes: 'md-drawer-footer mono', [
-          a(classes: 'md-drawer-playground', href: '$siteBasePath/playground', [.text('Playground')]),
-          const SiteIconLinks(),
         ]),
       ]),
     ]);

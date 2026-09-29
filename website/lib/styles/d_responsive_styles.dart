@@ -31,21 +31,6 @@ List<StyleRule> get responsiveStyles => [
       padding: .only(right: 0.px),
       margin: .only(bottom: 0.px),
     ),
-    css('.navbar-docs-toggle').styles(
-      display: Display.inlineFlex,
-      alignItems: AlignItems.center,
-      justifyContent: JustifyContent.center,
-      // The ☰ glyph's own ink sits low in its line box in most fonts —
-      // asymmetric padding (less above, more below) recenters it visually
-      // without changing the button's overall height (top+bottom still 8px).
-      padding: .only(top: 2.px, bottom: 6.px, left: 8.px, right: 8.px),
-      backgroundColor: AppColors.surface,
-      border: Border.all(color: AppColors.border, width: 1.px),
-      color: AppColors.ink,
-      fontSize: 1.1.rem,
-      lineHeight: 1.em,
-      radius: BorderRadius.circular(4.px),
-    ),
     css('.docs-sidebar-backdrop').styles(
       display: Display.block,
       position: Position.fixed(top: 0.px, left: 0.px, right: 0.px, bottom: 0.px),
@@ -58,9 +43,7 @@ List<StyleRule> get responsiveStyles => [
       },
     ),
     css('.docs-sidebar-panel').styles(
-      position: Position.fixed(top: 0.px, right: 0.px, bottom: 0.px),
-      display: Display.flex,
-      flexDirection: FlexDirection.column,
+      position: Position.fixed(top: 0.px, left: 0.px, bottom: 0.px),
       width: 82.percent,
       maxWidth: 320.px,
       height: Unit.expression('100vh'),
@@ -69,9 +52,9 @@ List<StyleRule> get responsiveStyles => [
       zIndex: ZIndex(1200),
       padding: .all(20.px),
       border: Border.only(
-        left: BorderSide.solid(color: AppColors.border, width: 1.px),
+        right: BorderSide.solid(color: AppColors.border, width: 1.px),
       ),
-      transform: Transform.translate(x: 105.percent),
+      transform: Transform.translate(x: (-105).percent),
       transition: const Transition('transform', duration: Duration(milliseconds: 200)),
     ),
     css('html.docs-menu-open .docs-sidebar-backdrop').styles(
@@ -94,8 +77,6 @@ List<StyleRule> get responsiveStyles => [
     css('.nav-playground, .nav-divider').styles(
       display: Display.none,
     ),
-    // Docs pages have no "Docs" link, so Playground still fits here.
-    css('.docs-page .nav-playground, .docs-page .nav-divider').styles(raw: {'display': 'revert'}),
 
     css('.hero').styles(
       raw: {'grid-template-columns': 'minmax(0, 1fr)'},
