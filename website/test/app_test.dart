@@ -5,6 +5,7 @@ import 'package:website/code/code_tabs.dart';
 import 'package:website/code/highlight.dart';
 import 'package:website/components/agent_skill_section.dart';
 import 'package:website/components/demo/hero_login_demo.dart';
+import 'package:website/components/feature_grid.dart';
 import 'package:website/components/hero_section.dart';
 import 'package:website/components/lists_section.dart';
 import 'package:website/components/model_section.dart';
@@ -28,7 +29,7 @@ void main() {
       expect(find.text('Playground'), findsOneComponent);
 
       // Section Kickers
-      expect(find.text('// ARCHITECTURAL INVARIANTS'), findsOneComponent);
+      expect(find.text('// FEATURES'), findsOneComponent);
       expect(find.text('// MEASURED'), findsOneComponent);
       expect(find.text('// CAPABILITY MATRIX'), findsOneComponent);
       expect(find.text('// THE MODEL'), findsOneComponent);
@@ -136,6 +137,23 @@ void main() {
       expect(find.text('0.00µs'), findsNothing);
     });
 
+    testComponents('FeatureGrid renders nine linked cards', (tester) async {
+      tester.pumpComponent(const FeatureGrid());
+
+      expect(find.text('// FEATURES'), findsOneComponent);
+      expect(find.tag('a'), findsNComponents(9));
+      for (final api in [
+        'validateAsync',
+        'addRelation',
+        'markReadOnly',
+        'revealFirst',
+        'handleSubmit',
+        'setServerErrors',
+      ]) {
+        expect(find.text(api), findsOneComponent);
+      }
+    });
+
     testComponents('HeroSection renders headline, command bar and CTAs', (tester) async {
       tester.pumpComponent(const HeroSection());
 
@@ -218,7 +236,7 @@ void main() {
       expect(content, contains(':root:not([data-theme="light"])'));
 
       // Critical sections present
-      expect(content, contains('id="problems"'));
+      expect(content, contains('id="features"'));
       expect(content, contains('id="benchmarks"'));
       expect(content, contains('id="matrix"'));
       expect(content, contains('id="model"'));

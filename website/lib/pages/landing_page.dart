@@ -2,9 +2,9 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../components/agent_skill_section.dart';
+import '../components/feature_grid.dart';
 import '../components/footer.dart';
 import '../components/hero_section.dart';
-import '../components/invariants_grid.dart';
 import '../components/lists_section.dart';
 import '../components/matrix_section.dart';
 import '../components/model_section.dart';
@@ -27,9 +27,9 @@ class LandingPage extends StatelessComponent {
       const hr(classes: 'rule'),
       const ListsSection(),
       const hr(classes: 'rule'),
-      const InvariantsGrid(),
-      const hr(classes: 'rule'),
       const TelemetrySection(),
+      const hr(classes: 'rule'),
+      const FeatureGrid(),
       const hr(classes: 'rule'),
       const MatrixSection(),
       const hr(classes: 'rule'),

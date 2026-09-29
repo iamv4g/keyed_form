@@ -193,63 +193,50 @@ List<StyleRule> get homeStyles => [
     padding: .only(top: 72.px, bottom: 56.px),
   ),
 
-  // Blueprint Invariants Grid
-  css('.blueprint-grid').styles(
+  // Feature grid: one linked card per capability.
+  css('.feature-grid').styles(
     display: Display.grid,
-    gap: Gap(row: 20.px, column: 20.px),
-    margin: .only(top: 36.px),
-    gridTemplate: GridTemplate(
-      columns: GridTracks([
-        GridTrack.repeat(
-          TrackRepeat.autoFit,
-          [GridTrack(TrackSize.minmax(TrackSize(330.px), TrackSize.fr(1)))],
-        ),
-      ]),
-    ),
+    gap: Gap(row: 16.px, column: 16.px),
+    margin: .only(top: 32.px),
+    raw: {'grid-template-columns': 'repeat(3, minmax(0, 1fr))'},
   ),
-  css('.grid-card').styles(
-    padding: .all(24.px),
-    radius: BorderRadius.circular(4.px),
+  css('.feature-card').styles(
     display: Display.flex,
     flexDirection: FlexDirection.column,
-    justifyContent: JustifyContent.spaceBetween,
+    gap: Gap(row: 10.px),
+    padding: .all(22.px),
     backgroundColor: AppColors.surface,
     border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(6.px),
+    color: AppColors.ink,
+    textDecoration: TextDecoration.none,
     transition: const Transition('border-color', duration: Duration(milliseconds: 150)),
   ),
-  css('.grid-card:hover').styles(
-    border: Border.all(color: AppColors.borderBright, width: 1.px),
+  css('.feature-card:hover').styles(
+    border: Border.all(color: AppColors.cyan, width: 1.px),
   ),
-
-  css('.card-num').styles(
-    fontSize: 0.7.rem,
-    color: AppColors.cyan,
-    fontWeight: FontWeight.w700,
-    margin: .only(bottom: 8.px),
-    letterSpacing: 0.06.em,
-  ),
-  css('.card-h').styles(
+  css('.feature-icon').styles(color: AppColors.cyan),
+  css('.feature-title').styles(
     fontSize: 1.05.rem,
     fontWeight: FontWeight.w600,
-    margin: .only(bottom: 10.px),
-    color: AppColors.ink,
   ),
-
-  css('.card-p').styles(
+  css('.feature-body').styles(
     fontSize: 0.88.rem,
-    margin: .only(bottom: 16.px),
-    lineHeight: 1.5.em,
+    lineHeight: 1.55.em,
     color: AppColors.inkMuted,
+    raw: {'flex': '1'},
   ),
-
-  css('.card-diff').styles(
-    padding: .symmetric(vertical: 10.px, horizontal: 14.px),
-    fontSize: 0.82.rem,
-    backgroundColor: AppColors.surfaceElevated,
-    color: AppColors.ink,
-    border: Border.only(
-      left: BorderSide.solid(color: AppColors.cyan, width: 2.px),
-    ),
+  css('.feature-api').styles(
+    display: Display.flex,
+    flexWrap: FlexWrap.wrap,
+    gap: Gap(column: 6.px, row: 6.px),
+  ),
+  css('.feature-api code').styles(
+    fontSize: 0.72.rem,
+    padding: .symmetric(vertical: 2.px, horizontal: 7.px),
+    color: AppColors.cyan,
+    backgroundColor: AppColors.cyanGlow,
+    radius: BorderRadius.circular(3.px),
   ),
 
   // Performance: the flat-rebuilds chart beside one latency figure.

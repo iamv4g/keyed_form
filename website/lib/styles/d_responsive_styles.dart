@@ -78,13 +78,8 @@ List<StyleRule> get responsiveStyles => [
     css('html.docs-menu-open .docs-sidebar-panel').styles(
       transform: Transform.translate(x: 0.percent),
     ),
-    css('.blueprint-grid').styles(
-      gridTemplate: GridTemplate(
-        columns: GridTracks([
-          GridTrack(TrackSize.fr(1)),
-          GridTrack(TrackSize.fr(1)),
-        ]),
-      ),
+    css('.feature-grid').styles(
+      raw: {'grid-template-columns': 'repeat(2, minmax(0, 1fr))'},
     ),
 
     // Navbar — Docs + three icons fit a 320px phone on one row, so the
@@ -236,27 +231,18 @@ List<StyleRule> get responsiveStyles => [
       margin: .only(top: 10.px),
     ),
 
-    // Blueprint Invariants Grid Mobile
-    css('.blueprint-grid').styles(
-      gap: Gap(row: 14.px),
+    // Feature grid Mobile — one column of compact cards.
+    css('.feature-grid').styles(
+      gap: Gap(row: 10.px),
       margin: .only(top: 22.px),
-      gridTemplate: GridTemplate(
-        columns: GridTracks([GridTrack(TrackSize.fr(1))]),
-      ),
+      raw: {'grid-template-columns': 'minmax(0, 1fr)'},
     ),
-    css('.grid-card').styles(
-      padding: .symmetric(vertical: 18.px, horizontal: 16.px),
+    css('.feature-card').styles(
+      padding: .symmetric(vertical: 16.px, horizontal: 16.px),
+      gap: Gap(row: 8.px),
     ),
-    css('.card-h').styles(
-      fontSize: 1.0.rem,
-    ),
-    css('.card-p').styles(
+    css('.feature-body').styles(
       fontSize: 0.85.rem,
-      margin: .only(bottom: 12.px),
-    ),
-    css('.card-diff').styles(
-      padding: .symmetric(vertical: 8.px, horizontal: 12.px),
-      fontSize: 0.8.rem,
     ),
 
     // Performance Mobile
