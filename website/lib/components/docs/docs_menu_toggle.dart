@@ -18,7 +18,7 @@ void closeDocsMenu() {
 }
 
 /// The "☰" button embedded in the shared Navbar, shown only on /docs at
-/// mobile widths (see [Navbar.showDocsMenuToggle]).
+/// mobile widths (see [Navbar.docs]).
 @client
 class DocsMenuToggle extends StatefulComponent {
   const DocsMenuToggle({super.key});

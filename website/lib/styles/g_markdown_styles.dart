@@ -160,6 +160,7 @@ List<StyleRule> get markdownStyles => [
   ),
 
   css('.md-toc-mobile').styles(display: Display.none),
+  css('.md-drawer-footer').styles(display: Display.none),
 
   css('.md-toc ul').styles(
     listStyle: ListStyle.none,
@@ -194,5 +195,25 @@ List<StyleRule> get markdownStyles => [
       padding: .zero,
     ),
     css('.md-toc-mobile a').styles(color: AppColors.inkMuted, textDecoration: TextDecoration.none),
+  ]),
+  // Phones: the navbar keeps only the brand and ☰; Playground and the
+  // icon links move to the drawer's footer.
+  css.media(MediaQuery.screen(maxWidth: 600.px), [
+    css('.docs-page .nav-links > :not(.navbar-docs-toggle)').styles(display: Display.none),
+    css('.md-drawer-footer').styles(
+      display: Display.flex,
+      alignItems: AlignItems.center,
+      gap: Gap(column: 14.px),
+      margin: .only(top: Unit.auto),
+      padding: .only(top: 16.px),
+      border: Border.only(
+        top: BorderSide.solid(color: AppColors.border, width: 1.px),
+      ),
+    ),
+    css('.md-drawer-footer .md-drawer-playground').styles(
+      color: AppColors.ink,
+      textDecoration: TextDecoration.none,
+      raw: {'margin-right': 'auto'},
+    ),
   ]),
 ];

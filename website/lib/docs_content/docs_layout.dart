@@ -35,7 +35,7 @@ class KfDocsLayout implements PageLayout {
         title: title == null ? 'Documentation · keyed_form' : '$title · keyed_form',
         meta: {'description': ?description},
       ),
-      const Navbar(showDocsMenuToggle: true),
+      const Navbar(docs: true),
       div(classes: 'docs-container', [
         div(classes: 'docs-layout md-layout', [
           _Sidebar(current: page.url),
@@ -115,6 +115,10 @@ class _Sidebar extends StatelessComponent {
                 ]),
             ]),
           ],
+        ]),
+        div(classes: 'md-drawer-footer mono', [
+          a(classes: 'md-drawer-playground', href: '$siteBasePath/playground', [.text('Playground')]),
+          const SiteIconLinks(),
         ]),
       ]),
     ]);

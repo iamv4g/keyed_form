@@ -58,7 +58,9 @@ List<StyleRule> get responsiveStyles => [
       },
     ),
     css('.docs-sidebar-panel').styles(
-      position: Position.fixed(top: 0.px, left: 0.px, bottom: 0.px),
+      position: Position.fixed(top: 0.px, right: 0.px, bottom: 0.px),
+      display: Display.flex,
+      flexDirection: FlexDirection.column,
       width: 82.percent,
       maxWidth: 320.px,
       height: Unit.expression('100vh'),
@@ -67,9 +69,9 @@ List<StyleRule> get responsiveStyles => [
       zIndex: ZIndex(1200),
       padding: .all(20.px),
       border: Border.only(
-        right: BorderSide.solid(color: AppColors.border, width: 1.px),
+        left: BorderSide.solid(color: AppColors.border, width: 1.px),
       ),
-      transform: Transform.translate(x: (-105).percent),
+      transform: Transform.translate(x: 105.percent),
       transition: const Transition('transform', duration: Duration(milliseconds: 200)),
     ),
     css('html.docs-menu-open .docs-sidebar-backdrop').styles(
@@ -92,6 +94,8 @@ List<StyleRule> get responsiveStyles => [
     css('.nav-playground, .nav-divider').styles(
       display: Display.none,
     ),
+    // Docs pages have no "Docs" link, so Playground still fits here.
+    css('.docs-page .nav-playground, .docs-page .nav-divider').styles(raw: {'display': 'revert'}),
 
     css('.hero').styles(
       raw: {'grid-template-columns': 'minmax(0, 1fr)'},
