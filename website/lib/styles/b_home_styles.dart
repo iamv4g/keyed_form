@@ -441,17 +441,18 @@ List<StyleRule> get homeStyles => [
     gap: Gap(row: 8.px),
   ),
   css('.pack-slot').styles(
-    position: Position.relative(),
     transition: const Transition('transform', duration: Duration(milliseconds: 150)),
   ),
-  // The dragged row follows the pointer 1:1 and floats above its siblings.
-  css('.pack-slot.dragging').styles(
-    zIndex: ZIndex(2),
-    raw: {'transition': 'none'},
-  ),
-  css('.pack-slot.dragging .pack-row').styles(
+  css('.pack-slot.lifted').styles(opacity: 0),
+  css('.pack-row-overlay').styles(
+    alignItems: AlignItems.center,
     border: Border.all(color: AppColors.cyan, width: 1.px),
-    raw: {'box-shadow': 'var(--card-shadow)'},
+    raw: {'box-shadow': 'var(--card-shadow)', 'cursor': 'grabbing'},
+  ),
+  css('.pack-overlay-label').styles(
+    padding: .symmetric(horizontal: 12.px),
+    fontSize: 0.92.rem,
+    color: AppColors.ink,
   ),
   css('.pack-row').styles(
     display: Display.flex,
@@ -470,7 +471,6 @@ List<StyleRule> get homeStyles => [
     raw: {'flex': '1', 'min-width': '0'},
   ),
   css('.pack-field .playground-field-error').styles(margin: .only(top: 4.px)),
-  // Touch drags start on the handle only, so it opts out of scrolling.
   css('.pack-handle').styles(
     display: Display.inlineFlex,
     alignItems: AlignItems.center,

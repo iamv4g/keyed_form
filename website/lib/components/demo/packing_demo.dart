@@ -6,10 +6,7 @@ import 'package:universal_web/web.dart' as web;
 
 import '../../demos/packing_schema.dart';
 
-/// The dynamic-list demo: rows addressed by `clientId`, reordered by
-/// dragging a handle. Every row is keyed by its id, so the DOM node — and
-/// with it the text, caret and error — travels with the row; the panel
-/// underneath shows each id following its row to a new index.
+/// Rows keyed by `clientId`, reordered by dragging a handle.
 @client
 class PackingDemo extends StatefulComponent {
   const PackingDemo({super.key});
@@ -46,7 +43,6 @@ class _PackingDemoState extends State<PackingDemo> {
     return label.isEmpty ? 'untitled item' : label;
   }
 
-  // Announce rows by their label, not their UUID.
   late final _announcements = DndAnnouncements(
     onDragStart: (active) => 'Picked up ${_name(active)}.',
     onDragOver: (active, over) =>
@@ -59,8 +55,7 @@ class _PackingDemoState extends State<PackingDemo> {
     final id = list.items[d.fromIndex].clientId;
     list.move(d.fromIndex, d.toIndex);
     if (!kIsWeb) return;
-    // Reordering re-inserts the row's DOM node, which drops focus. Hand it
-    // back to the row's handle so a keyboard user can keep going.
+    // Moving the row's DOM node drops focus; give it back to the handle.
     Future(() {
       final active = web.document.activeElement;
       if (active != null && active != web.document.body) return;
@@ -83,6 +78,8 @@ class _PackingDemoState extends State<PackingDemo> {
       div(classes: 'pack-box blueprint-box', [
         div(classes: 'playground-panel-title mono', [.text('// RUNNING — drag ⠿, then type')]),
         SortableScope(
+          strategy: SortableStrategies.dropOnOver,
+          offsetResolver: SortableOffsets.verticalList,
           itemIds: [for (final item in items) DndId(item.clientId)],
           onMove: _move,
           child: div(classes: 'pack-list', [
@@ -90,19 +87,17 @@ class _PackingDemoState extends State<PackingDemo> {
               SortableItem(
                 key: ValueKey(item.clientId),
                 id: DndId(item.clientId),
-                // Drags start only on the handle, which opts out of touch
-                // scrolling, so touch needs no long-press (the adapter's
-                // default) — a few pixels of movement is enough on any input.
+                // Handle-only drags, so touch needs no long-press.
                 constraint: const DndSensorActivationConstraint(distance: 4),
                 label: item.label.isEmpty ? 'Untitled item' : item.label,
                 description: 'Press space on the handle to lift, arrow keys to move, space to drop.',
                 builder: (context, drag, child) {
-                  final offset = drag.isDragging ? drag.session?.transform : null;
-                  final dx = offset?.x ?? drag.offset.x;
-                  final dy = offset?.y ?? drag.offset.y;
+                  final offset = drag.offset;
                   return div(
-                    classes: drag.isDragging ? 'pack-slot dragging' : 'pack-slot',
-                    styles: Styles(raw: {'transform': 'translate3d(${dx}px, ${dy}px, 0)'}),
+                    classes: drag.isActive || drag.isDragging ? 'pack-slot lifted' : 'pack-slot',
+                    styles: offset == DndPoint.zero
+                        ? null
+                        : Styles(raw: {'transform': 'translate(${offset.x}px, ${offset.y}px)'}),
                     [child],
                   );
                 },
@@ -113,6 +108,15 @@ class _PackingDemoState extends State<PackingDemo> {
                   onRemove: () => list.removeById(item.clientId),
                 ),
               ),
+            DndDragOverlay(
+              builder: (context, overlay) {
+                final label = list.byId(overlay.activeId.value)?.label ?? '';
+                return div(classes: 'pack-row pack-row-overlay', [
+                  span(classes: 'pack-handle', [.text('⠿')]),
+                  span(classes: 'pack-overlay-label', [.text(label.isEmpty ? 'Untitled item' : label)]),
+                ]);
+              },
+            ),
             DndLiveRegion(announcements: _announcements),
           ]),
         ),
