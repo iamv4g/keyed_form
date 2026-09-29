@@ -1,6 +1,4 @@
-/// The landing page's dynamic-list demo — a copy of
-/// `packages/keyed_form_flutter/example/lib/packing_list/packing_schema.dart`.
-/// Keep the two in step.
+/// Mirrors `example/lib/packing_list/packing_schema.dart`; keep in step.
 @keyedSchema
 library;
 

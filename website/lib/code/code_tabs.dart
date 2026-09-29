@@ -11,13 +11,8 @@ class CodeTab {
   final String code;
 }
 
-/// File tabs over highlighted Dart, switched by pure CSS: one radio input
-/// per tab (a native radio group, so arrow keys move between tabs) and
-/// `:checked ~` rules in [codeTabsStyles] reveal the matching panel. No
-/// hydration, so the highlighter stays server-side.
-///
-/// [id] must be unique on the page — it namespaces the radio group.
-/// Supports up to [maxTabs] tabs.
+/// File tabs over highlighted Dart, switched by CSS radio inputs (no
+/// hydration). [id] must be unique on the page.
 class CodeTabs extends StatelessComponent {
   const CodeTabs({required this.id, required this.tabs, this.caption, super.key});
 

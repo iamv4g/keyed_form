@@ -56,10 +56,8 @@ class _ThemeToggleState extends State<ThemeToggle> {
     }
   }
 
-  // Both icons are always rendered; CSS shows the one matching the
-  // current theme (see `.theme-icon-*` in sharedStyles). The pre-rendered
-  // HTML can't know the visitor's theme, so a state-driven icon would
-  // flash the wrong one until hydration.
+  // Both icons render and CSS picks one, so pre-rendered HTML can't flash
+  // the wrong icon before hydration.
   @override
   Component build(BuildContext context) {
     return button(

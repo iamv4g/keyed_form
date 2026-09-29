@@ -21,7 +21,6 @@ class ObservedField<Root, V> extends StatefulComponent {
   final String label;
   final Component Function(V? value, ValueChanged<V> onChange, VoidCallback onBlur) builder;
 
-  /// Whether to show the `rebuilds: n` badge next to the label.
   final bool showRebuilds;
 
   @override

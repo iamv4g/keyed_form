@@ -9,9 +9,6 @@ import 'observed_field.dart';
 
 final _jsonEncoder = JsonEncoder.withIndent('  ');
 
-/// The Model section's demo: the same login schema and controller as the
-/// code tabs beside it, with the whole draft and the visible errors
-/// printed live underneath — the form is one value, not a set of widgets.
 @client
 class ModelLoginDemo extends StatefulComponent {
   const ModelLoginDemo({super.key});

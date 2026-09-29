@@ -6,8 +6,6 @@ import '../code/code_tabs.dart';
 import '../code/snippets/login_snippets.dart';
 import 'demo/model_login_demo.dart';
 
-/// "The Model": the login example's three files on one side, the same
-/// schema and controller running on the other.
 class ModelSection extends StatelessComponent {
   const ModelSection({super.key});
 

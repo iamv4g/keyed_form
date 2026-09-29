@@ -1,8 +1,6 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
-/// Built-in vs wire-it-yourself, per form architecture. Lives in the
-/// benchmarks chapter (it used to be a landing-page section).
 class CapabilityMatrix extends StatelessComponent {
   const CapabilityMatrix({super.key});
 

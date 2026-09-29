@@ -64,9 +64,7 @@ Future<void> main() async {
   );
 }
 
-/// `name → version` for every package under `../packages`, read from each
-/// pubspec. `jaspr build`/`serve` run from `website/`, so the workspace root
-/// is one level up. Packages without a pubspec or a version line are skipped.
+/// `name → version` from `../packages/*/pubspec.yaml` (builds run in `website/`).
 Map<String, String> _readPackageVersions() {
   final packages = Directory('../packages');
   if (!packages.existsSync()) return const {};

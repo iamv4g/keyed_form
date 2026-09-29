@@ -38,9 +38,7 @@ const darkThemeTokens = <String, String>{
   '--red': '#ff4d4d',
   '--grid': 'rgba(0, 240, 255, 0.04)',
   '--card-shadow': '0 4px 20px rgba(0, 0, 0, 0.5)',
-  // `display` values for markup that exists once per theme (theme-toggle
-  // icons, the Jaspr badge) — `display: var(--dark-only)` rides the same
-  // prefers-color-scheme / data-theme cascade as every color token.
+  // For per-theme markup: `display: var(--dark-only)`.
   '--dark-only': 'inline-block',
   '--light-only': 'none',
 };

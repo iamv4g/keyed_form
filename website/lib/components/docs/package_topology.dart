@@ -30,8 +30,6 @@ const _packages = [
   ),
 ];
 
-/// The six workspace packages in dependency order, each with its own
-/// published version (see [PackageVersions]).
 class PackageTopology extends StatelessComponent {
   const PackageTopology({super.key});
 

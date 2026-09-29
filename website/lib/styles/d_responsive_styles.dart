@@ -82,9 +82,7 @@ List<StyleRule> get responsiveStyles => [
       raw: {'grid-template-columns': 'repeat(2, minmax(0, 1fr))'},
     ),
 
-    // Navbar — Docs + three icons fit a 320px phone on one row, so the
-    // row never wraps or scrolls. Playground drops out here; the hero links
-    // to it instead.
+    // Navbar: one row on phones; Playground drops out.
     css('.brand').styles(
       fontSize: 1.05.rem,
     ),
@@ -95,13 +93,11 @@ List<StyleRule> get responsiveStyles => [
       display: Display.none,
     ),
 
-    // Hero stacks: copy first, demo underneath.
     css('.hero').styles(
       raw: {'grid-template-columns': 'minmax(0, 1fr)'},
     ),
 
-    // Splits stack with the running demo first — it's the hook; the code
-    // explaining it follows.
+    // Splits stack demo-first.
     css('.split').styles(
       raw: {'grid-template-columns': 'minmax(0, 1fr)'},
     ),
@@ -231,7 +227,7 @@ List<StyleRule> get responsiveStyles => [
       margin: .only(top: 10.px),
     ),
 
-    // Feature grid Mobile — one column of compact cards.
+    // Feature grid Mobile
     css('.feature-grid').styles(
       gap: Gap(row: 10.px),
       margin: .only(top: 22.px),
@@ -321,7 +317,6 @@ List<StyleRule> get responsiveStyles => [
       margin: .only(top: 50.px),
       padding: .only(top: 40.px, bottom: 48.px),
     ),
-    // Brand across the top, then the three link columns two-up.
     css('.footer-grid').styles(
       raw: {'grid-template-columns': 'repeat(2, minmax(0, 1fr))'},
     ),

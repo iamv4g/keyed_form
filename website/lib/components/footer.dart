@@ -5,8 +5,6 @@ import '../base_path.dart';
 
 const _repo = 'https://github.com/iamv4g/keyed_form';
 
-/// Shared by every page: brand, three link columns, and a bottom row with
-/// the license and the "Built with Jaspr" badge.
 class Footer extends StatelessComponent {
   const Footer({super.key});
 
@@ -44,8 +42,7 @@ class Footer extends StatelessComponent {
             .text('MIT License · '),
             a(classes: 'footer-link', href: '$_repo/blob/main/LICENSE', target: Target.blank, [.text('LICENSE')]),
           ]),
-          // Both variants render; CSS shows the one matching the theme
-          // (--dark-only / --light-only), like the theme-toggle icons.
+          // CSS shows the variant matching the theme.
           a(
             classes: 'jaspr-badge',
             href: 'https://jaspr.site',

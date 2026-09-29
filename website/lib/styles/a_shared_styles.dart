@@ -138,7 +138,6 @@ List<StyleRule> get sharedStyles => [
     color: AppColors.cyan,
     border: Border.all(color: AppColors.cyan, width: 1.px),
   ),
-  // Dark theme offers the sun (switch to light), light theme the moon.
   css('.theme-icon-sun').styles(raw: {'display': 'var(--dark-only)'}),
   css('.theme-icon-moon').styles(raw: {'display': 'var(--light-only)'}),
 

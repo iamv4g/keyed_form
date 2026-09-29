@@ -4,8 +4,6 @@ import 'package:jaspr/jaspr.dart';
 import '../base_path.dart';
 import 'copy_button.dart';
 
-/// The landing page's last word: install and start. Landing-only — the
-/// footer below is shared by every page.
 class ClosingCta extends StatelessComponent {
   const ClosingCta({super.key});
 

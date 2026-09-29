@@ -6,8 +6,6 @@ import '../code/code_tabs.dart';
 import '../code/snippets/packing_snippets.dart';
 import 'demo/packing_demo.dart';
 
-/// Dynamic lists: rows addressed by id, reordered by drag and drop. Same
-/// split layout as the Model section.
 class ListsSection extends StatelessComponent {
   const ListsSection({super.key});
 

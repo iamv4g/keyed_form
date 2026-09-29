@@ -1,7 +1,5 @@
-/// The three files the Model section shows — a trimmed version of
-/// `packages/keyed_form_flutter/example/lib/login/`. Plain strings, not
-/// compiled here: when the Flutter API changes, re-check them by dropping
-/// the last two into the example app and running `flutter analyze`.
+/// Trimmed from `example/lib/login/`. Not compiled here — re-check with
+/// `flutter analyze` in the example when the API changes.
 abstract final class LoginSnippets {
   static const schema = r'''@keyedSchema
 library;

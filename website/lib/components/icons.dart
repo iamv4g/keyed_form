@@ -1,11 +1,8 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
-/// Inline SVG icons for the navbar and footer. All draw in `currentColor`,
-/// so they follow the surrounding link's color (and its hover state) in
-/// both themes.
+/// Inline SVG icons drawn in `currentColor`.
 abstract final class SiteIcons {
-  /// The Dart logo — stands for pub.dev, where every package is published.
   static Component dart({int size = 18}) => svg(
     viewBox: '0 0 500 500',
     width: size.px,
@@ -19,7 +16,6 @@ abstract final class SiteIcons {
     ],
   );
 
-  /// The GitHub mark.
   static Component github({int size = 18}) => svg(
     viewBox: '0 0 16 16',
     width: size.px,

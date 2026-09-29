@@ -1,8 +1,5 @@
-/// The three files the dynamic-list section shows — adapted from
-/// `packages/keyed_form_flutter/example/lib/packing_list/` (which reorders
-/// with move buttons; this version drags with dnd_kit_flutter). Plain
-/// strings, not compiled here: re-check them by dropping the last two into
-/// the example app with dnd_kit_flutter added and running `flutter analyze`.
+/// Adapted from `example/lib/packing_list/` to drag with dnd_kit_flutter.
+/// Not compiled here — re-check with `flutter analyze` in the example.
 abstract final class PackingSnippets {
   static const schema = r'''@keyedSchema
 library;

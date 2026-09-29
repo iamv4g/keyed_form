@@ -3,13 +3,10 @@ import 'package:jaspr/jaspr.dart';
 
 import '../base_path.dart';
 
-/// Measured cost, stated as flatness rather than as a comparison: the
-/// rebuild count for one keystroke doesn't move with form size. Figures
-/// come from the widget-layer and 100-row tables in `BenchmarksDoc`.
+/// Figures come from the tables in `BenchmarksDoc`.
 class TelemetrySection extends StatelessComponent {
   const TelemetrySection({super.key});
 
-  // Widget rebuilds for one keystroke, by form size (benchmarks doc).
   static const _rebuilds = [
     (fields: 10, rebuilds: 44),
     (fields: 50, rebuilds: 44),
@@ -30,8 +27,7 @@ class TelemetrySection extends StatelessComponent {
       div(classes: 'perf-grid', [
         div(classes: 'blueprint-box stat-tile', [
           _chart(),
-          // Wrapped in a span: the pre-renderer breaks lines between inline
-          // children of a div, which shows up as a space before the comma.
+          // span: the pre-renderer would otherwise add a space before ','.
           p(classes: 'stat-desc', [
             span([
               .text("One keystroke rebuilds one field's subtree — "),
@@ -54,7 +50,6 @@ class TelemetrySection extends StatelessComponent {
     ]);
   }
 
-  /// Four equal bars: the point is that they don't grow.
   static Component _chart() {
     const width = 360;
     const height = 170;

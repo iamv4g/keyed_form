@@ -6,10 +6,6 @@ import '../../base_path.dart';
 import '../../demos/login_schema.dart';
 import 'observed_field.dart';
 
-/// The hero's live proof of the headline: two fields on one
-/// `KeyedFormController`, each with its own rebuild counter. Typing moves
-/// only the edited field's counter, while the controller itself notifies
-/// on every keystroke.
 @client
 class HeroLoginDemo extends StatefulComponent {
   const HeroLoginDemo({super.key});

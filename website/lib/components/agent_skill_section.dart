@@ -3,9 +3,6 @@ import 'package:jaspr/jaspr.dart';
 
 import 'copy_button.dart';
 
-/// A compact band pointing coding agents at `skills/keyed_form/SKILL.md`.
-/// Installs into the cross-agent `.agents/skills/` folder; Claude Code
-/// reads `.claude/skills/`, hence the symlink line.
 class AgentSkillSection extends StatelessComponent {
   const AgentSkillSection({super.key});
 

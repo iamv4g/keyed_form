@@ -3,9 +3,7 @@ import 'package:jaspr/dom.dart';
 import '../code/code_tabs.dart';
 import 'theme_tokens.dart';
 
-/// Styles for [CodeTabs] and the `tk-*` token classes `highlightDart`
-/// emits. Token colors come from the theme tokens, so highlighted code
-/// follows the light/dark toggle like everything else.
+/// Styles for [CodeTabs] and the `tk-*` token classes.
 @css
 List<StyleRule> get codeStyles => [
   css('.code-tabs-box').styles(
@@ -17,8 +15,7 @@ List<StyleRule> get codeStyles => [
     minWidth: 0.px,
   ),
 
-  // Visually hidden but still focusable, so the radio group's native
-  // arrow-key navigation switches tabs.
+  // Hidden but focusable: arrow keys switch tabs.
   css('.code-tab-input').styles(
     position: Position.absolute(),
     opacity: 0,
@@ -76,7 +73,6 @@ List<StyleRule> get codeStyles => [
   ),
   css('.code-tabs-caption a').styles(color: AppColors.cyan),
 
-  // Tab i's radio reveals panel i and marks label i active.
   for (var i = 1; i <= CodeTabs.maxTabs; i++) ...[
     css('.code-tab-input:nth-of-type($i):checked ~ .code-tab-panels .code-tab-panel:nth-child($i)').styles(
       display: Display.block,

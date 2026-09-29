@@ -12,13 +12,12 @@ class _Feature {
     required this.anchor,
   });
 
-  /// A 24×24 stroke-only SVG path (`d`).
+  /// 24×24 stroke path.
   final String icon;
   final String title;
   final String body;
   final List<String> api;
 
-  /// The docs section the card links to.
   final String anchor;
 }
 
@@ -98,8 +97,6 @@ const _features = [
   ),
 ];
 
-/// Everything the demos above don't show, one card per capability, each
-/// linking to its docs section.
 class FeatureGrid extends StatelessComponent {
   const FeatureGrid({super.key});
 

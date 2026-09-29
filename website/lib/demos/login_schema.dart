@@ -1,7 +1,4 @@
-/// The landing page's login demo — `packages/keyed_form_flutter/example/
-/// lib/login/login_schema.dart` without the `remember` checkbox. Keep the
-/// two in step: the page shows this schema's source as "the code behind
-/// the demo".
+/// Mirrors `example/lib/login/login_schema.dart` minus `remember`; keep in step.
 @keyedSchema
 library;
 

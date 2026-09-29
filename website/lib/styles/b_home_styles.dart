@@ -90,8 +90,6 @@ List<StyleRule> get homeStyles => [
     backgroundColor: AppColors.border,
   ),
 
-  // Icon-only links: a square hit area (not just the 18px glyph) so they're
-  // comfortable to tap on phones.
   css('.nav-icon').styles(
     display: Display.inlineFlex,
     alignItems: AlignItems.center,
@@ -102,7 +100,7 @@ List<StyleRule> get homeStyles => [
   ),
 
   // Hero Section
-  // Hero: copy on the left, the live login demo on the right.
+  // Hero
   css('.hero').styles(
     position: Position.relative(),
     display: Display.grid,
@@ -133,8 +131,6 @@ List<StyleRule> get homeStyles => [
     letterSpacing: (-0.03).em,
     fontSize: 3.rem,
   ),
-  // The payoff beat always starts its own line, so "One" never strands
-  // at the end of the first line.
   css('.hero h1 .highlight').styles(
     display: Display.block,
     color: AppColors.cyan,
@@ -193,7 +189,7 @@ List<StyleRule> get homeStyles => [
     padding: .only(top: 72.px, bottom: 56.px),
   ),
 
-  // Feature grid: one linked card per capability.
+  // Feature grid
   css('.feature-grid').styles(
     display: Display.grid,
     gap: Gap(row: 16.px, column: 16.px),
@@ -239,7 +235,7 @@ List<StyleRule> get homeStyles => [
     radius: BorderRadius.circular(3.px),
   ),
 
-  // Closing call to action (landing only).
+  // Closing CTA
   css('.closing-cta').styles(
     textAlign: TextAlign.center,
     display: Display.flex,
@@ -251,7 +247,7 @@ List<StyleRule> get homeStyles => [
   ),
   css('.closing-cta .cta-group').styles(justifyContent: JustifyContent.center),
 
-  // Performance: the flat-rebuilds chart beside one latency figure.
+  // Performance
   css('.perf-grid').styles(
     display: Display.grid,
     gap: Gap(row: 16.px, column: 16.px),
@@ -297,7 +293,7 @@ List<StyleRule> get homeStyles => [
     raw: {'fill': 'var(--ink-muted)', 'font-size': '12px'},
   ),
 
-  // Capability matrix (docs benchmarks chapter)
+  // Capability matrix (docs)
   css('table.matrix').styles(
     width: 100.percent,
     minWidth: 720.px,
@@ -352,8 +348,7 @@ List<StyleRule> get homeStyles => [
     color: AppColors.inkMuted,
   ),
 
-  // Split: code on one side, the same code running on the other. Shared
-  // by the Model and Dynamic-list sections.
+  // Split: code | demo
   css('.split').styles(
     display: Display.grid,
     gap: Gap(column: 28.px, row: 20.px),
@@ -362,8 +357,6 @@ List<StyleRule> get homeStyles => [
     raw: {'grid-template-columns': 'minmax(0, 1.15fr) minmax(0, 1fr)'},
   ),
   css('.split-code, .split-demo').styles(minWidth: 0.px),
-  // The code column can run much taller than the demo; keep the demo in
-  // view while reading down it.
   css('.split-demo').styles(position: Position.sticky(top: 88.px)),
 
   css('.model-demo').styles(
@@ -403,8 +396,7 @@ List<StyleRule> get homeStyles => [
     color: AppColors.inkMuted,
   ),
 
-  // A multi-line shell command with its own copy button beside it (not
-  // over it — the command scrolls sideways on phones).
+  // Shell command + copy button
   css('.cmd-block').styles(
     display: Display.flex,
     alignItems: AlignItems.start,
@@ -512,7 +504,7 @@ List<StyleRule> get homeStyles => [
   ),
   css('.demo-credit a').styles(color: AppColors.cyan, textDecoration: TextDecoration.none),
 
-  // Three bold-led points under a split, then a docs link.
+  // Section points + link
   css('.points').styles(
     listStyle: ListStyle.none,
     display: Display.grid,
@@ -548,7 +540,7 @@ List<StyleRule> get homeStyles => [
   ),
   css('.section-link:hover').styles(raw: {'text-decoration': 'underline'}),
 
-  // Package topology (docs Package Architecture section)
+  // Package topology (docs)
   css('.topology-grid').styles(
     display: Display.grid,
     gap: Gap(row: 12.px, column: 12.px),
