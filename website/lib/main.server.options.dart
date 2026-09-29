@@ -5,15 +5,18 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/server.dart';
+import 'package:website/components/demo/hero_login_demo.dart'
+    as _hero_login_demo;
+import 'package:website/components/demo/model_login_demo.dart'
+    as _model_login_demo;
+import 'package:website/components/demo/packing_demo.dart' as _packing_demo;
 import 'package:website/components/docs/docs_menu_toggle.dart'
     as _docs_menu_toggle;
 import 'package:website/components/docs/docs_sidebar.dart' as _docs_sidebar;
 import 'package:website/components/docs/docs_toc.dart' as _docs_toc;
 import 'package:website/components/playground/playground_demo.dart'
     as _playground_demo;
-import 'package:website/components/code_section.dart' as _code_section;
 import 'package:website/components/copy_button.dart' as _copy_button;
-import 'package:website/components/optics_raytracer.dart' as _optics_raytracer;
 import 'package:website/components/theme_toggle.dart' as _theme_toggle;
 import 'package:website/styles/a_shared_styles.dart' as _a_shared_styles;
 import 'package:website/styles/b_home_styles.dart' as _b_home_styles;
@@ -22,6 +25,7 @@ import 'package:website/styles/d_responsive_styles.dart'
     as _d_responsive_styles;
 import 'package:website/styles/e_playground_styles.dart'
     as _e_playground_styles;
+import 'package:website/styles/f_code_styles.dart' as _f_code_styles;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -42,12 +46,16 @@ import 'package:website/styles/e_playground_styles.dart'
 ServerOptions get defaultServerOptions => ServerOptions(
   clientId: 'main.client.dart.js',
   clients: {
-    _code_section.CodeSection: ClientTarget<_code_section.CodeSection>(
-      'code_section',
-    ),
     _copy_button.CopyButton: ClientTarget<_copy_button.CopyButton>(
       'copy_button',
       params: __copy_buttonCopyButton,
+    ),
+    _hero_login_demo.HeroLoginDemo:
+        ClientTarget<_hero_login_demo.HeroLoginDemo>('hero_login_demo'),
+    _model_login_demo.ModelLoginDemo:
+        ClientTarget<_model_login_demo.ModelLoginDemo>('model_login_demo'),
+    _packing_demo.PackingDemo: ClientTarget<_packing_demo.PackingDemo>(
+      'packing_demo',
     ),
     _docs_menu_toggle.DocsMenuToggle:
         ClientTarget<_docs_menu_toggle.DocsMenuToggle>('docs_menu_toggle'),
@@ -55,8 +63,6 @@ ServerOptions get defaultServerOptions => ServerOptions(
       'docs_sidebar',
     ),
     _docs_toc.DocsToc: ClientTarget<_docs_toc.DocsToc>('docs_toc'),
-    _optics_raytracer.OpticsRaytracer:
-        ClientTarget<_optics_raytracer.OpticsRaytracer>('optics_raytracer'),
     _playground_demo.PlaygroundDemo:
         ClientTarget<_playground_demo.PlaygroundDemo>('playground_demo'),
     _theme_toggle.ThemeToggle: ClientTarget<_theme_toggle.ThemeToggle>(
@@ -69,6 +75,7 @@ ServerOptions get defaultServerOptions => ServerOptions(
     ..._c_docs_styles.docsStyles,
     ..._d_responsive_styles.responsiveStyles,
     ..._e_playground_styles.playgroundStyles,
+    ..._f_code_styles.codeStyles,
   ],
 );
 

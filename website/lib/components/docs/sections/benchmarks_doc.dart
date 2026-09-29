@@ -1,6 +1,7 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../capability_matrix.dart';
 import '../docs_callout.dart';
 
 class BenchmarksDoc extends StatelessComponent {
@@ -56,7 +57,9 @@ class BenchmarksDoc extends StatelessComponent {
           ]),
           tbody([
             tr([
-              td([strong(classes: 'text-cyan', [.text('keyed_form — setField')])]),
+              td([
+                strong(classes: 'text-cyan', [.text('keyed_form — setField')]),
+              ]),
               td(classes: 'num text-cyan font-semibold', [.text('11.00 µs')]),
               td(classes: 'num text-cyan font-semibold', [.text('5.00 µs')]),
               td(classes: 'num text-cyan font-semibold', [.text('9.00 µs')]),
@@ -77,7 +80,9 @@ class BenchmarksDoc extends StatelessComponent {
               td(classes: 'num', [.text('0.00 µs')]),
             ]),
             tr([
-              td([strong(classes: 'text-cyan', [.text('keyed_form — isValid')])]),
+              td([
+                strong(classes: 'text-cyan', [.text('keyed_form — isValid')]),
+              ]),
               td(classes: 'num text-cyan font-semibold', [.text('0.004 µs')]),
               td(classes: 'num text-cyan font-semibold', [.text('0.004 µs')]),
               td(classes: 'num text-cyan font-semibold', [.text('0.004 µs')]),
@@ -130,7 +135,9 @@ class BenchmarksDoc extends StatelessComponent {
           ]),
           tbody([
             tr([
-              td([strong(classes: 'text-cyan', [.text('keyed_form')])]),
+              td([
+                strong(classes: 'text-cyan', [.text('keyed_form')]),
+              ]),
               td(classes: 'num text-cyan font-semibold', [.text('2.00 µs')]),
               td(classes: 'num', [.text('0.01 µs')]),
               td(classes: 'num', [.text('0.00 µs')]),
@@ -174,7 +181,9 @@ class BenchmarksDoc extends StatelessComponent {
           ]),
           tbody([
             tr([
-              td([strong(classes: 'text-cyan', [.text('keyed_form_flutter')])]),
+              td([
+                strong(classes: 'text-cyan', [.text('keyed_form_flutter')]),
+              ]),
               td(classes: 'num text-cyan font-semibold', [.text('44')]),
               td(classes: 'num text-cyan font-semibold', [.text('44')]),
               td(classes: 'num text-cyan font-semibold', [.text('44')]),
@@ -211,6 +220,13 @@ class BenchmarksDoc extends StatelessComponent {
         code(classes: 'mono', [.text('benchmark/README.md')]),
         .text(' in the repository.'),
       ]),
+
+      div(id: 'capability-matrix', classes: 'docs-anchor', []),
+      h3(classes: 'docs-h3 display mt-24', [.text('Capability Matrix')]),
+      p([
+        .text('What each form architecture gives you built in, versus what you wire up yourself.'),
+      ]),
+      const CapabilityMatrix(),
     ]);
   }
 }

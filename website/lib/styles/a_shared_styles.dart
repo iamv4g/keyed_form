@@ -122,22 +122,24 @@ List<StyleRule> get sharedStyles => [
   ),
 
   css('.theme-toggle').styles(
-    backgroundColor: AppColors.surfaceElevated,
+    backgroundColor: Colors.transparent,
     border: Border.all(color: AppColors.border, width: 1.px),
-    color: AppColors.ink,
-    padding: .symmetric(vertical: 6.px, horizontal: 12.px),
-    radius: BorderRadius.circular(4.px),
+    color: AppColors.inkMuted,
+    width: 34.px,
+    height: 34.px,
+    radius: BorderRadius.circular(6.px),
     cursor: Cursor.pointer,
-    fontSize: 0.78.rem,
-    display: Display.flex,
+    display: Display.inlineFlex,
     alignItems: AlignItems.center,
-    gap: Gap(column: 6.px),
+    justifyContent: JustifyContent.center,
     transition: const Transition('all', duration: Duration(milliseconds: 150)),
   ),
   css('.theme-toggle:hover').styles(
     color: AppColors.cyan,
     border: Border.all(color: AppColors.cyan, width: 1.px),
   ),
+  css('.theme-icon-sun').styles(raw: {'display': 'var(--dark-only)'}),
+  css('.theme-icon-moon').styles(raw: {'display': 'var(--light-only)'}),
 
   css('.copy-btn').styles(
     backgroundColor: AppColors.surfaceElevated,
@@ -207,6 +209,7 @@ List<StyleRule> get sharedStyles => [
   css('.section-title').styles(
     fontSize: 2.1.rem,
     fontWeight: FontWeight.w700,
+    lineHeight: 1.2.em,
     letterSpacing: (-0.02).em,
     margin: .only(top: 8.px),
   ),
@@ -296,7 +299,7 @@ List<StyleRule> get sharedStyles => [
     color: AppColors.inkMuted,
   ),
 
-  // Footer (rendered on both the landing page and the docs page)
+  // Footer (rendered on every page)
   css('footer').styles(
     margin: .only(top: 80.px),
     padding: .only(top: 56.px, bottom: 72.px),
@@ -306,25 +309,56 @@ List<StyleRule> get sharedStyles => [
     ),
   ),
 
+  css('.footer-grid').styles(
+    display: Display.grid,
+    gap: Gap(column: 32.px, row: 28.px),
+    raw: {'grid-template-columns': 'minmax(0, 1.4fr) repeat(3, minmax(0, 1fr))'},
+  ),
+  css('.footer-brand .brand').styles(textDecoration: TextDecoration.none),
+  css('.footer-brand p').styles(
+    margin: .only(top: 10.px),
+    fontSize: 0.88.rem,
+    lineHeight: 1.5.em,
+    color: AppColors.inkMuted,
+    maxWidth: 260.px,
+  ),
+  css('.footer-col-title').styles(
+    fontSize: 0.72.rem,
+    letterSpacing: 0.08.em,
+    textTransform: TextTransform.upperCase,
+    color: AppColors.ink,
+    margin: .only(bottom: 12.px),
+  ),
+  css('.footer-col ul').styles(
+    listStyle: ListStyle.none,
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    gap: Gap(row: 8.px),
+  ),
   css('.footer-bottom').styles(
     margin: .only(top: 40.px),
+    padding: .only(top: 20.px),
     display: Display.flex,
     justifyContent: JustifyContent.spaceBetween,
     alignItems: AlignItems.center,
     flexWrap: FlexWrap.wrap,
     gap: Gap(row: 16.px, column: 16.px),
-    fontSize: 0.82.rem,
+    fontSize: 0.78.rem,
     color: AppColors.inkMuted,
-  ),
-  css('.footer-links').styles(
-    display: Display.flex,
-    flexWrap: FlexWrap.wrap,
-    gap: Gap(row: 8.px, column: 16.px),
+    border: Border.only(
+      top: BorderSide.solid(color: AppColors.border, width: 1.px),
+    ),
   ),
   css('.footer-link').styles(
+    fontSize: 0.88.rem,
     color: AppColors.inkMuted,
     textDecoration: const TextDecoration(line: TextDecorationLine.none),
   ),
+  css('.footer-link:hover').styles(color: AppColors.cyan),
+  css('.footer-bottom .footer-link').styles(fontSize: 1.em),
+  css('.jaspr-badge').styles(display: Display.inlineFlex, raw: {'line-height': '0'}),
+  css('.jaspr-badge-dark').styles(raw: {'display': 'var(--dark-only)'}),
+  css('.jaspr-badge-light').styles(raw: {'display': 'var(--light-only)'}),
 
   // Syntax highlighting & misc utility classes (used by both CodeSection and
   // every DocsCodeBlock)

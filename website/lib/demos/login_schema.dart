@@ -1,0 +1,12 @@
+/// Mirrors `example/lib/login/login_schema.dart` minus `remember`; keep in step.
+@keyedSchema
+library;
+
+import 'package:keyed_form_schema/keyed_form_schema.dart';
+
+part 'login_schema.kfg.dart';
+
+final _loginSchema = ks.object({
+  'email': ks.string(error: .text('Enter your email')).email(error: .text('That does not look like an email')),
+  'password': ks.string(error: .text('Enter your password')).min(8, error: .text('At least 8 characters')),
+});

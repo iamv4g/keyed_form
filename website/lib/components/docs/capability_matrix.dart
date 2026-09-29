@@ -1,23 +1,12 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
-class MatrixSection extends StatelessComponent {
-  const MatrixSection({super.key});
+class CapabilityMatrix extends StatelessComponent {
+  const CapabilityMatrix({super.key});
 
   @override
   Component build(BuildContext context) {
-    return section(id: 'matrix', classes: 'wrap', [
-      span(classes: 'section-kicker mono', [
-        .text('// CAPABILITY MATRIX'),
-      ]),
-      h2(classes: 'section-title display', [
-        .text('Built in by default vs built yourself'),
-      ]),
-      p(classes: 'section-lede', [
-        .text(
-          'Direct capability comparison across the major Flutter form architectures.',
-        ),
-      ]),
+    return Component.fragment([
       div(classes: 'table-scroll', [
         table(classes: 'matrix', [
           thead([

@@ -1,50 +1,65 @@
 import 'dart:io';
 
+import 'package:jaspr/jaspr.dart' show JasprBadge;
 import 'package:jaspr_test/jaspr_test.dart';
-import 'package:website/components/code_section.dart';
+import 'package:website/code/code_tabs.dart';
+import 'package:website/build_inputs.dart';
+import 'package:website/code/highlight.dart';
+import 'package:website/components/agent_skill_section.dart';
+import 'package:website/components/demo/hero_login_demo.dart';
+import 'package:website/components/docs/package_topology.dart';
+import 'package:website/components/feature_grid.dart';
+import 'package:website/components/footer.dart';
 import 'package:website/components/hero_section.dart';
+import 'package:website/components/lists_section.dart';
+import 'package:website/components/model_section.dart';
+import 'package:website/components/telemetry_section.dart';
 import 'package:website/components/navbar.dart';
-import 'package:website/components/optics_raytracer.dart';
 import 'package:website/pages/docs_page.dart';
+import 'package:website/example_sources.dart';
 import 'package:website/pages/landing_page.dart';
+import 'package:website/package_versions.dart';
 
 void main() {
+  setUpAll(initHighlighter);
+
   group('Website Component Tests', () {
     testComponents('renders full App with all landing page sections', (
       tester,
     ) async {
-      tester.pumpComponent(const LandingPage());
+      tester.pumpComponent(ExampleSources(files: readExampleSources(), child: const LandingPage()));
 
       // Brand & Navigation
       expect(find.textContaining('keyed_form'), findsComponents);
-      expect(find.text('Invariants'), findsOneComponent);
-      expect(find.text('Benchmarks'), findsOneComponent);
-      expect(find.text('Architecture'), findsOneComponent);
+      expect(find.text('Docs'), findsComponents); // navbar + footer column
+      expect(find.text('Playground'), findsComponents);
 
       // Section Kickers
-      expect(find.text('// LIVE RESOLUTION ENGINE'), findsOneComponent);
-      expect(find.text('// ARCHITECTURAL INVARIANTS'), findsOneComponent);
-      expect(find.text('// MEASURED TELEMETRY'), findsOneComponent);
-      expect(find.text('// CAPABILITY MATRIX'), findsOneComponent);
-      expect(find.text('// IMPLEMENTATION PATTERN'), findsOneComponent);
-      expect(find.text('// WORKSPACE TOPOLOGY'), findsOneComponent);
+      expect(find.text('// FEATURES'), findsOneComponent);
+      expect(find.text('// MEASURED'), findsOneComponent);
+      expect(find.text('// THE MODEL'), findsOneComponent);
+      expect(find.text('// AGENT SKILL'), findsOneComponent);
+      expect(find.text('// DYNAMIC LISTS'), findsOneComponent);
 
-      // Footer
-      expect(
-        find.text(
-          ' — Typed forms on keyed optics. Released under the MIT License.',
-        ),
-        findsOneComponent,
-      );
+      // Closing CTA + footer
+      expect(find.text('Your next form is one schema away.'), findsOneComponent);
+      expect(find.text('Typed Flutter forms, one rebuild per keystroke.'), findsOneComponent);
     });
 
-    testComponents('Navbar renders brand, Docs button and ThemeToggle', (tester) async {
+    testComponents('Navbar renders brand, text links, icon links and ThemeToggle', (tester) async {
       tester.pumpComponent(const Navbar());
 
       expect(find.textContaining('keyed_form'), findsOneComponent);
-      expect(find.text('v0.1.0'), findsNothing);
       expect(find.text('Docs'), findsOneComponent);
-      expect(find.text('☼ LIGHT'), findsOneComponent);
+      expect(find.text('Playground'), findsOneComponent);
+      // In-page anchors are gone from the header.
+      expect(find.text('Invariants'), findsNothing);
+      expect(find.text('Architecture'), findsNothing);
+      // pub.dev / GitHub are icon-only links, labelled for screen readers.
+      expect(find.tag('svg'), findsComponents);
+      expect(find.text('pub.dev ↗'), findsNothing);
+      expect(find.text('GitHub ↗'), findsNothing);
+      expect(find.tag('button'), findsOneComponent);
     });
 
     testComponents('DocsPage renders 6 developer chapters and reassurance callout', (
@@ -54,7 +69,7 @@ void main() {
 
       // Navigation & Branding — shares the same Navbar as every other page
       expect(find.text(' keyed_form'), findsOneComponent);
-      expect(find.text('Docs'), findsOneComponent);
+      expect(find.text('Docs'), findsComponents); // navbar + footer column
 
       // Section titles
       expect(find.text('Overview & The Problem with Traditional Forms'), findsOneComponent);
@@ -65,76 +80,183 @@ void main() {
       expect(find.text('Real-World Production Recipes'), findsOneComponent);
       expect(find.text('Testing Without Widgets: Pure Dart in < 2ms'), findsOneComponent);
       expect(find.text('API Reference'), findsComponents);
+      expect(find.text('Capability Matrix'), findsComponents);
 
       // Reassurance Callout
       expect(find.textContaining("Don't Worry About Optics / Lenses!"), findsOneComponent);
     });
 
-    testComponents('OpticsRaytracer starts with target node active and updates', (
-      tester,
-    ) async {
-      tester.pumpComponent(const OpticsRaytracer());
+    testComponents('ModelSection shows the three login files, the demo and the points', (tester) async {
+      tester.pumpComponent(ExampleSources(files: readExampleSources(), child: const ModelSection()));
 
-      expect(find.text('TourFields.stop(ref).nights'), findsOneComponent);
-      expect(find.text('FieldRef<TourSchema, int>'), findsOneComponent);
-      expect(find.text('[ COMPILE-TIME VERIFIED ]'), findsOneComponent);
+      expect(find.text('// THE MODEL'), findsOneComponent);
+      for (final file in ['login_schema.dart', 'login_form.dart', 'login_text_field.dart']) {
+        expect(find.text(file), findsOneComponent);
+      }
+      expect(find.text('Run the example'), findsOneComponent);
+      expect(find.text('// WATCH — form.value.toMap()'), findsOneComponent);
+      expect(find.text('// ERRORS — form.visibleErrorKeys'), findsOneComponent);
+      expect(find.text('Sign in'), findsOneComponent);
+      expect(find.text('Quickstart in 5 minutes →'), findsOneComponent);
     });
 
-    testComponents('CodeSection switches tabs on click', (tester) async {
-      tester.pumpComponent(const CodeSection());
+    testComponents('AgentSkillSection installs into .agents/skills and links it for Claude Code', (tester) async {
+      tester.pumpComponent(const AgentSkillSection());
 
-      // Initial tab is Schema DSL
+      expect(find.text('// AGENT SKILL'), findsOneComponent);
+      expect(find.textContaining('-o .agents/skills/keyed_form/SKILL.md'), findsOneComponent);
       expect(
-        find.text('1. Schema DSL (tour_schema.dart)'),
+        find.text('mkdir -p .claude/skills && ln -s ../../.agents/skills/keyed_form .claude/skills/keyed_form'),
         findsOneComponent,
       );
-      expect(find.text('COPY SNIPPET'), findsOneComponent);
-      expect(find.text('@keyedSchema\n'), findsOneComponent);
-
-      // Switch to tab 2: Flutter UI Binding
-      final tab2Button = find.ancestor(
-        of: find.textContaining('2. Flutter UI Binding'),
-        matching: find.tag('button'),
-      );
-      await tester.click(tab2Button);
-
-      expect(
-        find.text('1. Schema DSL (tour_schema.dart)'),
-        findsOneComponent,
-      );
-      expect(find.text('@keyedSchema\n'), findsNothing);
-      expect(find.textContaining('KeyedForm<TourSchema>'), findsOneComponent);
-
-      // Switch to tab 3: Generated Optics
-      final tab3Button = find.ancestor(
-        of: find.textContaining('3. Generated Optics'),
-        matching: find.tag('button'),
-      );
-      await tester.click(tab3Button);
-
-      expect(find.textContaining('abstract final class'), findsOneComponent);
-      expect(find.text('// 100% Typo-Proof'), findsOneComponent);
+      expect(find.text('COPY'), findsNComponents(2));
+      expect(find.text('Read SKILL.md →'), findsOneComponent);
     });
 
-    testComponents('HeroSection renders headline, tagline and command bar', (
-      tester,
-    ) async {
+    testComponents('ListsSection shows the packing files, the demo rows and the dnd_kit credit', (tester) async {
+      tester.pumpComponent(ExampleSources(files: readExampleSources(), child: const ListsSection()));
+
+      expect(find.text('// DYNAMIC LISTS'), findsOneComponent);
+      for (final file in ['packing_schema.dart', 'packing_list.dart', 'packing_row.dart']) {
+        expect(find.text(file), findsOneComponent);
+      }
+      expect(find.text('// ROWS — index · clientId · label'), findsOneComponent);
+      expect(find.text('⠿'), findsNComponents(3));
+      expect(find.text('dnd_kit'), findsOneComponent);
+    });
+
+    testComponents('TelemetrySection shows flat rebuilds without comparing against anything', (tester) async {
+      tester.pumpComponent(const TelemetrySection());
+
+      expect(find.text('// MEASURED'), findsOneComponent);
+      expect(find.text('44'), findsNComponents(4));
+      for (final size in [10, 50, 100, 250]) {
+        expect(find.text('$size fields'), findsOneComponent);
+      }
+      expect(find.text('~2 µs'), findsOneComponent);
+      expect(find.text('6,021'), findsNothing);
+      expect(find.text('0.00µs'), findsNothing);
+    });
+
+    testComponents('FeatureGrid renders nine linked cards', (tester) async {
+      tester.pumpComponent(const FeatureGrid());
+
+      expect(find.text('// FEATURES'), findsOneComponent);
+      expect(find.tag('a'), findsNComponents(9));
+      for (final api in [
+        'validateAsync',
+        'addRelation',
+        'markReadOnly',
+        'revealFirst',
+        'handleSubmit',
+        'setServerErrors',
+      ]) {
+        expect(find.text(api), findsOneComponent);
+      }
+    });
+
+    testComponents('Footer has three link columns and both Jaspr badge variants', (tester) async {
+      tester.pumpComponent(const Footer());
+
+      for (final title in ['Project', 'Docs', 'Resources']) {
+        expect(find.text(title), findsOneComponent);
+      }
+      for (final link in ['Changelog', 'Issues', 'API reference', 'Quickstart', 'Playground']) {
+        expect(find.text(link), findsOneComponent);
+      }
+      expect(find.byType(JasprBadge), findsNComponents(2));
+      expect(find.textContaining('v0.'), findsNothing);
+    });
+
+    testComponents('PackageTopology shows each package with its own version', (tester) async {
+      tester.pumpComponent(
+        const PackageVersions(
+          versions: {'keyed_form_gen': '0.2.0', 'keyed_form_flutter': '0.1.0'},
+          child: PackageTopology(),
+        ),
+      );
+
+      expect(find.text('keyed_form_gen'), findsOneComponent);
+      expect(find.text('v0.2.0'), findsOneComponent);
+      expect(find.text('v0.1.0'), findsOneComponent);
+      // No version known → no chip, rather than a wrong one.
+      expect(find.text('keyed_lens'), findsOneComponent);
+      expect(find.textContaining(RegExp(r'^v\d')), findsNComponents(2));
+    });
+
+    testComponents('HeroSection renders headline, command bar and CTAs', (tester) async {
       tester.pumpComponent(const HeroSection());
 
-      expect(
-        find.text('System Specification · Zero-Allocation Keyed Optics'),
-        findsOneComponent,
-      );
-      expect(
-        find.text('flutter pub add keyed_form_flutter keyed_form_schema'),
-        findsOneComponent,
-      );
+      expect(find.text('Big forms. Less code.'), findsOneComponent);
+      expect(find.text('One rebuild per keystroke.'), findsOneComponent);
+      for (final chip in ['MIT', 'Pure Dart core', 'Flutter']) {
+        expect(find.text(chip), findsOneComponent);
+      }
+      expect(find.text('flutter pub add keyed_form_flutter keyed_form_schema'), findsOneComponent);
       expect(find.text('COPY'), findsOneComponent);
-      expect(
-        find.text('Start with keyed_form_flutter →'),
-        findsOneComponent,
-      );
+      expect(find.text('Build your first form →'), findsOneComponent);
+      expect(find.text('Open full playground →'), findsOneComponent);
     });
+
+    // Typing is exercised in a real browser (see the redesign's CDP checks):
+    // jaspr_test can't synthesise an input event carrying a value.
+    testComponents('HeroLoginDemo starts with both rebuild counters at zero', (tester) async {
+      tester.pumpComponent(const HeroLoginDemo());
+
+      expect(find.text('Email'), findsOneComponent);
+      expect(find.text('Password'), findsOneComponent);
+      expect(find.text('rebuilds: 0'), findsNComponents(2));
+      expect(find.text('Sign in'), findsOneComponent);
+    });
+  });
+
+  group('Code highlighting', () {
+    test('tokens are classed by their innermost TextMate scope', () {
+      expect(tokenClassFor(['storage.modifier.dart']), 'tk-keyword');
+      expect(tokenClassFor(['meta.declaration.dart', 'keyword.other.import.dart']), 'tk-keyword');
+      expect(tokenClassFor(['string.interpolated.single.dart']), 'tk-string');
+      expect(tokenClassFor(['comment.line.double-slash.dart']), 'tk-comment');
+      expect(tokenClassFor(['support.class.dart']), 'tk-type');
+      expect(tokenClassFor(['storage.type.annotation.dart']), 'tk-annotation');
+      expect(tokenClassFor(['keyword.operator.assignment.dart']), isNull);
+      expect(tokenClassFor([]), isNull);
+    });
+
+    test('highlightDart splits code into tokens', () {
+      expect(highlightDart("final name = 'Ann';").length, greaterThan(3));
+    });
+
+    testComponents('CodeTabs renders one radio + label + panel per tab, first checked', (tester) async {
+      tester.pumpComponent(
+        const CodeTabs(
+          id: 'demo',
+          tabs: [CodeTab('a.dart', 'class A {}'), CodeTab('b.dart', 'class B {}')],
+        ),
+      );
+
+      expect(find.text('a.dart'), findsOneComponent);
+      expect(find.text('b.dart'), findsOneComponent);
+      expect(find.tag('input'), findsNComponents(2));
+      expect(find.text('COPY'), findsNComponents(2));
+    });
+  });
+
+  group('Example sources', () {
+    // Formatting differs (website: 120 columns, example: 80), so compare
+    // without whitespace.
+    String rules(String source) => source.substring(source.indexOf('final _')).replaceAll(RegExp(r'\s'), '');
+
+    for (final (web, example) in [
+      ('lib/demos/login_schema.dart', ExampleFiles.loginSchema),
+      ('lib/demos/packing_schema.dart', ExampleFiles.packingSchema),
+    ]) {
+      test('$web matches the Flutter example schema', () {
+        expect(
+          rules(File(web).readAsStringSync()),
+          rules(File('$exampleLibDir/$example').readAsStringSync()),
+        );
+      });
+    }
   });
 
   group('Static Site Output Verification', () {
@@ -151,7 +273,7 @@ void main() {
       expect(
         content,
         contains(
-          '<title>keyed_form — typed, O(1) Flutter forms built on keyed optics</title>',
+          '<title>keyed_form — big Flutter forms, one rebuild per keystroke</title>',
         ),
       );
 
@@ -163,12 +285,9 @@ void main() {
       expect(content, contains(':root:not([data-theme="light"])'));
 
       // Critical sections present
-      expect(content, contains('id="optics"'));
-      expect(content, contains('id="problems"'));
+      expect(content, contains('id="features"'));
       expect(content, contains('id="benchmarks"'));
-      expect(content, contains('id="matrix"'));
-      expect(content, contains('id="code"'));
-      expect(content, contains('id="packages"'));
+      expect(content, contains('id="model"'));
 
       // Client hydration script present
       expect(content, contains('src="main.client.dart.js"'));
@@ -192,7 +311,6 @@ void main() {
       // Mobile Responsive & Overflow Containment verification
       expect(content, contains('@media screen and (max-width: 768px)'));
       expect(content, contains('overflow-x: clip'));
-      expect(content, contains('word-break: break-all'));
       expect(content, contains('flex: 1'));
       expect(content, contains('min-width: 0'));
       expect(content, contains('border-collapse: collapse'));

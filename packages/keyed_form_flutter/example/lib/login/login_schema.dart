@@ -12,5 +12,4 @@ final _loginSchema = ks.object({
   'password': ks
       .string(error: .text('Enter your password'))
       .min(8, error: .text('At least 8 characters')),
-  'remember': ks.boolean().defaultTo(false),
 });

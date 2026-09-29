@@ -60,16 +60,23 @@ List<StyleRule> get homeStyles => [
     radius: BorderRadius.circular(2.px),
   ),
 
+  css('.nav-start').styles(
+    display: Display.flex,
+    alignItems: AlignItems.center,
+    gap: Gap(column: 10.px),
+  ),
+
   css('.nav-links', [
     css('&').styles(
       display: Display.flex,
       alignItems: AlignItems.center,
-      gap: Gap(column: 20.px),
+      gap: Gap(column: 18.px),
       fontSize: 0.85.rem,
     ),
     css('a').styles(
       color: AppColors.inkMuted,
       textDecoration: TextDecoration.none,
+      whiteSpace: WhiteSpace.noWrap,
       transition: const Transition('color', duration: Duration(milliseconds: 150)),
     ),
     css('a:hover').styles(
@@ -77,47 +84,55 @@ List<StyleRule> get homeStyles => [
     ),
   ]),
 
-  // Hero Section
-  css('.hero').styles(
-    position: Position.relative(),
-    padding: .only(top: 72.px, bottom: 56.px),
+  css('.nav-divider').styles(
+    width: 1.px,
+    height: 18.px,
+    backgroundColor: AppColors.border,
   ),
 
-  css('.telemetry-tag').styles(
+  css('.nav-icon').styles(
     display: Display.inlineFlex,
     alignItems: AlignItems.center,
-    gap: Gap(column: 8.px),
-    padding: .symmetric(vertical: 4.px, horizontal: 12.px),
-    backgroundColor: AppColors.cyanGlow,
-    fontSize: 0.75.rem,
-    color: AppColors.cyan,
-    letterSpacing: 0.08.em,
-    textTransform: TextTransform.upperCase,
-    margin: .only(bottom: 24.px),
-    radius: BorderRadius.circular(2.px),
-    raw: {
-      'border': '1px solid color-mix(in srgb, var(--cyan) 35%, transparent)',
-    },
+    justifyContent: JustifyContent.center,
+    width: 34.px,
+    height: 34.px,
+    margin: .symmetric(horizontal: (-6).px),
   ),
-  css('.telemetry-tag::before').styles(
-    content: '',
-    width: 6.px,
-    height: 6.px,
-    backgroundColor: AppColors.cyan,
-    radius: BorderRadius.circular(50.percent),
-    raw: {
-      'box-shadow': '0 0 8px var(--cyan)',
-    },
+
+  // Hero Section
+  // Hero
+  css('.hero').styles(
+    position: Position.relative(),
+    display: Display.grid,
+    alignItems: AlignItems.center,
+    gap: Gap(column: 48.px, row: 32.px),
+    padding: .only(top: 72.px, bottom: 56.px),
+    raw: {'grid-template-columns': 'minmax(0, 1.25fr) minmax(0, 1fr)'},
+  ),
+
+  css('.hero-chips').styles(
+    display: Display.flex,
+    flexWrap: FlexWrap.wrap,
+    gap: Gap(column: 8.px, row: 8.px),
+    margin: .only(bottom: 22.px),
+  ),
+  css('.chip').styles(
+    padding: .symmetric(vertical: 3.px, horizontal: 10.px),
+    fontSize: 0.72.rem,
+    letterSpacing: 0.04.em,
+    color: AppColors.inkMuted,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(999.px),
   ),
 
   css('.hero h1').styles(
     fontWeight: FontWeight.w700,
     lineHeight: 1.1.em,
     letterSpacing: (-0.03).em,
-    fontSize: 3.4.rem,
-    maxWidth: 820.px,
+    fontSize: 3.rem,
   ),
   css('.hero h1 .highlight').styles(
+    display: Display.block,
     color: AppColors.cyan,
     position: Position.relative(),
   ),
@@ -146,220 +161,137 @@ List<StyleRule> get homeStyles => [
     fontSize: 0.88.rem,
   ),
 
-  // Workbench & Raytracer
-  css('.workbench').styles(
-    margin: .only(top: 48.px),
+  css('.hero-demo').styles(
     padding: .all(24.px),
     radius: BorderRadius.circular(4.px),
   ),
-  css('.workbench-header').styles(
+  css('.hero-demo .demo-actions').styles(margin: .only(bottom: 16.px)),
+  css('.hero-demo-footer').styles(
     display: Display.flex,
+    flexWrap: FlexWrap.wrap,
     justifyContent: JustifyContent.spaceBetween,
-    alignItems: AlignItems.center,
-    margin: .only(bottom: 20.px),
-    padding: .only(bottom: 12.px),
+    gap: Gap(column: 12.px, row: 8.px),
+    padding: .only(top: 14.px),
+    fontSize: 0.74.rem,
+    color: AppColors.inkMuted,
     border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.border, width: 1.px),
+      top: BorderSide.solid(color: AppColors.border, width: 1.px),
     ),
   ),
-
-  css('.workbench-title').styles(
-    fontSize: 0.8.rem,
-    textTransform: TextTransform.upperCase,
-    letterSpacing: 0.1.em,
-    color: AppColors.inkMuted,
-  ),
-
-  css('.optics-canvas').styles(
-    width: 100.percent,
-    overflow: Overflow.only(x: Overflow.auto),
-  ),
-  css('.optics-canvas svg').styles(
-    display: Display.block,
-    margin: .symmetric(horizontal: .auto),
-    width: 100.percent,
-    maxWidth: 820.px,
-    height: Unit.auto,
-  ),
-  css('.node-btn').styles(
-    cursor: Cursor.pointer,
-    transition: const Transition('all', duration: Duration(milliseconds: 200)),
-  ),
-  css('.node-btn:hover circle, .node-btn.active circle, .node-btn:hover ellipse, .node-btn.active ellipse').styles(
-    raw: {
-      'stroke': 'var(--cyan)',
-      'stroke-width': '3px',
-      'filter': 'drop-shadow(0 0 8px var(--cyan))',
-    },
-  ),
-
-  css('.beam-status').styles(
-    margin: .only(top: 16.px),
-    padding: .symmetric(vertical: 12.px, horizontal: 16.px),
-    fontSize: 0.82.rem,
-    display: Display.flex,
-    alignItems: AlignItems.center,
-    justifyContent: JustifyContent.spaceBetween,
-    flexWrap: FlexWrap.wrap,
-    gap: Gap(row: 10.px, column: 10.px),
-    backgroundColor: AppColors.surfaceElevated,
-    border: Border.all(color: AppColors.border, width: 1.px),
-  ),
-
-  css('.workbench-subtitle').styles(
-    fontSize: 0.76.rem,
+  css('.hero-demo-footer a').styles(
     color: AppColors.cyan,
-  ),
-  css('.beam-label').styles(
-    fontSize: 0.82.rem,
-    color: AppColors.inkMuted,
-  ),
-  css('.beam-path').styles(
-    color: AppColors.cyan,
-    fontWeight: FontWeight.w600,
-    margin: .only(left: 8.px),
-  ),
-  css('.beam-type').styles(
-    color: AppColors.amber,
-    fontWeight: FontWeight.w600,
-    margin: .only(left: 8.px),
-  ),
-  css('.beam-verified').styles(
-    color: AppColors.green,
-    fontWeight: FontWeight.w600,
+    textDecoration: TextDecoration.none,
   ),
 
-  // Section (top/bottom padding for every home <section>)
   css('section').styles(
     padding: .only(top: 72.px, bottom: 56.px),
   ),
 
-  // Blueprint Invariants Grid
-  css('.blueprint-grid').styles(
-    display: Display.grid,
-    gap: Gap(row: 20.px, column: 20.px),
-    margin: .only(top: 36.px),
-    gridTemplate: GridTemplate(
-      columns: GridTracks([
-        GridTrack.repeat(
-          TrackRepeat.autoFit,
-          [GridTrack(TrackSize.minmax(TrackSize(330.px), TrackSize.fr(1)))],
-        ),
-      ]),
-    ),
-  ),
-  css('.grid-card').styles(
-    padding: .all(24.px),
-    radius: BorderRadius.circular(4.px),
-    display: Display.flex,
-    flexDirection: FlexDirection.column,
-    justifyContent: JustifyContent.spaceBetween,
-    backgroundColor: AppColors.surface,
-    border: Border.all(color: AppColors.border, width: 1.px),
-    transition: const Transition('border-color', duration: Duration(milliseconds: 150)),
-  ),
-  css('.grid-card:hover').styles(
-    border: Border.all(color: AppColors.borderBright, width: 1.px),
-  ),
-
-  css('.card-num').styles(
-    fontSize: 0.7.rem,
-    color: AppColors.cyan,
-    fontWeight: FontWeight.w700,
-    margin: .only(bottom: 8.px),
-    letterSpacing: 0.06.em,
-  ),
-  css('.card-h').styles(
-    fontSize: 1.05.rem,
-    fontWeight: FontWeight.w600,
-    margin: .only(bottom: 10.px),
-    color: AppColors.ink,
-  ),
-
-  css('.card-p').styles(
-    fontSize: 0.88.rem,
-    margin: .only(bottom: 16.px),
-    lineHeight: 1.5.em,
-    color: AppColors.inkMuted,
-  ),
-
-  css('.card-diff').styles(
-    padding: .symmetric(vertical: 10.px, horizontal: 14.px),
-    fontSize: 0.82.rem,
-    backgroundColor: AppColors.surfaceElevated,
-    color: AppColors.ink,
-    border: Border.only(
-      left: BorderSide.solid(color: AppColors.cyan, width: 2.px),
-    ),
-  ),
-
-  // Benchmark HUD & Charts
-  css('.hud-stats').styles(
+  // Feature grid
+  css('.feature-grid').styles(
     display: Display.grid,
     gap: Gap(row: 16.px, column: 16.px),
     margin: .only(top: 32.px),
-    gridTemplate: GridTemplate(
-      columns: GridTracks([
-        GridTrack.repeat(
-          TrackRepeat.autoFit,
-          [GridTrack(TrackSize.minmax(TrackSize(280.px), TrackSize.fr(1)))],
-        ),
-      ]),
-    ),
+    raw: {'grid-template-columns': 'repeat(3, minmax(0, 1fr))'},
+  ),
+  css('.feature-card').styles(
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    gap: Gap(row: 10.px),
+    padding: .all(22.px),
+    backgroundColor: AppColors.surface,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(6.px),
+    color: AppColors.ink,
+    textDecoration: TextDecoration.none,
+    transition: const Transition('border-color', duration: Duration(milliseconds: 150)),
+  ),
+  css('.feature-card:hover').styles(
+    border: Border.all(color: AppColors.cyan, width: 1.px),
+  ),
+  css('.feature-icon').styles(color: AppColors.cyan),
+  css('.feature-title').styles(
+    fontSize: 1.05.rem,
+    fontWeight: FontWeight.w600,
+  ),
+  css('.feature-body').styles(
+    fontSize: 0.88.rem,
+    lineHeight: 1.55.em,
+    color: AppColors.inkMuted,
+    raw: {'flex': '1'},
+  ),
+  css('.feature-api').styles(
+    display: Display.flex,
+    flexWrap: FlexWrap.wrap,
+    gap: Gap(column: 6.px, row: 6.px),
+  ),
+  css('.feature-api code').styles(
+    fontSize: 0.72.rem,
+    padding: .symmetric(vertical: 2.px, horizontal: 7.px),
+    color: AppColors.cyan,
+    backgroundColor: AppColors.cyanGlow,
+    radius: BorderRadius.circular(3.px),
+  ),
+
+  // Closing CTA
+  css('.closing-cta').styles(
+    textAlign: TextAlign.center,
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    alignItems: AlignItems.center,
+  ),
+  css('.closing-cta .section-lede').styles(
+    margin: .only(left: .auto, right: .auto),
+  ),
+  css('.closing-cta .cta-group').styles(justifyContent: JustifyContent.center),
+
+  // Performance
+  css('.perf-grid').styles(
+    display: Display.grid,
+    gap: Gap(row: 16.px, column: 16.px),
+    margin: .only(top: 32.px),
+    raw: {'grid-template-columns': 'minmax(0, 1.5fr) minmax(0, 1fr)'},
   ),
   css('.stat-tile').styles(
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    justifyContent: JustifyContent.center,
     padding: .symmetric(vertical: 22.px, horizontal: 24.px),
     radius: BorderRadius.circular(4.px),
     backgroundColor: AppColors.surface,
     border: Border.all(color: AppColors.border, width: 1.px),
   ),
-
   css('.stat-big').styles(
     fontSize: 2.5.rem,
     fontWeight: FontWeight.w700,
     color: AppColors.cyan,
     lineHeight: 1.0.em,
   ),
-  css('.stat-bad').styles(
-    color: AppColors.red,
-    fontSize: 1.5.rem,
-    margin: .only(left: 6.px),
-  ),
   css('.stat-desc').styles(
     margin: .only(top: 10.px),
-    fontSize: 0.84.rem,
-    lineHeight: 1.45.em,
+    fontSize: 0.9.rem,
+    lineHeight: 1.5.em,
     color: AppColors.inkMuted,
   ),
-
-  css('.chart-panel').styles(
-    margin: .only(top: 28.px),
-    radius: BorderRadius.circular(4.px),
-    padding: .all(24.px),
-    overflow: Overflow.only(x: Overflow.auto),
-    backgroundColor: AppColors.surface,
-    border: Border.all(color: AppColors.border, width: 1.px),
-  ),
-
-  css('.chart-title').styles(
-    fontSize: 0.88.rem,
-    margin: .only(bottom: 16.px),
-    color: AppColors.inkMuted,
-  ),
-  css('.chart-title b').styles(color: AppColors.ink),
-
-  css('.chart-panel svg').styles(
+  css('.stat-desc strong').styles(color: AppColors.ink),
+  css('.perf-chart').styles(
     display: Display.block,
-    maxWidth: 530.px,
     width: 100.percent,
+    maxWidth: 420.px,
     height: Unit.auto,
-    margin: .only(right: .auto),
   ),
-  css('.chart-panel text').styles(
+  css('.perf-bar').styles(raw: {'fill': 'var(--cyan)', 'opacity': '0.85'}),
+  css('.perf-axis').styles(raw: {'stroke': 'var(--border-bright)', 'stroke-width': '1'}),
+  css('.perf-value').styles(
     fontFamily: const .list([FontFamily('JetBrains Mono'), FontFamilies.monospace]),
+    raw: {'fill': 'var(--ink)', 'font-size': '15px', 'font-weight': '700'},
+  ),
+  css('.perf-label').styles(
+    fontFamily: const .list([FontFamily('JetBrains Mono'), FontFamilies.monospace]),
+    raw: {'fill': 'var(--ink-muted)', 'font-size': '12px'},
   ),
 
-  // Matrix
+  // Capability matrix (docs)
   css('table.matrix').styles(
     width: 100.percent,
     minWidth: 720.px,
@@ -414,62 +346,199 @@ List<StyleRule> get homeStyles => [
     color: AppColors.inkMuted,
   ),
 
-  // Code Container (the landing page's CodeSection tabs)
-  css('.code-container').styles(
-    margin: .only(top: 36.px),
+  // Split: code | demo
+  css('.split').styles(
+    display: Display.grid,
+    gap: Gap(column: 28.px, row: 20.px),
+    alignItems: AlignItems.start,
+    margin: .only(top: 32.px),
+    raw: {'grid-template-columns': 'minmax(0, 1.15fr) minmax(0, 1fr)'},
+  ),
+  css('.split-code, .split-demo').styles(minWidth: 0.px),
+  css('.split-demo').styles(position: Position.sticky(top: 88.px)),
+
+  css('.model-demo').styles(
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    gap: Gap(row: 14.px),
+  ),
+  css('.model-demo-form').styles(
+    padding: .all(22.px),
     radius: BorderRadius.circular(4.px),
-    overflow: Overflow.hidden,
-    backgroundColor: AppColors.surface,
-    border: Border.all(color: AppColors.border, width: 1.px),
   ),
-
-  css('.code-header-bar').styles(
+  css('.demo-actions').styles(
     display: Display.flex,
+    flexWrap: FlexWrap.wrap,
     alignItems: AlignItems.center,
-    justifyContent: JustifyContent.spaceBetween,
-    padding: .symmetric(vertical: 4.px, horizontal: 8.px),
-    backgroundColor: AppColors.surfaceElevated,
-    border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.border, width: 1.px),
-    ),
+    gap: Gap(column: 14.px, row: 10.px),
+  ),
+  css('.demo-actions .btn').styles(cursor: Cursor.pointer),
+  css('.demo-status').styles(
+    fontSize: 0.78.rem,
+    color: AppColors.green,
   ),
 
-  css('.code-tabs').styles(
-    display: Display.flex,
-    gap: Gap(column: 4.px),
+  // Agent skill band
+  css('.skill-box').styles(
+    display: Display.grid,
+    alignItems: AlignItems.center,
+    gap: Gap(column: 36.px, row: 24.px),
+    padding: .all(32.px),
+    radius: BorderRadius.circular(6.px),
+    raw: {'grid-template-columns': 'minmax(0, 1fr) minmax(0, 1.1fr)'},
   ),
-  css('.tab-btn').styles(
-    padding: .symmetric(vertical: 9.px, horizontal: 18.px),
-    backgroundColor: Colors.transparent,
-    border: Border.unset,
-    fontSize: 0.82.rem,
-    cursor: Cursor.pointer,
-    radius: BorderRadius.circular(3.px),
-    transition: const Transition('all', duration: Duration(milliseconds: 150)),
+  css('.skill-install').styles(minWidth: 0.px),
+  css('.skill-note').styles(
+    margin: .only(top: 16.px, bottom: 8.px),
+    fontSize: 0.76.rem,
     color: AppColors.inkMuted,
   ),
 
-  css('.tab-btn.active').styles(
-    backgroundColor: AppColors.surface,
+  // Shell command + copy button
+  css('.cmd-block').styles(
+    display: Display.flex,
+    alignItems: AlignItems.start,
+    gap: Gap(column: 8.px),
+    padding: .all(8.px),
+    backgroundColor: AppColors.bg,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(4.px),
+  ),
+  css('.cmd-block pre').styles(
+    margin: .zero,
+    padding: .symmetric(vertical: 6.px, horizontal: 8.px),
+    fontSize: 0.78.rem,
+    lineHeight: 1.6.em,
     color: AppColors.cyan,
-    fontWeight: FontWeight.w600,
-    shadow: BoxShadow(
-      offsetX: 0.px,
-      offsetY: 1.px,
-      blur: 3.px,
-      color: Color('rgba(0, 0, 0, 0.2)'),
+    overflow: Overflow.only(x: Overflow.auto),
+    raw: {'white-space': 'pre', 'flex': '1', 'min-width': '0'},
+  ),
+  css('.cmd-block .copy-btn').styles(flex: Flex(shrink: 0)),
+
+  // Dynamic-list demo
+  css('.pack-demo').styles(
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    gap: Gap(row: 14.px),
+  ),
+  css('.pack-box').styles(
+    padding: .all(22.px),
+    radius: BorderRadius.circular(4.px),
+  ),
+  css('.pack-list').styles(
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    gap: Gap(row: 8.px),
+  ),
+  css('.pack-slot').styles(
+    transition: const Transition('transform', duration: Duration(milliseconds: 150)),
+  ),
+  css('.pack-slot.lifted').styles(opacity: 0),
+  css('.pack-row-overlay').styles(
+    alignItems: AlignItems.center,
+    border: Border.all(color: AppColors.cyan, width: 1.px),
+    raw: {'box-shadow': 'var(--card-shadow)', 'cursor': 'grabbing'},
+  ),
+  css('.pack-overlay-label').styles(
+    padding: .symmetric(horizontal: 12.px),
+    fontSize: 0.92.rem,
+    color: AppColors.ink,
+  ),
+  css('.pack-row').styles(
+    display: Display.flex,
+    alignItems: AlignItems.start,
+    gap: Gap(column: 10.px),
+    padding: .all(6.px),
+    backgroundColor: AppColors.surface,
+    border: Border.all(color: Colors.transparent, width: 1.px),
+    radius: BorderRadius.circular(4.px),
+  ),
+  css('.pack-row input[type="checkbox"]').styles(
+    margin: .only(top: 12.px),
+    raw: {'accent-color': 'var(--cyan)'},
+  ),
+  css('.pack-field').styles(
+    raw: {'flex': '1', 'min-width': '0'},
+  ),
+  css('.pack-field .playground-field-error').styles(margin: .only(top: 4.px)),
+  css('.pack-handle').styles(
+    display: Display.inlineFlex,
+    alignItems: AlignItems.center,
+    justifyContent: JustifyContent.center,
+    width: 28.px,
+    height: 38.px,
+    color: AppColors.inkMuted,
+    fontSize: 1.1.rem,
+    cursor: Cursor.grab,
+    raw: {'touch-action': 'none', 'user-select': 'none'},
+  ),
+  css('.pack-handle:hover').styles(color: AppColors.cyan),
+  css('.pack-remove, .pack-add').styles(
+    backgroundColor: Colors.transparent,
+    color: AppColors.inkMuted,
+    cursor: Cursor.pointer,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(3.px),
+  ),
+  css('.pack-remove').styles(
+    width: 38.px,
+    height: 38.px,
+    flex: Flex(shrink: 0),
+  ),
+  css('.pack-remove:disabled').styles(opacity: 0.35, cursor: Cursor.notAllowed),
+  css('.pack-add').styles(
+    margin: .only(top: 12.px),
+    padding: .symmetric(vertical: 8.px, horizontal: 14.px),
+    fontSize: 0.8.rem,
+  ),
+  css('.pack-remove:hover:not(:disabled), .pack-add:hover').styles(
+    color: AppColors.cyan,
+    border: Border.all(color: AppColors.cyan, width: 1.px),
+  ),
+  css('.demo-credit').styles(
+    margin: .only(top: 10.px),
+    fontSize: 0.74.rem,
+    color: AppColors.inkMuted,
+  ),
+  css('.demo-credit a').styles(color: AppColors.cyan, textDecoration: TextDecoration.none),
+
+  // Section points + link
+  css('.points').styles(
+    listStyle: ListStyle.none,
+    display: Display.grid,
+    gap: Gap(column: 28.px, row: 14.px),
+    margin: .only(top: 28.px),
+    gridTemplate: GridTemplate(
+      columns: GridTracks([GridTrack(TrackSize.fr(1)), GridTrack(TrackSize.fr(1)), GridTrack(TrackSize.fr(1))]),
     ),
   ),
-
-  css('.code-content').styles(
-    padding: .all(24.px),
-    overflow: Overflow.only(x: Overflow.auto),
-    fontSize: 0.88.rem,
-    lineHeight: 1.68.em,
-    backgroundColor: AppColors.bg,
+  css('.points li').styles(
+    fontSize: 0.92.rem,
+    lineHeight: 1.6.em,
+    color: AppColors.inkMuted,
+    padding: .only(left: 14.px),
+    border: Border.only(
+      left: BorderSide.solid(color: AppColors.cyan, width: 2.px),
+    ),
   ),
+  css('.points strong').styles(color: AppColors.ink),
+  css('.points code').styles(
+    fontSize: 0.85.em,
+    color: AppColors.ink,
+    backgroundColor: AppColors.surfaceElevated,
+    padding: .symmetric(horizontal: 5.px, vertical: 1.px),
+    radius: BorderRadius.circular(3.px),
+  ),
+  css('.section-link').styles(
+    display: Display.inlineBlock,
+    margin: .only(top: 22.px),
+    fontSize: 0.85.rem,
+    color: AppColors.cyan,
+    textDecoration: TextDecoration.none,
+  ),
+  css('.section-link:hover').styles(raw: {'text-decoration': 'underline'}),
 
-  // Topology Stack
+  // Package topology (docs)
   css('.topology-grid').styles(
     display: Display.grid,
     gap: Gap(row: 12.px, column: 12.px),
@@ -484,10 +553,31 @@ List<StyleRule> get homeStyles => [
     ),
   ),
   css('.topology-card').styles(
+    display: Display.block,
     padding: .symmetric(vertical: 16.px, horizontal: 20.px),
     radius: BorderRadius.circular(4.px),
     backgroundColor: AppColors.surface,
     border: Border.all(color: AppColors.border, width: 1.px),
+    textDecoration: TextDecoration.none,
+    transition: const Transition('border-color', duration: Duration(milliseconds: 150)),
+  ),
+  css('.topology-card:hover').styles(
+    border: Border.all(color: AppColors.cyan, width: 1.px),
+  ),
+  css('.topology-head').styles(
+    display: Display.flex,
+    justifyContent: JustifyContent.spaceBetween,
+    alignItems: AlignItems.baseline,
+    gap: Gap(column: 8.px),
+    margin: .only(bottom: 6.px),
+  ),
+  css('.topology-version').styles(
+    fontSize: 0.72.rem,
+    padding: .symmetric(vertical: 1.px, horizontal: 6.px),
+    color: AppColors.inkMuted,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(999.px),
+    whiteSpace: WhiteSpace.noWrap,
   ),
 
   css('.topology-card.flutter-layer').styles(
@@ -499,7 +589,6 @@ List<StyleRule> get homeStyles => [
     fontSize: 0.92.rem,
     fontWeight: FontWeight.w600,
     color: AppColors.cyan,
-    margin: .only(bottom: 6.px),
   ),
   css('.topology-desc').styles(
     fontSize: 0.82.rem,

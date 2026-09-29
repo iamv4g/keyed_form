@@ -9,9 +9,15 @@ import 'package:jaspr/server.dart';
 
 import 'app.dart';
 import 'base_path.dart';
+import 'build_inputs.dart';
+import 'code/highlight.dart';
+import 'example_sources.dart';
 import 'main.server.options.dart';
+import 'package_versions.dart';
 
-void main() {
+Future<void> main() async {
+  await initHighlighter();
+
   Jaspr.initializeApp(
     options: defaultServerOptions,
   );
@@ -19,14 +25,14 @@ void main() {
   runApp(
     Document(
       base: '$siteBasePath/',
-      title: 'keyed_form — typed, O(1) Flutter forms built on keyed optics',
+      title: 'keyed_form — big Flutter forms, one rebuild per keystroke',
       lang: 'en',
       meta: {
         'description':
-            "keyed_form gives every field a stable, typed, serializable identity — dynamic lists survive reorders, rebuilds stay O(1) at any form size, and a form's state is a plain immutable value you can test without a widget.",
-        'og:title': 'keyed_form — typed, O(1) Flutter forms on keyed optics',
+            'Typed Flutter forms from one schema: each widget listens to its own slice of state, dynamic lists keep their identity across reorders, and form logic is plain Dart you can test without a widget tree.',
+        'og:title': 'keyed_form — big Flutter forms, one rebuild per keystroke',
         'og:description':
-            'Typed, O(1) Flutter forms built on keyed optics. Verified in a reproducible open-source benchmark harness against three alternative Flutter form architectures — string-keyed controllers, declarative builders, and sealed-state validators.',
+            'Typed Flutter forms from one schema: each widget listens to its own slice of state, dynamic lists keep their identity across reorders, and form logic is plain Dart you can test without a widget tree.',
         'og:type': 'website',
         'og:url': 'https://iamv4g.github.io/keyed_form/',
         'twitter:card': 'summary_large_image',
@@ -34,8 +40,20 @@ void main() {
       head: [
         link(
           rel: 'icon',
-          href:
-              "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300F0FF' stroke-width='2'><circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='3' fill='%2300F0FF'/><line x1='12' y1='2' x2='12' y2='4'/><line x1='12' y1='20' x2='12' y2='22'/><line x1='2' y1='12' x2='4' y2='12'/><line x1='20' y1='12' x2='22' y2='12'/></svg>",
+          href: '$siteBasePath/favicon.ico',
+          type: 'image/x-icon',
+          attributes: {'sizes': '16x16 32x32 48x48'},
+        ),
+        link(
+          rel: 'icon',
+          href: '$siteBasePath/favicon.svg',
+          type: 'image/svg+xml',
+          attributes: {'sizes': 'any'},
+        ),
+        link(
+          rel: 'apple-touch-icon',
+          href: '$siteBasePath/apple-touch-icon.png',
+          attributes: {'sizes': '180x180'},
         ),
         link(rel: 'preconnect', href: 'https://fonts.googleapis.com'),
         link(
@@ -53,7 +71,10 @@ void main() {
               "try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}",
         ),
       ],
-      body: const App(),
+      body: PackageVersions(
+        versions: readPackageVersions(),
+        child: ExampleSources(files: readExampleSources(), child: const App()),
+      ),
     ),
   );
 }

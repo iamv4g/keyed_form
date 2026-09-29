@@ -78,46 +78,36 @@ List<StyleRule> get responsiveStyles => [
     css('html.docs-menu-open .docs-sidebar-panel').styles(
       transform: Transform.translate(x: 0.percent),
     ),
-    css('.blueprint-grid').styles(
-      gridTemplate: GridTemplate(
-        columns: GridTracks([
-          GridTrack(TrackSize.fr(1)),
-          GridTrack(TrackSize.fr(1)),
-        ]),
-      ),
+    css('.feature-grid').styles(
+      raw: {'grid-template-columns': 'repeat(2, minmax(0, 1fr))'},
     ),
 
-    // Navbar — wraps starting here (not 768px): the full link set overlaps
-    // the brand/theme-toggle well above phone widths, around 800-900px.
-    css('.nav-inner').styles(
-      height: Unit.auto,
-      minHeight: 56.px,
-      flexWrap: FlexWrap.wrap,
-      gap: Gap(row: 10.px, column: 10.px),
-      padding: .symmetric(vertical: 10.px),
-    ),
+    // Navbar: one row on phones; Playground drops out.
     css('.brand').styles(
       fontSize: 1.05.rem,
     ),
     css('.nav-links').styles(
-      width: 100.percent,
-      maxWidth: 100.percent,
-      overflow: Overflow.only(x: Overflow.auto),
       gap: Gap(column: 14.px),
-      padding: .only(top: 2.px, bottom: 6.px),
-      fontSize: 0.8.rem,
-      raw: {
-        'min-width': '0',
-        '-webkit-overflow-scrolling': 'touch',
-        'scrollbar-width': 'none',
-      },
     ),
-    css('.nav-links::-webkit-scrollbar').styles(
-      raw: {'display': 'none'},
+    css('.nav-playground, .nav-divider').styles(
+      display: Display.none,
     ),
-    css('.nav-links a, .nav-links .theme-toggle').styles(
-      whiteSpace: WhiteSpace.noWrap,
-      flex: Flex(shrink: 0),
+
+    css('.hero').styles(
+      raw: {'grid-template-columns': 'minmax(0, 1fr)'},
+    ),
+
+    // Splits stack demo-first.
+    css('.split').styles(
+      raw: {'grid-template-columns': 'minmax(0, 1fr)'},
+    ),
+    css('.split-demo').styles(position: Position.static, raw: {'order': '-1'}),
+    css('.points').styles(
+      gridTemplate: GridTemplate(columns: GridTracks([GridTrack(TrackSize.fr(1))])),
+    ),
+    css('.skill-box').styles(
+      padding: .all(22.px),
+      raw: {'grid-template-columns': 'minmax(0, 1fr)'},
     ),
   ]),
 
@@ -156,13 +146,8 @@ List<StyleRule> get responsiveStyles => [
     css('.hero').styles(
       padding: .only(top: 38.px, bottom: 32.px),
     ),
-    css('.telemetry-tag').styles(
-      fontSize: 0.68.rem,
-      padding: .symmetric(vertical: 4.px, horizontal: 10.px),
-      letterSpacing: 0.05.em,
-      whiteSpace: WhiteSpace.normal,
-      lineHeight: 1.4.em,
-      margin: .only(bottom: 18.px),
+    css('.hero-chips').styles(
+      margin: .only(bottom: 16.px),
     ),
     css('.hero h1').styles(
       lineHeight: 1.15.em,
@@ -223,46 +208,8 @@ List<StyleRule> get responsiveStyles => [
       fontSize: 0.88.rem,
     ),
 
-    // Optics Workbench Mobile
-    css('.workbench').styles(
-      margin: .only(top: 32.px),
-      padding: .symmetric(vertical: 16.px, horizontal: 12.px),
-    ),
-    css('.workbench-header').styles(
-      flexDirection: FlexDirection.column,
-      alignItems: AlignItems.start,
-      gap: Gap(row: 6.px),
-      margin: .only(bottom: 14.px),
-      padding: .only(bottom: 10.px),
-    ),
-    css('.optics-canvas').styles(
-      width: 100.percent,
-      maxWidth: 100.percent,
-      boxSizing: BoxSizing.borderBox,
-      overflow: Overflow.only(x: Overflow.auto),
-      padding: .only(bottom: 6.px),
-      raw: {
-        '-webkit-overflow-scrolling': 'touch',
-      },
-    ),
-    css('.optics-canvas svg').styles(
-      minWidth: 640.px,
-      width: 100.percent,
-      height: Unit.auto,
-      display: Display.block,
-    ),
-    css('.beam-status').styles(
-      flexDirection: FlexDirection.column,
-      alignItems: AlignItems.start,
-      gap: Gap(row: 8.px),
-      padding: .symmetric(vertical: 10.px, horizontal: 12.px),
-      fontSize: 0.78.rem,
-    ),
-    css('.beam-status div').styles(
-      width: 100.percent,
-      raw: {
-        'word-break': 'break-all',
-      },
+    css('.hero-demo').styles(
+      padding: .symmetric(vertical: 18.px, horizontal: 16.px),
     ),
 
     // Section Mobile
@@ -280,63 +227,30 @@ List<StyleRule> get responsiveStyles => [
       margin: .only(top: 10.px),
     ),
 
-    // Blueprint Invariants Grid Mobile
-    css('.blueprint-grid').styles(
-      gap: Gap(row: 14.px),
+    // Feature grid Mobile
+    css('.feature-grid').styles(
+      gap: Gap(row: 10.px),
       margin: .only(top: 22.px),
-      gridTemplate: GridTemplate(
-        columns: GridTracks([GridTrack(TrackSize.fr(1))]),
-      ),
+      raw: {'grid-template-columns': 'minmax(0, 1fr)'},
     ),
-    css('.grid-card').styles(
-      padding: .symmetric(vertical: 18.px, horizontal: 16.px),
+    css('.feature-card').styles(
+      padding: .symmetric(vertical: 16.px, horizontal: 16.px),
+      gap: Gap(row: 8.px),
     ),
-    css('.card-h').styles(
-      fontSize: 1.0.rem,
-    ),
-    css('.card-p').styles(
+    css('.feature-body').styles(
       fontSize: 0.85.rem,
-      margin: .only(bottom: 12.px),
-    ),
-    css('.card-diff').styles(
-      padding: .symmetric(vertical: 8.px, horizontal: 12.px),
-      fontSize: 0.8.rem,
     ),
 
-    // HUD Mobile
-    css('.hud-stats').styles(
-      gap: Gap(row: 12.px),
+    // Performance Mobile
+    css('.perf-grid').styles(
       margin: .only(top: 20.px),
-      gridTemplate: GridTemplate(
-        columns: GridTracks([GridTrack(TrackSize.fr(1))]),
-      ),
+      raw: {'grid-template-columns': 'minmax(0, 1fr)'},
     ),
     css('.stat-tile').styles(
       padding: .symmetric(vertical: 18.px, horizontal: 16.px),
     ),
     css('.stat-big').styles(
       fontSize: 2.2.rem,
-    ),
-    css('.stat-desc').styles(
-      fontSize: 0.82.rem,
-    ),
-
-    // Chart Panel Mobile
-    css('.chart-panel').styles(
-      margin: .only(top: 20.px),
-      padding: .symmetric(vertical: 16.px, horizontal: 12.px),
-      width: 100.percent,
-      maxWidth: 100.percent,
-      boxSizing: BoxSizing.borderBox,
-      overflow: Overflow.only(x: Overflow.auto),
-      raw: {
-        '-webkit-overflow-scrolling': 'touch',
-      },
-    ),
-    css('.chart-panel svg').styles(
-      minWidth: 480.px,
-      width: 100.percent,
-      maxWidth: 100.percent,
     ),
 
     // Tables Mobile
@@ -380,52 +294,6 @@ List<StyleRule> get responsiveStyles => [
       margin: .only(top: 10.px),
     ),
 
-    // Code Container Mobile
-    css('.code-container').styles(
-      margin: .only(top: 22.px),
-    ),
-    css('.code-header-bar').styles(
-      flexDirection: FlexDirection.column,
-      alignItems: AlignItems.stretch,
-      gap: Gap(row: 8.px),
-      padding: .all(8.px),
-    ),
-    css('.code-tabs').styles(
-      width: 100.percent,
-      maxWidth: 100.percent,
-      minWidth: 0.px,
-      overflow: Overflow.only(x: Overflow.auto),
-      whiteSpace: WhiteSpace.noWrap,
-      padding: .only(bottom: 4.px),
-      raw: {
-        'min-width': '0',
-        '-webkit-overflow-scrolling': 'touch',
-        'scrollbar-width': 'none',
-      },
-    ),
-    css('.code-tabs::-webkit-scrollbar').styles(
-      raw: {'display': 'none'},
-    ),
-    css('.tab-btn').styles(
-      padding: .symmetric(vertical: 8.px, horizontal: 12.px),
-      fontSize: 0.74.rem,
-      whiteSpace: WhiteSpace.noWrap,
-      flex: Flex(shrink: 0),
-    ),
-    css('.code-header-bar .copy-btn').styles(
-      alignSelf: AlignSelf.end,
-      padding: .symmetric(vertical: 5.px, horizontal: 12.px),
-    ),
-    css('.code-content').styles(
-      padding: .symmetric(vertical: 16.px, horizontal: 14.px),
-      fontSize: 0.78.rem,
-      lineHeight: 1.55.em,
-      overflow: Overflow.only(x: Overflow.auto),
-      raw: {
-        '-webkit-overflow-scrolling': 'touch',
-      },
-    ),
-
     // Topology Grid Mobile
     css('.topology-grid').styles(
       gap: Gap(row: 10.px),
@@ -449,12 +317,15 @@ List<StyleRule> get responsiveStyles => [
       margin: .only(top: 50.px),
       padding: .only(top: 40.px, bottom: 48.px),
     ),
+    css('.footer-grid').styles(
+      raw: {'grid-template-columns': 'repeat(2, minmax(0, 1fr))'},
+    ),
+    css('.footer-brand').styles(raw: {'grid-column': '1 / -1'}),
     css('.footer-bottom').styles(
       margin: .only(top: 28.px),
       flexDirection: FlexDirection.column,
       alignItems: AlignItems.start,
       gap: Gap(row: 14.px),
-      fontSize: 0.78.rem,
     ),
   ]),
 ];

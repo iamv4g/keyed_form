@@ -10,6 +10,7 @@ on:
       - packages/keyed_form_gen/**
       - packages/keyed_lens/**
       - packages/keyed_form_core/**
+      - packages/keyed_form_flutter/**
       - .github/workflows/deploy-website.yml
   workflow_dispatch:
 

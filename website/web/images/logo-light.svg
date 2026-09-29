@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none" role="img" aria-labelledby="title">
+  <title id="title">keyed_form — KF ribbon monogram</title>
+  <defs>
+    <linearGradient id="stem" x1="15" y1="20" x2="33" y2="84" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#008799"/>
+      <stop offset=".5" stop-color="#0096a7"/>
+      <stop offset="1" stop-color="#005b7c"/>
+    </linearGradient>
+    <linearGradient id="leg" x1="35" y1="48" x2="76" y2="84" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#005572"/>
+      <stop offset=".27" stop-color="#008ba3"/>
+      <stop offset=".72" stop-color="#009cab"/>
+      <stop offset="1" stop-color="#00a8af"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="52" y1="34" x2="79" y2="12" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#b9610d"/>
+      <stop offset=".48" stop-color="#c97200"/>
+      <stop offset="1" stop-color="#e7ac26"/>
+    </linearGradient>
+    <linearGradient id="ribbon" x1="32" y1="56" x2="61" y2="13" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#006b8c"/>
+      <stop offset=".44" stop-color="#00a79f"/>
+      <stop offset=".72" stop-color="#8fc683"/>
+      <stop offset="1" stop-color="#ecc95d"/>
+    </linearGradient>
+    <linearGradient id="middle" x1="54" y1="56" x2="77" y2="41" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#b96714"/>
+      <stop offset=".55" stop-color="#c97200"/>
+      <stop offset="1" stop-color="#dfa322"/>
+    </linearGradient>
+  </defs>
+  <path d="M40 42 80 78C84 82 82 85 77 85H64C60 85 58 84 55 81L30 57Z" fill="url(#leg)"/>
+  <path d="M30 40 51 19Q58 12 66 12H83Q87 12 85 18Q83 24 79 28Q75 32 70 32H48.9L30 59Z" fill="url(#amber)"/>
+  <path d="M30 40 51 19Q58 12 66 12H71Q64 12 58 19L30 59Z" fill="url(#ribbon)"/>
+  <!-- Match the K edge's 9:10 slope; keep a constant perpendicular gap. -->
+  <path d="M55 41H77Q81 41 79 46Q77 51 74 53Q71 56 66 56H59.222222L47 45 49 43Q51 41 55 41Z" fill="url(#middle)"/>
+  <path d="M12 24Q12 21 15 19L26 12Q30 10 30 15V82Q30 86 26 84Q20 82 16 78Q12 74 12 69Z" fill="url(#stem)"/>
+</svg>

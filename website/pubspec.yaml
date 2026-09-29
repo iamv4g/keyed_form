@@ -9,10 +9,12 @@ environment:
 resolution: workspace
 
 dependencies:
+  dnd_kit_jaspr: ^0.6.0
   jaspr: ^0.23.4
   jaspr_router: ^0.8.2
   keyed_form: ^0.1.0
   keyed_form_schema: ^0.1.0
+  syntax_highlight_lite: ^0.0.1
   universal_web: ^1.1.1+1
 
 dev_dependencies:
