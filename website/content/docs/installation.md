@@ -24,13 +24,15 @@ Schemas live in files annotated with `@keyedSchema`. The generator turns each on
 dart run build_runner build -d
 ```
 
+<Note>
+
+Commit the generated `*.kfg.dart` files. **Nothing is generated at runtime**, so a fresh checkout builds without running the generator.
+
+</Note>
+
 Keep it running while you work with `dart run build_runner watch -d`.
 
 ## Requirements
 
 - Dart 3.10 or newer
 - Flutter, only for `keyed_form_flutter` — the schema, generator and controller are pure Dart
-
-## Next
-
-[Dynamic lists](docs/dynamic-lists) — rows that keep their identity when you reorder them.

@@ -1,5 +1,19 @@
-/// Sidebar order for the Markdown docs under `content/docs/`.
-const docsPages = <({String group, String title, String path})>[
-  (group: 'Getting started', title: 'Installation', path: '/docs/installation'),
-  (group: 'Guides', title: 'Dynamic lists', path: '/docs/dynamic-lists'),
+/// One Markdown docs page, in sidebar order.
+class DocsEntry {
+  const DocsEntry(this.group, this.title, this.slug);
+
+  final String group;
+  final String title;
+
+  /// File name under `content/docs/` without `.md`; `index` is `/docs`.
+  final String slug;
+
+  String get path => slug == 'index' ? '/docs' : '/docs/$slug';
+}
+
+/// Sidebar order, eyebrows and Prev/Next all come from this list; a test
+/// keeps it in step with the files under `content/docs/`.
+const docsPages = <DocsEntry>[
+  DocsEntry('Getting started', 'Installation', 'installation'),
+  DocsEntry('Lists & scrolling', 'Dynamic lists', 'dynamic-lists'),
 ];

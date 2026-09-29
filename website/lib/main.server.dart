@@ -84,8 +84,8 @@ Future<void> main() async {
             loaders: [FilesystemLoader('content')],
             configResolver: PageConfig.all(
               parsers: [MarkdownParser()],
-              extensions: [HeadingAnchorsExtension(), TableOfContentsExtension(maxHeaderDepth: 2)],
-              components: [const KfCodeBlock(), const ExampleCode(), const PackingDemoTag()],
+              extensions: [TableOfContentsExtension(maxHeaderDepth: 2)],
+              components: [const KfCodeBlock(), const ExampleCode(), const PackingDemoTag(), const Note()],
               layouts: [const KfDocsLayout()],
               theme: ContentTheme.none(),
             ),

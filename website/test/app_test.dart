@@ -16,6 +16,7 @@ import 'package:website/components/model_section.dart';
 import 'package:website/components/telemetry_section.dart';
 import 'package:website/components/navbar.dart';
 import 'package:website/pages/docs_page.dart';
+import 'package:website/docs_content/docs_nav.dart';
 import 'package:website/example_sources.dart';
 import 'package:website/pages/landing_page.dart';
 import 'package:website/package_versions.dart';
@@ -257,6 +258,17 @@ void main() {
         );
       });
     }
+  });
+
+  test('docs nav lists exactly the Markdown pages under content/docs', () {
+    final files = Directory('content/docs')
+        .listSync()
+        .whereType<File>()
+        .map((f) => f.uri.pathSegments.last)
+        .where((name) => name.endsWith('.md'))
+        .map((name) => name.substring(0, name.length - 3))
+        .toSet();
+    expect(docsPages.map((e) => e.slug).toSet(), files);
   });
 
   group('Static Site Output Verification', () {

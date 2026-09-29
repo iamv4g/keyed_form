@@ -54,3 +54,14 @@ class PackingDemoTag extends CustomComponentBase {
   @override
   Component apply(String name, Map<String, String> attributes, Component? child) => const PackingDemo();
 }
+
+/// `<Note>…</Note>`: the one callout style docs use.
+class Note extends CustomComponentBase {
+  const Note();
+
+  @override
+  Pattern get pattern => 'Note';
+
+  @override
+  Component apply(String name, Map<String, String> attributes, Component? child) => aside(classes: 'md-note', [?child]);
+}

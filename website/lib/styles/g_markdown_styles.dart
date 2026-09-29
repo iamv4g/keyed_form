@@ -5,11 +5,7 @@ import 'theme_tokens.dart';
 /// Markdown docs pages (`content/docs/`): one idea per page, plain type.
 @css
 List<StyleRule> get markdownStyles => [
-  css('.md-sidebar').styles(
-    position: Position.sticky(top: 88.px),
-    alignSelf: AlignSelf.start,
-    fontSize: 0.92.rem,
-  ),
+  css('.md-sidebar').styles(fontSize: 0.92.rem),
   css('.md-sidebar-group').styles(
     margin: .only(top: 20.px, bottom: 8.px),
     fontSize: 0.78.rem,
@@ -54,7 +50,7 @@ List<StyleRule> get markdownStyles => [
     color: AppColors.ink,
   ),
   css('.md-lead').styles(
-    margin: .only(top: 12.px, bottom: 36.px),
+    margin: .only(top: 12.px, bottom: 28.px),
     fontSize: 1.25.rem,
     lineHeight: 1.55.em,
     color: AppColors.inkMuted,
@@ -72,6 +68,9 @@ List<StyleRule> get markdownStyles => [
     fontSize: 1.15.rem,
     color: AppColors.ink,
   ),
+  // jaspr_content wraps the body in <section class="content">; undo the
+  // landing's section padding.
+  css('.md-content section.content').styles(padding: .zero),
   css('.md-content p').styles(margin: .only(bottom: 16.px)),
   css('.md-content a').styles(color: AppColors.cyan),
   css('.md-content ul, .md-content ol').styles(
@@ -114,6 +113,54 @@ List<StyleRule> get markdownStyles => [
   ),
   css('.md-content th').styles(color: AppColors.ink, fontWeight: FontWeight.w600),
 
+  css('.md-note').styles(
+    margin: .only(bottom: 20.px),
+    padding: .symmetric(vertical: 14.px, horizontal: 18.px),
+    backgroundColor: AppColors.surface,
+    border: Border.only(
+      left: BorderSide.solid(color: AppColors.cyan, width: 3.px),
+    ),
+    radius: BorderRadius.circular(4.px),
+  ),
+  css('.md-note > :last-child').styles(margin: .only(bottom: 0.px)),
+
+  css('.md-page-footer').styles(
+    margin: .only(top: 56.px),
+    padding: .only(top: 24.px),
+    border: Border.only(
+      top: BorderSide.solid(color: AppColors.border, width: 1.px),
+    ),
+  ),
+  css('.md-pager').styles(
+    display: Display.flex,
+    justifyContent: JustifyContent.spaceBetween,
+    gap: Gap(column: 16.px),
+  ),
+  css('.md-pager-link').styles(
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    gap: Gap(row: 2.px),
+    padding: .symmetric(vertical: 12.px, horizontal: 16.px),
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(6.px),
+    textDecoration: TextDecoration.none,
+    raw: {'flex': '1', 'max-width': '50%'},
+  ),
+  css('.md-pager-link:hover').styles(
+    border: Border.all(color: AppColors.cyan, width: 1.px),
+  ),
+  css('.md-pager-link.next').styles(alignItems: AlignItems.end, raw: {'margin-left': 'auto'}),
+  css('.md-pager-label').styles(fontSize: 0.8.rem, color: AppColors.inkMuted),
+  css('.md-pager-title').styles(color: AppColors.cyan, fontWeight: FontWeight.w600),
+  css('.md-edit').styles(
+    display: Display.inlineBlock,
+    margin: .only(top: 20.px),
+    fontSize: 0.85.rem,
+    color: AppColors.inkMuted,
+  ),
+
+  css('.md-toc-mobile').styles(display: Display.none),
+
   css('.md-toc ul').styles(
     listStyle: ListStyle.none,
     padding: .only(left: 12.px),
@@ -131,7 +178,21 @@ List<StyleRule> get markdownStyles => [
 
   css.media(MediaQuery.screen(maxWidth: 992.px), [
     css('.md-layout').styles(raw: {'grid-template-columns': 'minmax(0, 1fr)'}),
-    css('.md-sidebar').styles(display: Display.none),
     css('.md-content').styles(fontSize: 1.rem),
+    css('.md-toc-mobile').styles(
+      display: Display.block,
+      margin: .only(bottom: 24.px),
+      padding: .symmetric(vertical: 10.px, horizontal: 14.px),
+      border: Border.all(color: AppColors.border, width: 1.px),
+      radius: BorderRadius.circular(6.px),
+      fontSize: 0.92.rem,
+    ),
+    css('.md-toc-mobile summary').styles(color: AppColors.ink, cursor: Cursor.pointer),
+    css('.md-toc-mobile ul').styles(
+      listStyle: ListStyle.none,
+      margin: .only(top: 8.px),
+      padding: .zero,
+    ),
+    css('.md-toc-mobile a').styles(color: AppColors.inkMuted, textDecoration: TextDecoration.none),
   ]),
 ];
