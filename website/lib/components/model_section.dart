@@ -48,20 +48,26 @@ class ModelSection extends StatelessComponent {
       ]),
       ul(classes: 'points', [
         li([
-          strong([.text('One draft, one controller. ')]),
-          .text('The whole form is one immutable value; fields are addresses into it, not objects to wire up.'),
+          span([
+            strong([.text('One draft, one controller. ')]),
+            .text('The whole form is one immutable value; fields are addresses into it, not objects to wire up.'),
+          ]),
         ]),
         li([
-          strong([.text('Refs, not strings. ')]),
-          code([.text('LoginFields.email')]),
-          .text(' is a typed field ref — rename a field and the compiler finds every use.'),
+          span([
+            strong([.text('Refs, not strings. ')]),
+            code([.text('LoginFields.email')]),
+            .text(' is a typed field ref — rename a field and the compiler finds every use.'),
+          ]),
         ]),
         li([
-          strong([.text('Headless by design. ')]),
-          code([.text('KeyedFormField')]),
-          .text(
-            ' hands you the value, the error and a text controller; render with Material, Cupertino or your own design system.',
-          ),
+          span([
+            strong([.text('Headless by design. ')]),
+            code([.text('KeyedFormField')]),
+            .text(
+              ' hands you the value, the error and a text controller; render with Material, Cupertino or your own design system.',
+            ),
+          ]),
         ]),
       ]),
       a(classes: 'section-link mono', href: '$siteBasePath/docs#quickstart', [.text('Quickstart in 5 minutes →')]),

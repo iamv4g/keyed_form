@@ -58,24 +58,30 @@ class ListsSection extends StatelessComponent {
       ]),
       ul(classes: 'points', [
         li([
-          strong([.text('Rows have ids, not indexes. ')]),
-          .text('Every row carries a '),
-          code([.text('clientId')]),
-          .text('; field refs, errors and touched state are keyed by it, so a reorder moves them with the row.'),
+          span([
+            strong([.text('Rows have ids, not indexes. ')]),
+            .text('Every row carries a '),
+            code([.text('clientId')]),
+            .text('; field refs, errors and touched state are keyed by it, so a reorder moves them with the row.'),
+          ]),
         ]),
         li([
-          strong([.text('One call per edit. ')]),
-          code([.text('list.move')]),
-          .text(', '),
-          code([.text('append')]),
-          .text(', '),
-          code([.text('removeById')]),
-          .text(' — the list editor works the same whether a drag, a button or a server patch asked for it.'),
+          span([
+            strong([.text('One call per edit. ')]),
+            code([.text('list.move')]),
+            .text(', '),
+            code([.text('append')]),
+            .text(', '),
+            code([.text('removeById')]),
+            .text(' — the list editor works the same whether a drag, a button or a server patch asked for it.'),
+          ]),
         ]),
         li([
-          strong([.text('Rules for the whole list. ')]),
-          code([.text('.min(1)')]),
-          .text(' and cross-row checks sit on the list itself, beside the per-row rules.'),
+          span([
+            strong([.text('Rules for the whole list. ')]),
+            code([.text('.min(1)')]),
+            .text(' and cross-row checks sit on the list itself, beside the per-row rules.'),
+          ]),
         ]),
       ]),
       a(classes: 'section-link mono', href: '$siteBasePath/docs#virtualization', [
