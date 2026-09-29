@@ -114,6 +114,10 @@ List<StyleRule> get responsiveStyles => [
     css('.points').styles(
       gridTemplate: GridTemplate(columns: GridTracks([GridTrack(TrackSize.fr(1))])),
     ),
+    css('.skill-box').styles(
+      padding: .all(22.px),
+      raw: {'grid-template-columns': 'minmax(0, 1fr)'},
+    ),
   ]),
 
   css.media(MediaQuery.screen(maxWidth: 768.px), [

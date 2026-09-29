@@ -408,6 +408,44 @@ List<StyleRule> get homeStyles => [
     color: AppColors.green,
   ),
 
+  // Agent skill band
+  css('.skill-box').styles(
+    display: Display.grid,
+    alignItems: AlignItems.center,
+    gap: Gap(column: 36.px, row: 24.px),
+    padding: .all(32.px),
+    radius: BorderRadius.circular(6.px),
+    raw: {'grid-template-columns': 'minmax(0, 1fr) minmax(0, 1.1fr)'},
+  ),
+  css('.skill-install').styles(minWidth: 0.px),
+  css('.skill-note').styles(
+    margin: .only(top: 16.px, bottom: 8.px),
+    fontSize: 0.76.rem,
+    color: AppColors.inkMuted,
+  ),
+
+  // A multi-line shell command with its own copy button beside it (not
+  // over it — the command scrolls sideways on phones).
+  css('.cmd-block').styles(
+    display: Display.flex,
+    alignItems: AlignItems.start,
+    gap: Gap(column: 8.px),
+    padding: .all(8.px),
+    backgroundColor: AppColors.bg,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(4.px),
+  ),
+  css('.cmd-block pre').styles(
+    margin: .zero,
+    padding: .symmetric(vertical: 6.px, horizontal: 8.px),
+    fontSize: 0.78.rem,
+    lineHeight: 1.6.em,
+    color: AppColors.cyan,
+    overflow: Overflow.only(x: Overflow.auto),
+    raw: {'white-space': 'pre', 'flex': '1', 'min-width': '0'},
+  ),
+  css('.cmd-block .copy-btn').styles(flex: Flex(shrink: 0)),
+
   // Three bold-led points under a split, then a docs link.
   css('.points').styles(
     listStyle: ListStyle.none,

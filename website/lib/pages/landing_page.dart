@@ -1,6 +1,7 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../components/agent_skill_section.dart';
 import '../components/footer.dart';
 import '../components/hero_section.dart';
 import '../components/invariants_grid.dart';
@@ -20,6 +21,8 @@ class LandingPage extends StatelessComponent {
       const HeroSection(),
       const hr(classes: 'rule'),
       const ModelSection(),
+      const hr(classes: 'rule'),
+      const AgentSkillSection(),
       const hr(classes: 'rule'),
       const InvariantsGrid(),
       const hr(classes: 'rule'),

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:jaspr_test/jaspr_test.dart';
 import 'package:website/code/code_tabs.dart';
 import 'package:website/code/highlight.dart';
+import 'package:website/components/agent_skill_section.dart';
 import 'package:website/components/demo/hero_login_demo.dart';
 import 'package:website/components/hero_section.dart';
 import 'package:website/components/model_section.dart';
@@ -29,6 +30,7 @@ void main() {
       expect(find.text('// MEASURED TELEMETRY'), findsOneComponent);
       expect(find.text('// CAPABILITY MATRIX'), findsOneComponent);
       expect(find.text('// THE MODEL'), findsOneComponent);
+      expect(find.text('// AGENT SKILL'), findsOneComponent);
       expect(find.text('// WORKSPACE TOPOLOGY'), findsOneComponent);
 
       // Footer
@@ -91,6 +93,19 @@ void main() {
       expect(find.text('// ERRORS — form.visibleErrorKeys'), findsOneComponent);
       expect(find.text('Sign in'), findsOneComponent);
       expect(find.text('Quickstart in 5 minutes →'), findsOneComponent);
+    });
+
+    testComponents('AgentSkillSection installs into .agents/skills and links it for Claude Code', (tester) async {
+      tester.pumpComponent(const AgentSkillSection());
+
+      expect(find.text('// AGENT SKILL'), findsOneComponent);
+      expect(find.textContaining('-o .agents/skills/keyed_form/SKILL.md'), findsOneComponent);
+      expect(
+        find.text('mkdir -p .claude/skills && ln -s ../../.agents/skills/keyed_form .claude/skills/keyed_form'),
+        findsOneComponent,
+      );
+      expect(find.text('COPY'), findsNComponents(2));
+      expect(find.text('Read SKILL.md →'), findsOneComponent);
     });
 
     testComponents('HeroSection renders headline, command bar and CTAs', (tester) async {
