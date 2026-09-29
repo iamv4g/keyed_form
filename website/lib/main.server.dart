@@ -93,6 +93,7 @@ Future<void> main() async {
                   const ExampleCode(),
                   const PackingDemoTag(),
                   const PackageTopologyTag(),
+                  const CapabilityMatrixTag(),
                   const Note(),
                 ],
                 layouts: [const KfDocsLayout()],

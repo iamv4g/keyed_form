@@ -14,7 +14,7 @@ class DocsEntry {
 /// Sidebar order, eyebrows and Prev/Next all come from this list; a test
 /// keeps it in step with the files under `content/docs/`.
 const docsPages = <DocsEntry>[
-  DocsEntry('Getting started', 'Introduction', 'introduction'),
+  DocsEntry('Getting started', 'Introduction', 'index'),
   DocsEntry('Getting started', 'Installation', 'installation'),
   DocsEntry('Getting started', 'Quickstart', 'quickstart'),
   DocsEntry('Getting started', 'How it works', 'how-it-works'),
@@ -25,4 +25,16 @@ const docsPages = <DocsEntry>[
   DocsEntry('Core concepts', 'Async validation', 'async-validation'),
   DocsEntry('Core concepts', 'Relations', 'relations'),
   DocsEntry('Lists & scrolling', 'Dynamic lists', 'dynamic-lists'),
+  DocsEntry('Lists & scrolling', 'Long lists', 'long-lists'),
+  DocsEntry('Lists & scrolling', 'Scroll to first error', 'scroll-to-first-error'),
+  DocsEntry('Recipes', 'Multi-step forms', 'wizard'),
+  DocsEntry('Recipes', 'Server errors', 'server-errors'),
+  DocsEntry('Recipes', 'Cascading dropdowns', 'cascading-dropdowns'),
+  DocsEntry('Recipes', 'Custom controls', 'custom-controls'),
+  DocsEntry('Recipes', 'Discriminated unions', 'unions'),
+  DocsEntry('Testing', 'Testing', 'testing'),
+  DocsEntry('Reference', 'API reference', 'api-reference'),
+  DocsEntry('Reference', 'Migration', 'migration'),
+  DocsEntry('Reference', 'FAQ', 'faq'),
+  DocsEntry('Reference', 'Benchmarks', 'benchmarks'),
 ];

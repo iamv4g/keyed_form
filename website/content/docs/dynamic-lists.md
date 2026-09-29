@@ -24,6 +24,10 @@ These are the example app's own files — the demo above runs the same schema an
 | `move(from, to)` | reorders; `to` is the index after removal |
 | `removeById(clientId)` | drops a row and its errors |
 
+## Stable identity beats array indexes
+
+Use each row's `clientId` to build its field reference and widget key. Its index changes after insertion, removal, or a move; its identity does not. This keeps values, errors, focus, and dirty state attached to the same record.
+
 ## Rules for the whole list
 
 A list field takes its own rules next to the per-row ones — here `.min(1)` keeps at least one row.

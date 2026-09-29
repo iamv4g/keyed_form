@@ -6,9 +6,7 @@ import '../../package_versions.dart';
 const _packages = [
   (
     name: 'keyed_lens',
-    desc:
-        'Pure Dart, 0 dependencies. The general-purpose toolkit (Lens, AffineLens, Prism, FieldKey) used internally '
-        'for nested immutable updates.',
+    desc: 'Pure Dart, 0 dependencies. Typed update primitives for nested immutable values.',
   ),
   (
     name: 'keyed_form_core',

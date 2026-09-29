@@ -6,6 +6,7 @@ import '../code/code_tabs.dart';
 import '../code/highlight.dart';
 import '../components/demo/packing_demo.dart';
 import '../components/docs/package_topology.dart';
+import '../components/docs/capability_matrix.dart';
 import '../example_sources.dart';
 
 /// Fenced code blocks, highlighted with the site's own tk-* classes.
@@ -65,6 +66,17 @@ class PackageTopologyTag extends CustomComponentBase {
 
   @override
   Component apply(String name, Map<String, String> attributes, Component? child) => const PackageTopology();
+}
+
+/// `<CapabilityMatrix />`: compact comparison table on the benchmarks page.
+class CapabilityMatrixTag extends CustomComponentBase {
+  const CapabilityMatrixTag();
+
+  @override
+  Pattern get pattern => 'CapabilityMatrix';
+
+  @override
+  Component apply(String name, Map<String, String> attributes, Component? child) => const CapabilityMatrix();
 }
 
 /// `<Note>…</Note>`: the one callout style docs use.
