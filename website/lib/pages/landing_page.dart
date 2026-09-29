@@ -2,6 +2,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../components/agent_skill_section.dart';
+import '../components/closing_cta.dart';
 import '../components/feature_grid.dart';
 import '../components/footer.dart';
 import '../components/hero_section.dart';
@@ -34,6 +35,8 @@ class LandingPage extends StatelessComponent {
       const MatrixSection(),
       const hr(classes: 'rule'),
       const TopologySection(),
+      const hr(classes: 'rule'),
+      const ClosingCta(),
       const Footer(),
     ]);
   }

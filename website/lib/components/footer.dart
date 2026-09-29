@@ -1,6 +1,12 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../base_path.dart';
+
+const _repo = 'https://github.com/iamv4g/keyed_form';
+
+/// Shared by every page: brand, three link columns, and a bottom row with
+/// the license and the "Built with Jaspr" badge.
 class Footer extends StatelessComponent {
   const Footer({super.key});
 
@@ -8,47 +14,63 @@ class Footer extends StatelessComponent {
   Component build(BuildContext context) {
     return footer([
       div(classes: 'wrap', [
-        div(classes: 'cta-group mono', [
-          a(
-            classes: 'btn btn-cyan',
-            href: 'https://pub.dev/packages/keyed_form_flutter',
-            [.text('Get Started with keyed_form_flutter →')],
-          ),
-          a(
-            classes: 'btn btn-outline',
-            href: 'https://github.com/iamv4g/keyed_form',
-            [.text('Read Source on GitHub ↗')],
-          ),
+        div(classes: 'footer-grid', [
+          div(classes: 'footer-brand', [
+            a(classes: 'brand display', href: '$siteBasePath/', [.text('keyed_form')]),
+            p([.text('Typed Flutter forms, one rebuild per keystroke.')]),
+          ]),
+          _column('Project', [
+            _link('pub.dev', 'https://pub.dev/packages/keyed_form_flutter', external: true),
+            _link('GitHub', _repo, external: true),
+            _link('Changelog', '$_repo/blob/main/packages/keyed_form_flutter/CHANGELOG.md', external: true),
+            _link('Issues', '$_repo/issues', external: true),
+            _link('API reference', 'https://pub.dev/documentation/keyed_form_flutter/latest/', external: true),
+          ]),
+          _column('Docs', [
+            _link('Quickstart', '$siteBasePath/docs#quickstart'),
+            _link('Dynamic lists', '$siteBasePath/docs#virtualization'),
+            _link('Validation', '$siteBasePath/docs#validation'),
+            _link('Testing', '$siteBasePath/docs#testing-without-widgets'),
+            _link('Benchmarks', '$siteBasePath/docs#benchmarks-methodology'),
+          ]),
+          _column('Resources', [
+            _link('Playground', '$siteBasePath/playground'),
+            _link('Agent skill (SKILL.md)', '$_repo/blob/main/skills/keyed_form/SKILL.md', external: true),
+            _link('Full examples', '$_repo/tree/main/packages/keyed_form_flutter/example', external: true),
+          ]),
         ]),
         div(classes: 'footer-bottom mono', [
-          div([
-            strong([.text('keyed_form')]),
-            .text(
-              ' — Typed forms on keyed optics. Released under the MIT License.',
-            ),
+          span([
+            .text('MIT License · '),
+            a(classes: 'footer-link', href: '$_repo/blob/main/LICENSE', target: Target.blank, [.text('LICENSE')]),
           ]),
-          div(classes: 'footer-links', [
-            a(
-              href: 'https://pub.dev/packages/keyed_form_flutter',
-              target: Target.blank,
-              classes: 'footer-link',
-              [.text('pub.dev')],
-            ),
-            a(
-              href: 'https://github.com/iamv4g/keyed_form',
-              target: Target.blank,
-              classes: 'footer-link',
-              [.text('GitHub')],
-            ),
-            a(
-              href: 'https://github.com/iamv4g/keyed_form/blob/main/LICENSE',
-              target: Target.blank,
-              classes: 'footer-link',
-              [.text('License')],
-            ),
-          ]),
+          // Both variants render; CSS shows the one matching the theme
+          // (--dark-only / --light-only), like the theme-toggle icons.
+          a(
+            classes: 'jaspr-badge',
+            href: 'https://jaspr.site',
+            target: Target.blank,
+            attributes: {'aria-label': 'Built with Jaspr'},
+            [
+              span(classes: 'jaspr-badge-light', [const JasprBadge.lightTwoTone()]),
+              span(classes: 'jaspr-badge-dark', [const JasprBadge.darkTwoTone()]),
+            ],
+          ),
         ]),
       ]),
     ]);
+  }
+
+  static Component _column(String title, List<Component> links) {
+    return div(classes: 'footer-col', [
+      div(classes: 'footer-col-title mono', [.text(title)]),
+      ul([
+        for (final link in links) li([link]),
+      ]),
+    ]);
+  }
+
+  static Component _link(String label, String href, {bool external = false}) {
+    return a(classes: 'footer-link', href: href, target: external ? Target.blank : null, [.text(label)]);
   }
 }

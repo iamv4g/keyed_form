@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:jaspr/jaspr.dart' show JasprBadge;
 import 'package:jaspr_test/jaspr_test.dart';
 import 'package:website/code/code_tabs.dart';
 import 'package:website/code/highlight.dart';
 import 'package:website/components/agent_skill_section.dart';
 import 'package:website/components/demo/hero_login_demo.dart';
 import 'package:website/components/feature_grid.dart';
+import 'package:website/components/footer.dart';
 import 'package:website/components/hero_section.dart';
 import 'package:website/components/lists_section.dart';
 import 'package:website/components/model_section.dart';
@@ -25,8 +27,8 @@ void main() {
 
       // Brand & Navigation
       expect(find.textContaining('keyed_form'), findsComponents);
-      expect(find.text('Docs'), findsOneComponent);
-      expect(find.text('Playground'), findsOneComponent);
+      expect(find.text('Docs'), findsComponents); // navbar + footer column
+      expect(find.text('Playground'), findsComponents);
 
       // Section Kickers
       expect(find.text('// FEATURES'), findsOneComponent);
@@ -37,13 +39,9 @@ void main() {
       expect(find.text('// DYNAMIC LISTS'), findsOneComponent);
       expect(find.text('// WORKSPACE TOPOLOGY'), findsOneComponent);
 
-      // Footer
-      expect(
-        find.text(
-          ' — Typed forms on keyed optics. Released under the MIT License.',
-        ),
-        findsOneComponent,
-      );
+      // Closing CTA + footer
+      expect(find.text('Your next form is one schema away.'), findsOneComponent);
+      expect(find.text('Typed Flutter forms, one rebuild per keystroke.'), findsOneComponent);
     });
 
     testComponents('Navbar renders brand, text links, icon links and ThemeToggle', (tester) async {
@@ -69,7 +67,7 @@ void main() {
 
       // Navigation & Branding — shares the same Navbar as every other page
       expect(find.text(' keyed_form'), findsOneComponent);
-      expect(find.text('Docs'), findsOneComponent);
+      expect(find.text('Docs'), findsComponents); // navbar + footer column
 
       // Section titles
       expect(find.text('Overview & The Problem with Traditional Forms'), findsOneComponent);
@@ -152,6 +150,19 @@ void main() {
       ]) {
         expect(find.text(api), findsOneComponent);
       }
+    });
+
+    testComponents('Footer has three link columns and both Jaspr badge variants', (tester) async {
+      tester.pumpComponent(const Footer());
+
+      for (final title in ['Project', 'Docs', 'Resources']) {
+        expect(find.text(title), findsOneComponent);
+      }
+      for (final link in ['Changelog', 'Issues', 'API reference', 'Quickstart', 'Playground']) {
+        expect(find.text(link), findsOneComponent);
+      }
+      expect(find.byType(JasprBadge), findsNComponents(2));
+      expect(find.textContaining('v0.'), findsNothing);
     });
 
     testComponents('HeroSection renders headline, command bar and CTAs', (tester) async {

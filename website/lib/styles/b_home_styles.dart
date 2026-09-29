@@ -239,6 +239,18 @@ List<StyleRule> get homeStyles => [
     radius: BorderRadius.circular(3.px),
   ),
 
+  // Closing call to action (landing only).
+  css('.closing-cta').styles(
+    textAlign: TextAlign.center,
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    alignItems: AlignItems.center,
+  ),
+  css('.closing-cta .section-lede').styles(
+    margin: .only(left: .auto, right: .auto),
+  ),
+  css('.closing-cta .cta-group').styles(justifyContent: JustifyContent.center),
+
   // Performance: the flat-rebuilds chart beside one latency figure.
   css('.perf-grid').styles(
     display: Display.grid,

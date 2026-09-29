@@ -321,12 +321,16 @@ List<StyleRule> get responsiveStyles => [
       margin: .only(top: 50.px),
       padding: .only(top: 40.px, bottom: 48.px),
     ),
+    // Brand across the top, then the three link columns two-up.
+    css('.footer-grid').styles(
+      raw: {'grid-template-columns': 'repeat(2, minmax(0, 1fr))'},
+    ),
+    css('.footer-brand').styles(raw: {'grid-column': '1 / -1'}),
     css('.footer-bottom').styles(
       margin: .only(top: 28.px),
       flexDirection: FlexDirection.column,
       alignItems: AlignItems.start,
       gap: Gap(row: 14.px),
-      fontSize: 0.78.rem,
     ),
   ]),
 ];
