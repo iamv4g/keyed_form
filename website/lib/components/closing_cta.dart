@@ -22,7 +22,7 @@ class ClosingCta extends StatelessComponent {
         const CopyButton(text: _installCommand),
       ]),
       div(classes: 'cta-group mono', [
-        a(href: '$siteBasePath/docs#quickstart', classes: 'btn btn-cyan', [.text('Build your first form →')]),
+        a(href: '$siteBasePath/docs/quickstart', classes: 'btn btn-cyan', [.text('Build your first form →')]),
         a(
           href: 'https://github.com/iamv4g/keyed_form',
           target: Target.blank,

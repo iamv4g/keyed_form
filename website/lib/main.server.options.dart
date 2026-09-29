@@ -15,15 +15,12 @@ import 'package:website/components/docs/docs_menu_backdrop.dart'
 import 'package:website/components/docs/docs_menu_toggle.dart'
     as _docs_menu_toggle;
 import 'package:website/components/docs/docs_search.dart' as _docs_search;
-import 'package:website/components/docs/docs_sidebar.dart' as _docs_sidebar;
-import 'package:website/components/docs/docs_toc.dart' as _docs_toc;
 import 'package:website/components/playground/playground_demo.dart'
     as _playground_demo;
 import 'package:website/components/copy_button.dart' as _copy_button;
 import 'package:website/components/theme_toggle.dart' as _theme_toggle;
 import 'package:website/styles/a_shared_styles.dart' as _a_shared_styles;
 import 'package:website/styles/b_home_styles.dart' as _b_home_styles;
-import 'package:website/styles/c_docs_styles.dart' as _c_docs_styles;
 import 'package:website/styles/d_responsive_styles.dart'
     as _d_responsive_styles;
 import 'package:website/styles/e_playground_styles.dart'
@@ -73,10 +70,6 @@ ServerOptions get defaultServerOptions => ServerOptions(
       'docs_search',
       params: __docs_searchDocsSearch,
     ),
-    _docs_sidebar.DocsSidebar: ClientTarget<_docs_sidebar.DocsSidebar>(
-      'docs_sidebar',
-    ),
-    _docs_toc.DocsToc: ClientTarget<_docs_toc.DocsToc>('docs_toc'),
     _playground_demo.PlaygroundDemo:
         ClientTarget<_playground_demo.PlaygroundDemo>('playground_demo'),
     _theme_toggle.ThemeToggle: ClientTarget<_theme_toggle.ThemeToggle>(
@@ -86,7 +79,6 @@ ServerOptions get defaultServerOptions => ServerOptions(
   styles: () => [
     ..._a_shared_styles.sharedStyles,
     ..._b_home_styles.homeStyles,
-    ..._c_docs_styles.docsStyles,
     ..._d_responsive_styles.responsiveStyles,
     ..._e_playground_styles.playgroundStyles,
     ..._f_code_styles.codeStyles,

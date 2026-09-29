@@ -16,7 +16,6 @@ import 'package:website/components/lists_section.dart';
 import 'package:website/components/model_section.dart';
 import 'package:website/components/telemetry_section.dart';
 import 'package:website/components/navbar.dart';
-import 'package:website/pages/docs_page.dart';
 import 'package:website/docs_content/docs_nav.dart';
 import 'package:website/docs_content/search_index.dart';
 import 'package:website/example_sources.dart';
@@ -63,30 +62,6 @@ void main() {
       expect(find.text('pub.dev ↗'), findsNothing);
       expect(find.text('GitHub ↗'), findsNothing);
       expect(find.tag('button'), findsOneComponent);
-    });
-
-    testComponents('DocsPage renders 6 developer chapters and reassurance callout', (
-      tester,
-    ) async {
-      tester.pumpComponent(const DocsPage());
-
-      // Navigation & Branding — shares the same Navbar as every other page
-      expect(find.text(' keyed_form'), findsOneComponent);
-      expect(find.text('Docs'), findsComponents); // navbar + footer column
-
-      // Section titles
-      expect(find.text('Overview & The Problem with Traditional Forms'), findsOneComponent);
-      expect(find.text('Thinking in Keyed Optics'), findsComponents);
-      expect(find.text('Quickstart in 5 Minutes'), findsOneComponent);
-      expect(find.text('Form Controller & State Lifecycle'), findsOneComponent);
-      expect(find.text('Lazy Scroll, Virtualization & State Preservation'), findsOneComponent);
-      expect(find.text('Real-World Production Recipes'), findsOneComponent);
-      expect(find.text('Testing Without Widgets: Pure Dart in < 2ms'), findsOneComponent);
-      expect(find.text('API Reference'), findsComponents);
-      expect(find.text('Capability Matrix'), findsComponents);
-
-      // Reassurance Callout
-      expect(find.textContaining("Don't Worry About Optics / Lenses!"), findsOneComponent);
     });
 
     testComponents('ModelSection shows the three login files, the demo and the points', (tester) async {
@@ -296,6 +271,12 @@ void main() {
   });
 
   group('Static Site Output Verification', () {
+    test('build/jaspr contains generated Markdown docs routes', () {
+      expect(File('build/jaspr/docs/index.html').existsSync(), isTrue);
+      expect(File('build/jaspr/docs/quickstart/index.html').existsSync(), isTrue);
+      expect(File('build/jaspr/docs/benchmarks/index.html').existsSync(), isTrue);
+    });
+
     test('build/jaspr contains valid production static assets', () {
       final htmlFile = File('build/jaspr/index.html');
       expect(htmlFile.existsSync(), isTrue);

@@ -5,12 +5,28 @@ import 'theme_tokens.dart';
 /// Markdown docs pages (`content/docs/`): one idea per page, plain type.
 @css
 List<StyleRule> get markdownStyles => [
+  css('.docs-container').styles(
+    maxWidth: 1440.px,
+    margin: .symmetric(horizontal: .auto),
+    padding: .symmetric(horizontal: 24.px),
+  ),
   // Sidebar | content | on-this-page; the header is ~100px tall.
   css('.md-layout').styles(
     display: Display.grid,
     gap: Gap(column: 36.px),
     padding: .only(top: 32.px, bottom: 64.px),
     raw: {'grid-template-columns': '240px minmax(0, 1fr) 210px'},
+  ),
+  css('.docs-toc').styles(
+    position: Position.sticky(top: 116.px),
+    height: Unit.expression('calc(100vh - 128px)'),
+    overflow: Overflow.only(y: Overflow.auto),
+  ),
+  css('.docs-toc-header').styles(
+    margin: .only(bottom: 8.px),
+    fontSize: 0.72.rem,
+    fontWeight: FontWeight.w600,
+    color: AppColors.inkMuted,
   ),
   css('.md-sidebar').styles(fontSize: 0.92.rem),
   css('.md-sidebar-panel').styles(

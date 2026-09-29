@@ -80,7 +80,7 @@ class ListsSection extends StatelessComponent {
           ]),
         ]),
       ]),
-      a(classes: 'section-link mono', href: '$siteBasePath/docs#virtualization', [
+      a(classes: 'section-link mono', href: '$siteBasePath/docs/long-lists', [
         .text('Lists, virtualization & scroll-to-error →'),
       ]),
     ]);
