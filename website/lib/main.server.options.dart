@@ -23,6 +23,7 @@ import 'package:website/styles/d_responsive_styles.dart'
     as _d_responsive_styles;
 import 'package:website/styles/e_playground_styles.dart'
     as _e_playground_styles;
+import 'package:website/styles/f_code_styles.dart' as _f_code_styles;
 
 /// Default [ServerOptions] for use with your Jaspr project.
 ///
@@ -70,6 +71,7 @@ ServerOptions get defaultServerOptions => ServerOptions(
     ..._c_docs_styles.docsStyles,
     ..._d_responsive_styles.responsiveStyles,
     ..._e_playground_styles.playgroundStyles,
+    ..._f_code_styles.codeStyles,
   ],
 );
 

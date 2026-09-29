@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:jaspr_test/jaspr_test.dart';
+import 'package:website/code/code_tabs.dart';
+import 'package:website/code/highlight.dart';
 import 'package:website/components/code_section.dart';
 import 'package:website/components/demo/hero_login_demo.dart';
 import 'package:website/components/hero_section.dart';
@@ -9,6 +11,8 @@ import 'package:website/pages/docs_page.dart';
 import 'package:website/pages/landing_page.dart';
 
 void main() {
+  setUpAll(initHighlighter);
+
   group('Website Component Tests', () {
     testComponents('renders full App with all landing page sections', (
       tester,
@@ -133,6 +137,37 @@ void main() {
       expect(find.text('Email'), findsOneComponent);
       expect(find.text('Password'), findsOneComponent);
       expect(find.text('rebuilds: 0'), findsNComponents(2));
+    });
+  });
+
+  group('Code highlighting', () {
+    test('tokens are classed by their innermost TextMate scope', () {
+      expect(tokenClassFor(['storage.modifier.dart']), 'tk-keyword');
+      expect(tokenClassFor(['meta.declaration.dart', 'keyword.other.import.dart']), 'tk-keyword');
+      expect(tokenClassFor(['string.interpolated.single.dart']), 'tk-string');
+      expect(tokenClassFor(['comment.line.double-slash.dart']), 'tk-comment');
+      expect(tokenClassFor(['support.class.dart']), 'tk-type');
+      expect(tokenClassFor(['storage.type.annotation.dart']), 'tk-annotation');
+      expect(tokenClassFor(['keyword.operator.assignment.dart']), isNull);
+      expect(tokenClassFor([]), isNull);
+    });
+
+    test('highlightDart splits code into tokens', () {
+      expect(highlightDart("final name = 'Ann';").length, greaterThan(3));
+    });
+
+    testComponents('CodeTabs renders one radio + label + panel per tab, first checked', (tester) async {
+      tester.pumpComponent(
+        const CodeTabs(
+          id: 'demo',
+          tabs: [CodeTab('a.dart', 'class A {}'), CodeTab('b.dart', 'class B {}')],
+        ),
+      );
+
+      expect(find.text('a.dart'), findsOneComponent);
+      expect(find.text('b.dart'), findsOneComponent);
+      expect(find.tag('input'), findsNComponents(2));
+      expect(find.text('COPY'), findsNComponents(2));
     });
   });
 

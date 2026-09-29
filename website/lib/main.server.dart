@@ -9,9 +9,12 @@ import 'package:jaspr/server.dart';
 
 import 'app.dart';
 import 'base_path.dart';
+import 'code/highlight.dart';
 import 'main.server.options.dart';
 
-void main() {
+Future<void> main() async {
+  await initHighlighter();
+
   Jaspr.initializeApp(
     options: defaultServerOptions,
   );
