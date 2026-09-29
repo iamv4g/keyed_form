@@ -14,6 +14,9 @@ class DocsEntry {
 /// Sidebar order, eyebrows and Prev/Next all come from this list; a test
 /// keeps it in step with the files under `content/docs/`.
 const docsPages = <DocsEntry>[
+  DocsEntry('Getting started', 'Introduction', 'introduction'),
   DocsEntry('Getting started', 'Installation', 'installation'),
+  DocsEntry('Getting started', 'Quickstart', 'quickstart'),
+  DocsEntry('Getting started', 'How it works', 'how-it-works'),
   DocsEntry('Lists & scrolling', 'Dynamic lists', 'dynamic-lists'),
 ];
