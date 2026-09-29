@@ -221,15 +221,15 @@ void dispose() {
       ]),
 
       const DocsCodeBlock(
-        title: 'lib/login/login_screen.dart',
+        title: 'lib/email_check/email_check_screen.dart',
         language: 'dart',
         rawSnippet: '''// 1. Async validation over the network, with a timeout
-KeyedFormField.text<LoginSchema>(
-  field: LoginFields.email,
+KeyedFormField.text<EmailCheckSchema>(
+  field: EmailCheckFields.email,
   builder: (context, f, controller) {
     void checkEmail() {
       f.onBlur();
-      form.field(LoginFields.email).validateAsync(
+      form.field(EmailCheckFields.email).validateAsync(
         () => api.checkEmailTaken(f.value ?? ''),
         timeout: const Duration(seconds: 5),
       );
@@ -258,7 +258,7 @@ form.setServerErrorPaths({
 });''',
         code: Component.fragment([
           span(classes: 'syntax-comment', [.text('// Async validation with validateAsync\n')]),
-          .text('form.field(LoginFields.email).'),
+          .text('form.field(EmailCheckFields.email).'),
           span(classes: 'syntax-fn', [.text('validateAsync')]),
           .text('(\n  () => api.checkEmailTaken(f.value ?? '),
           span(classes: 'syntax-str', [.text("''")]),
