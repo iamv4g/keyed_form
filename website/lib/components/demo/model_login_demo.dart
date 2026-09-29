@@ -71,15 +71,14 @@ class _ModelLoginDemoState extends State<ModelLoginDemo> {
           showRebuilds: false,
           builder: (value, onChange, onBlur) => _input(InputType.password, value, onChange, onBlur),
         ),
-        div(classes: 'model-demo-actions', [
+        div(classes: 'demo-actions', [
           button(
             type: ButtonType.button,
             classes: 'btn btn-cyan mono',
             onClick: _submit,
             [.text('Sign in')],
           ),
-          if (_signedInAs != null)
-            span(classes: 'model-demo-status mono', [.text('✓ valid — would sign in $_signedInAs')]),
+          if (_signedInAs != null) span(classes: 'demo-status mono', [.text('✓ valid — would sign in $_signedInAs')]),
         ]),
       ]),
       ObserverPanel<LoginSchema>(

@@ -22,6 +22,7 @@ class _HeroLoginDemoState extends State<HeroLoginDemo> {
   );
 
   int _notifications = 0;
+  String? _signedInAs;
 
   @override
   void initState() {
@@ -32,6 +33,15 @@ class _HeroLoginDemoState extends State<HeroLoginDemo> {
   void _onFormChange() {
     _notifications++;
     if (mounted) setState(() {});
+  }
+
+  void _edited(String value, ValueChanged<String> onChange) {
+    if (_signedInAs != null) setState(() => _signedInAs = null);
+    onChange(value);
+  }
+
+  Future<void> _submit() async {
+    await form.submit((value) => setState(() => _signedInAs = value.email));
   }
 
   @override
@@ -54,7 +64,7 @@ class _HeroLoginDemoState extends State<HeroLoginDemo> {
           classes: 'playground-input',
           attributes: {'autocomplete': 'off', 'placeholder': 'you@example.com'},
           value: value ?? '',
-          onInput: onChange,
+          onInput: (v) => _edited(v, onChange),
           events: {'blur': (_) => onBlur()},
         ),
       ),
@@ -67,10 +77,14 @@ class _HeroLoginDemoState extends State<HeroLoginDemo> {
           classes: 'playground-input',
           attributes: {'autocomplete': 'off'},
           value: value ?? '',
-          onInput: onChange,
+          onInput: (v) => _edited(v, onChange),
           events: {'blur': (_) => onBlur()},
         ),
       ),
+      div(classes: 'demo-actions', [
+        button(type: ButtonType.button, classes: 'btn btn-cyan mono', onClick: _submit, [.text('Sign in')]),
+        if (_signedInAs != null) span(classes: 'demo-status mono', [.text('✓ valid — would sign in $_signedInAs')]),
+      ]),
       div(classes: 'hero-demo-footer mono', [
         span([
           .text('Controller notified '),

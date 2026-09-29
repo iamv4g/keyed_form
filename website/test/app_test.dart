@@ -206,6 +206,7 @@ void main() {
       expect(find.text('Email'), findsOneComponent);
       expect(find.text('Password'), findsOneComponent);
       expect(find.text('rebuilds: 0'), findsNComponents(2));
+      expect(find.text('Sign in'), findsOneComponent);
     });
   });
 

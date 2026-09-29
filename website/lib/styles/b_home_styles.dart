@@ -165,9 +165,7 @@ List<StyleRule> get homeStyles => [
     padding: .all(24.px),
     radius: BorderRadius.circular(4.px),
   ),
-  css('.hero-demo .playground-field:last-of-type').styles(
-    margin: .only(bottom: 8.px),
-  ),
+  css('.hero-demo .demo-actions').styles(margin: .only(bottom: 16.px)),
   css('.hero-demo-footer').styles(
     display: Display.flex,
     flexWrap: FlexWrap.wrap,
@@ -368,14 +366,14 @@ List<StyleRule> get homeStyles => [
     padding: .all(22.px),
     radius: BorderRadius.circular(4.px),
   ),
-  css('.model-demo-actions').styles(
+  css('.demo-actions').styles(
     display: Display.flex,
     flexWrap: FlexWrap.wrap,
     alignItems: AlignItems.center,
     gap: Gap(column: 14.px, row: 10.px),
   ),
-  css('.model-demo-actions .btn').styles(cursor: Cursor.pointer),
-  css('.model-demo-status').styles(
+  css('.demo-actions .btn').styles(cursor: Cursor.pointer),
+  css('.demo-status').styles(
     fontSize: 0.78.rem,
     color: AppColors.green,
   ),
