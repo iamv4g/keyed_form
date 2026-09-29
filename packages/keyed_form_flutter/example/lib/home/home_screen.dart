@@ -29,7 +29,7 @@ final _demos = <_Demo>[
   ),
   _Demo(
     'Packing list',
-    'A dynamic list bound with KeyedFieldList directly.',
+    'A dynamic list bound with KeyedFieldList, reordered by drag and drop.',
     (_) => const PackingListScreen(),
   ),
   _Demo(
