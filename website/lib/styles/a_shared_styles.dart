@@ -210,6 +210,7 @@ List<StyleRule> get sharedStyles => [
   css('.section-title').styles(
     fontSize: 2.1.rem,
     fontWeight: FontWeight.w700,
+    lineHeight: 1.2.em,
     letterSpacing: (-0.02).em,
     margin: .only(top: 8.px),
   ),
