@@ -3,7 +3,7 @@ import 'package:jaspr/jaspr.dart';
 
 import '../base_path.dart';
 import '../code/code_tabs.dart';
-import '../code/snippets/packing_snippets.dart';
+import '../example_sources.dart';
 import 'demo/packing_demo.dart';
 
 class ListsSection extends StatelessComponent {
@@ -24,22 +24,20 @@ class ListsSection extends StatelessComponent {
         div(classes: 'split-code', [
           CodeTabs(
             id: 'lists-code',
-            tabs: const [
-              CodeTab('packing_schema.dart', PackingSnippets.schema),
-              CodeTab('packing_list.dart', PackingSnippets.list),
-              CodeTab('packing_row.dart', PackingSnippets.row),
+            tabs: [
+              for (final path in ExampleFiles.packing) CodeTab(path.split('/').last, ExampleSources.of(context, path)),
             ],
             caption: Component.fragment([
-              .text('Adapted for the page. '),
+              .text('The example app\'s own files. '),
               a(
                 href:
                     'https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter/example/lib/packing_list',
                 target: Target.blank,
                 [
-                  strong([.text('Full example')]),
+                  strong([.text('Run the example')]),
                 ],
               ),
-              .text(' — insert-after, check-off and move buttons ↗'),
+              .text(' ↗'),
             ]),
           ),
         ]),

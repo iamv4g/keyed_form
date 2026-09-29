@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:jaspr/jaspr.dart' show JasprBadge;
 import 'package:jaspr_test/jaspr_test.dart';
 import 'package:website/code/code_tabs.dart';
+import 'package:website/build_inputs.dart';
 import 'package:website/code/highlight.dart';
 import 'package:website/components/agent_skill_section.dart';
 import 'package:website/components/demo/hero_login_demo.dart';
@@ -15,6 +16,7 @@ import 'package:website/components/model_section.dart';
 import 'package:website/components/telemetry_section.dart';
 import 'package:website/components/navbar.dart';
 import 'package:website/pages/docs_page.dart';
+import 'package:website/example_sources.dart';
 import 'package:website/pages/landing_page.dart';
 import 'package:website/package_versions.dart';
 
@@ -25,7 +27,7 @@ void main() {
     testComponents('renders full App with all landing page sections', (
       tester,
     ) async {
-      tester.pumpComponent(const LandingPage());
+      tester.pumpComponent(ExampleSources(files: readExampleSources(), child: const LandingPage()));
 
       // Brand & Navigation
       expect(find.textContaining('keyed_form'), findsComponents);
@@ -112,7 +114,7 @@ void main() {
     });
 
     testComponents('ListsSection shows the packing files, the demo rows and the dnd_kit credit', (tester) async {
-      tester.pumpComponent(const ListsSection());
+      tester.pumpComponent(ExampleSources(files: readExampleSources(), child: const ListsSection()));
 
       expect(find.text('// DYNAMIC LISTS'), findsOneComponent);
       for (final file in ['packing_schema.dart', 'packing_list.dart', 'packing_row.dart']) {
@@ -235,6 +237,16 @@ void main() {
       expect(find.text('b.dart'), findsOneComponent);
       expect(find.tag('input'), findsNComponents(2));
       expect(find.text('COPY'), findsNComponents(2));
+    });
+  });
+
+  group('Example sources', () {
+    test('the landing list demo schema matches the Flutter example schema', () {
+      String rules(String source) => source.substring(source.indexOf('final _packingSchema'));
+      expect(
+        rules(File('lib/demos/packing_schema.dart').readAsStringSync()),
+        rules(File('$exampleLibDir/${ExampleFiles.packingSchema}').readAsStringSync()),
+      );
     });
   });
 

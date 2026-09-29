@@ -4,14 +4,14 @@
 /// To run code on the client, check the `main.client.dart` file.
 library;
 
-import 'dart:io';
-
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 
 import 'app.dart';
 import 'base_path.dart';
+import 'build_inputs.dart';
 import 'code/highlight.dart';
+import 'example_sources.dart';
 import 'main.server.options.dart';
 import 'package_versions.dart';
 
@@ -59,25 +59,10 @@ Future<void> main() async {
               "try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}",
         ),
       ],
-      body: PackageVersions(versions: _readPackageVersions(), child: const App()),
+      body: PackageVersions(
+        versions: readPackageVersions(),
+        child: ExampleSources(files: readExampleSources(), child: const App()),
+      ),
     ),
   );
-}
-
-/// `name → version` from `../packages/*/pubspec.yaml` (builds run in `website/`).
-Map<String, String> _readPackageVersions() {
-  final packages = Directory('../packages');
-  if (!packages.existsSync()) return const {};
-  final name = RegExp(r'^name:\s*(\S+)', multiLine: true);
-  final version = RegExp(r'^version:\s*(\S+)', multiLine: true);
-  final versions = <String, String>{};
-  for (final dir in packages.listSync().whereType<Directory>()) {
-    final pubspec = File('${dir.path}/pubspec.yaml');
-    if (!pubspec.existsSync()) continue;
-    final text = pubspec.readAsStringSync();
-    final n = name.firstMatch(text)?.group(1);
-    final v = version.firstMatch(text)?.group(1);
-    if (n != null && v != null) versions[n] = v;
-  }
-  return versions;
 }
