@@ -88,7 +88,13 @@ Future<void> main() async {
               configResolver: PageConfig.all(
                 parsers: [MarkdownParser()],
                 extensions: [TableOfContentsExtension(maxHeaderDepth: 2)],
-                components: [const KfCodeBlock(), const ExampleCode(), const PackingDemoTag(), const Note()],
+                components: [
+                  const KfCodeBlock(),
+                  const ExampleCode(),
+                  const PackingDemoTag(),
+                  const PackageTopologyTag(),
+                  const Note(),
+                ],
                 layouts: [const KfDocsLayout()],
                 theme: ContentTheme.none(),
               ),

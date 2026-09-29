@@ -18,5 +18,11 @@ const docsPages = <DocsEntry>[
   DocsEntry('Getting started', 'Installation', 'installation'),
   DocsEntry('Getting started', 'Quickstart', 'quickstart'),
   DocsEntry('Getting started', 'How it works', 'how-it-works'),
+  DocsEntry('Core concepts', 'Packages', 'packages'),
+  DocsEntry('Core concepts', 'Controller', 'controller'),
+  DocsEntry('Core concepts', 'Field handles', 'field-handles'),
+  DocsEntry('Core concepts', 'Validation', 'validation'),
+  DocsEntry('Core concepts', 'Async validation', 'async-validation'),
+  DocsEntry('Core concepts', 'Relations', 'relations'),
   DocsEntry('Lists & scrolling', 'Dynamic lists', 'dynamic-lists'),
 ];

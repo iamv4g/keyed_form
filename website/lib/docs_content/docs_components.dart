@@ -5,6 +5,7 @@ import 'package:jaspr_content/jaspr_content.dart';
 import '../code/code_tabs.dart';
 import '../code/highlight.dart';
 import '../components/demo/packing_demo.dart';
+import '../components/docs/package_topology.dart';
 import '../example_sources.dart';
 
 /// Fenced code blocks, highlighted with the site's own tk-* classes.
@@ -53,6 +54,17 @@ class PackingDemoTag extends CustomComponentBase {
 
   @override
   Component apply(String name, Map<String, String> attributes, Component? child) => const PackingDemo();
+}
+
+/// `<PackageTopology />`: package layers with versions loaded at build time.
+class PackageTopologyTag extends CustomComponentBase {
+  const PackageTopologyTag();
+
+  @override
+  Pattern get pattern => 'PackageTopology';
+
+  @override
+  Component apply(String name, Map<String, String> attributes, Component? child) => const PackageTopology();
 }
 
 /// `<Note>…</Note>`: the one callout style docs use.
