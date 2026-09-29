@@ -2,31 +2,31 @@
   <title id="title">keyed_form — KF ribbon monogram</title>
   <defs>
     <linearGradient id="stem" x1="15" y1="20" x2="33" y2="84" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#00f0ff"/>
-      <stop offset=".5" stop-color="#00cbdc"/>
-      <stop offset="1" stop-color="#007baa"/>
+      <stop stop-color="#008799"/>
+      <stop offset=".5" stop-color="#0096a7"/>
+      <stop offset="1" stop-color="#005b7c"/>
     </linearGradient>
     <linearGradient id="leg" x1="35" y1="48" x2="76" y2="84" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#007397"/>
-      <stop offset=".27" stop-color="#00bbd2"/>
-      <stop offset=".72" stop-color="#00e5eb"/>
-      <stop offset="1" stop-color="#00f0ed"/>
+      <stop stop-color="#005572"/>
+      <stop offset=".27" stop-color="#008ba3"/>
+      <stop offset=".72" stop-color="#009cab"/>
+      <stop offset="1" stop-color="#00a8af"/>
     </linearGradient>
     <linearGradient id="amber" x1="52" y1="34" x2="79" y2="12" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#ff8a20"/>
-      <stop offset=".48" stop-color="#ffb020"/>
-      <stop offset="1" stop-color="#ffe451"/>
+      <stop stop-color="#b9610d"/>
+      <stop offset=".48" stop-color="#c97200"/>
+      <stop offset="1" stop-color="#e7ac26"/>
     </linearGradient>
     <linearGradient id="ribbon" x1="32" y1="56" x2="61" y2="13" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#008cba"/>
-      <stop offset=".44" stop-color="#00ddd9"/>
-      <stop offset=".72" stop-color="#8ce8aa"/>
-      <stop offset="1" stop-color="#ffe56b"/>
+      <stop stop-color="#006b8c"/>
+      <stop offset=".44" stop-color="#00a79f"/>
+      <stop offset=".72" stop-color="#8fc683"/>
+      <stop offset="1" stop-color="#ecc95d"/>
     </linearGradient>
     <linearGradient id="middle" x1="54" y1="56" x2="77" y2="41" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#ff9225"/>
-      <stop offset=".55" stop-color="#ffb020"/>
-      <stop offset="1" stop-color="#ffdb46"/>
+      <stop stop-color="#b96714"/>
+      <stop offset=".55" stop-color="#c97200"/>
+      <stop offset="1" stop-color="#dfa322"/>
     </linearGradient>
   </defs>
   <path d="M40 42 80 78C84 82 82 85 77 85H64C60 85 58 84 55 81L30 57Z" fill="url(#leg)"/>

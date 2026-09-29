@@ -40,8 +40,20 @@ Future<void> main() async {
       head: [
         link(
           rel: 'icon',
-          href:
-              "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300F0FF' stroke-width='2'><circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='3' fill='%2300F0FF'/><line x1='12' y1='2' x2='12' y2='4'/><line x1='12' y1='20' x2='12' y2='22'/><line x1='2' y1='12' x2='4' y2='12'/><line x1='20' y1='12' x2='22' y2='12'/></svg>",
+          href: '$siteBasePath/favicon.ico',
+          type: 'image/x-icon',
+          attributes: {'sizes': '16x16 32x32 48x48'},
+        ),
+        link(
+          rel: 'icon',
+          href: '$siteBasePath/favicon.svg',
+          type: 'image/svg+xml',
+          attributes: {'sizes': 'any'},
+        ),
+        link(
+          rel: 'apple-touch-icon',
+          href: '$siteBasePath/apple-touch-icon.png',
+          attributes: {'sizes': '180x180'},
         ),
         link(rel: 'preconnect', href: 'https://fonts.googleapis.com'),
         link(

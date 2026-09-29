@@ -2,6 +2,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../base_path.dart';
+import 'brand_mark.dart';
 
 const _repo = 'https://github.com/iamv4g/keyed_form';
 
@@ -14,7 +15,7 @@ class Footer extends StatelessComponent {
       div(classes: 'wrap', [
         div(classes: 'footer-grid', [
           div(classes: 'footer-brand', [
-            a(classes: 'brand display', href: '$siteBasePath/', [.text('keyed_form')]),
+            a(classes: 'brand display', href: '$siteBasePath/', [const BrandMark(), .text('keyed_form')]),
             p([.text('Typed Flutter forms, one rebuild per keystroke.')]),
           ]),
           _column('Project', [

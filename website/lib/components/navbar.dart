@@ -2,6 +2,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../base_path.dart';
+import 'brand_mark.dart';
 import 'docs/docs_menu_toggle.dart';
 import 'icons.dart';
 import 'theme_toggle.dart';
@@ -21,24 +22,7 @@ class Navbar extends StatelessComponent {
         div(classes: 'nav-start', [
           if (showDocsMenuToggle) const DocsMenuToggle(),
           a(classes: 'brand display', href: '$siteBasePath/', [
-            svg(
-              viewBox: '0 0 24 24',
-              attributes: {
-                'width': '22',
-                'height': '22',
-                'fill': 'none',
-                'stroke': 'var(--cyan)',
-                'stroke-width': '2',
-              },
-              [
-                circle(cx: '12', cy: '12', r: '8', []),
-                circle(cx: '12', cy: '12', r: '3', attributes: {'fill': 'var(--cyan)'}, []),
-                line(x1: '12', y1: '2', x2: '12', y2: '4', []),
-                line(x1: '12', y1: '20', x2: '12', y2: '22', []),
-                line(x1: '2', y1: '12', x2: '4', y2: '12', []),
-                line(x1: '20', y1: '12', x2: '22', y2: '12', []),
-              ],
-            ),
+            const BrandMark(),
             .text(' keyed_form'),
           ]),
         ]),
