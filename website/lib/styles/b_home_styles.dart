@@ -252,70 +252,50 @@ List<StyleRule> get homeStyles => [
     ),
   ),
 
-  // Benchmark HUD & Charts
-  css('.hud-stats').styles(
+  // Performance: the flat-rebuilds chart beside one latency figure.
+  css('.perf-grid').styles(
     display: Display.grid,
     gap: Gap(row: 16.px, column: 16.px),
     margin: .only(top: 32.px),
-    gridTemplate: GridTemplate(
-      columns: GridTracks([
-        GridTrack.repeat(
-          TrackRepeat.autoFit,
-          [GridTrack(TrackSize.minmax(TrackSize(280.px), TrackSize.fr(1)))],
-        ),
-      ]),
-    ),
+    raw: {'grid-template-columns': 'minmax(0, 1.5fr) minmax(0, 1fr)'},
   ),
   css('.stat-tile').styles(
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    justifyContent: JustifyContent.center,
     padding: .symmetric(vertical: 22.px, horizontal: 24.px),
     radius: BorderRadius.circular(4.px),
     backgroundColor: AppColors.surface,
     border: Border.all(color: AppColors.border, width: 1.px),
   ),
-
   css('.stat-big').styles(
     fontSize: 2.5.rem,
     fontWeight: FontWeight.w700,
     color: AppColors.cyan,
     lineHeight: 1.0.em,
   ),
-  css('.stat-bad').styles(
-    color: AppColors.red,
-    fontSize: 1.5.rem,
-    margin: .only(left: 6.px),
-  ),
   css('.stat-desc').styles(
     margin: .only(top: 10.px),
-    fontSize: 0.84.rem,
-    lineHeight: 1.45.em,
+    fontSize: 0.9.rem,
+    lineHeight: 1.5.em,
     color: AppColors.inkMuted,
   ),
-
-  css('.chart-panel').styles(
-    margin: .only(top: 28.px),
-    radius: BorderRadius.circular(4.px),
-    padding: .all(24.px),
-    overflow: Overflow.only(x: Overflow.auto),
-    backgroundColor: AppColors.surface,
-    border: Border.all(color: AppColors.border, width: 1.px),
-  ),
-
-  css('.chart-title').styles(
-    fontSize: 0.88.rem,
-    margin: .only(bottom: 16.px),
-    color: AppColors.inkMuted,
-  ),
-  css('.chart-title b').styles(color: AppColors.ink),
-
-  css('.chart-panel svg').styles(
+  css('.stat-desc strong').styles(color: AppColors.ink),
+  css('.perf-chart').styles(
     display: Display.block,
-    maxWidth: 530.px,
     width: 100.percent,
+    maxWidth: 420.px,
     height: Unit.auto,
-    margin: .only(right: .auto),
   ),
-  css('.chart-panel text').styles(
+  css('.perf-bar').styles(raw: {'fill': 'var(--cyan)', 'opacity': '0.85'}),
+  css('.perf-axis').styles(raw: {'stroke': 'var(--border-bright)', 'stroke-width': '1'}),
+  css('.perf-value').styles(
     fontFamily: const .list([FontFamily('JetBrains Mono'), FontFamilies.monospace]),
+    raw: {'fill': 'var(--ink)', 'font-size': '15px', 'font-weight': '700'},
+  ),
+  css('.perf-label').styles(
+    fontFamily: const .list([FontFamily('JetBrains Mono'), FontFamilies.monospace]),
+    raw: {'fill': 'var(--ink-muted)', 'font-size': '12px'},
   ),
 
   // Matrix

@@ -8,6 +8,7 @@ import 'package:website/components/demo/hero_login_demo.dart';
 import 'package:website/components/hero_section.dart';
 import 'package:website/components/lists_section.dart';
 import 'package:website/components/model_section.dart';
+import 'package:website/components/telemetry_section.dart';
 import 'package:website/components/navbar.dart';
 import 'package:website/pages/docs_page.dart';
 import 'package:website/pages/landing_page.dart';
@@ -28,7 +29,7 @@ void main() {
 
       // Section Kickers
       expect(find.text('// ARCHITECTURAL INVARIANTS'), findsOneComponent);
-      expect(find.text('// MEASURED TELEMETRY'), findsOneComponent);
+      expect(find.text('// MEASURED'), findsOneComponent);
       expect(find.text('// CAPABILITY MATRIX'), findsOneComponent);
       expect(find.text('// THE MODEL'), findsOneComponent);
       expect(find.text('// AGENT SKILL'), findsOneComponent);
@@ -120,6 +121,19 @@ void main() {
       expect(find.text('// ROWS — index · clientId · label'), findsOneComponent);
       expect(find.text('⠿'), findsNComponents(3));
       expect(find.text('dnd_kit'), findsOneComponent);
+    });
+
+    testComponents('TelemetrySection shows flat rebuilds without comparing against anything', (tester) async {
+      tester.pumpComponent(const TelemetrySection());
+
+      expect(find.text('// MEASURED'), findsOneComponent);
+      expect(find.text('44'), findsNComponents(4));
+      for (final size in [10, 50, 100, 250]) {
+        expect(find.text('$size fields'), findsOneComponent);
+      }
+      expect(find.text('~2 µs'), findsOneComponent);
+      expect(find.text('6,021'), findsNothing);
+      expect(find.text('0.00µs'), findsNothing);
     });
 
     testComponents('HeroSection renders headline, command bar and CTAs', (tester) async {

@@ -259,40 +259,16 @@ List<StyleRule> get responsiveStyles => [
       fontSize: 0.8.rem,
     ),
 
-    // HUD Mobile
-    css('.hud-stats').styles(
-      gap: Gap(row: 12.px),
+    // Performance Mobile
+    css('.perf-grid').styles(
       margin: .only(top: 20.px),
-      gridTemplate: GridTemplate(
-        columns: GridTracks([GridTrack(TrackSize.fr(1))]),
-      ),
+      raw: {'grid-template-columns': 'minmax(0, 1fr)'},
     ),
     css('.stat-tile').styles(
       padding: .symmetric(vertical: 18.px, horizontal: 16.px),
     ),
     css('.stat-big').styles(
       fontSize: 2.2.rem,
-    ),
-    css('.stat-desc').styles(
-      fontSize: 0.82.rem,
-    ),
-
-    // Chart Panel Mobile
-    css('.chart-panel').styles(
-      margin: .only(top: 20.px),
-      padding: .symmetric(vertical: 16.px, horizontal: 12.px),
-      width: 100.percent,
-      maxWidth: 100.percent,
-      boxSizing: BoxSizing.borderBox,
-      overflow: Overflow.only(x: Overflow.auto),
-      raw: {
-        '-webkit-overflow-scrolling': 'touch',
-      },
-    ),
-    css('.chart-panel svg').styles(
-      minWidth: 480.px,
-      width: 100.percent,
-      maxWidth: 100.percent,
     ),
 
     // Tables Mobile
