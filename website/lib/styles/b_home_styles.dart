@@ -102,46 +102,41 @@ List<StyleRule> get homeStyles => [
   ),
 
   // Hero Section
+  // Hero: copy on the left, the live login demo on the right.
   css('.hero').styles(
     position: Position.relative(),
+    display: Display.grid,
+    alignItems: AlignItems.center,
+    gap: Gap(column: 48.px, row: 32.px),
     padding: .only(top: 72.px, bottom: 56.px),
+    raw: {'grid-template-columns': 'minmax(0, 1.25fr) minmax(0, 1fr)'},
   ),
 
-  css('.telemetry-tag').styles(
-    display: Display.inlineFlex,
-    alignItems: AlignItems.center,
-    gap: Gap(column: 8.px),
-    padding: .symmetric(vertical: 4.px, horizontal: 12.px),
-    backgroundColor: AppColors.cyanGlow,
-    fontSize: 0.75.rem,
-    color: AppColors.cyan,
-    letterSpacing: 0.08.em,
-    textTransform: TextTransform.upperCase,
-    margin: .only(bottom: 24.px),
-    radius: BorderRadius.circular(2.px),
-    raw: {
-      'border': '1px solid color-mix(in srgb, var(--cyan) 35%, transparent)',
-    },
+  css('.hero-chips').styles(
+    display: Display.flex,
+    flexWrap: FlexWrap.wrap,
+    gap: Gap(column: 8.px, row: 8.px),
+    margin: .only(bottom: 22.px),
   ),
-  css('.telemetry-tag::before').styles(
-    content: '',
-    width: 6.px,
-    height: 6.px,
-    backgroundColor: AppColors.cyan,
-    radius: BorderRadius.circular(50.percent),
-    raw: {
-      'box-shadow': '0 0 8px var(--cyan)',
-    },
+  css('.chip').styles(
+    padding: .symmetric(vertical: 3.px, horizontal: 10.px),
+    fontSize: 0.72.rem,
+    letterSpacing: 0.04.em,
+    color: AppColors.inkMuted,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(999.px),
   ),
 
   css('.hero h1').styles(
     fontWeight: FontWeight.w700,
     lineHeight: 1.1.em,
     letterSpacing: (-0.03).em,
-    fontSize: 3.4.rem,
-    maxWidth: 820.px,
+    fontSize: 3.rem,
   ),
+  // The payoff beat always starts its own line, so "One" never strands
+  // at the end of the first line.
   css('.hero h1 .highlight').styles(
+    display: Display.block,
     color: AppColors.cyan,
     position: Position.relative(),
   ),
@@ -170,90 +165,30 @@ List<StyleRule> get homeStyles => [
     fontSize: 0.88.rem,
   ),
 
-  // Workbench & Raytracer
-  css('.workbench').styles(
-    margin: .only(top: 48.px),
+  css('.hero-demo').styles(
     padding: .all(24.px),
     radius: BorderRadius.circular(4.px),
   ),
-  css('.workbench-header').styles(
+  css('.hero-demo .playground-field:last-of-type').styles(
+    margin: .only(bottom: 8.px),
+  ),
+  css('.hero-demo-footer').styles(
     display: Display.flex,
+    flexWrap: FlexWrap.wrap,
     justifyContent: JustifyContent.spaceBetween,
-    alignItems: AlignItems.center,
-    margin: .only(bottom: 20.px),
-    padding: .only(bottom: 12.px),
+    gap: Gap(column: 12.px, row: 8.px),
+    padding: .only(top: 14.px),
+    fontSize: 0.74.rem,
+    color: AppColors.inkMuted,
     border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.border, width: 1.px),
+      top: BorderSide.solid(color: AppColors.border, width: 1.px),
     ),
   ),
-
-  css('.workbench-title').styles(
-    fontSize: 0.8.rem,
-    textTransform: TextTransform.upperCase,
-    letterSpacing: 0.1.em,
-    color: AppColors.inkMuted,
-  ),
-
-  css('.optics-canvas').styles(
-    width: 100.percent,
-    overflow: Overflow.only(x: Overflow.auto),
-  ),
-  css('.optics-canvas svg').styles(
-    display: Display.block,
-    margin: .symmetric(horizontal: .auto),
-    width: 100.percent,
-    maxWidth: 820.px,
-    height: Unit.auto,
-  ),
-  css('.node-btn').styles(
-    cursor: Cursor.pointer,
-    transition: const Transition('all', duration: Duration(milliseconds: 200)),
-  ),
-  css('.node-btn:hover circle, .node-btn.active circle, .node-btn:hover ellipse, .node-btn.active ellipse').styles(
-    raw: {
-      'stroke': 'var(--cyan)',
-      'stroke-width': '3px',
-      'filter': 'drop-shadow(0 0 8px var(--cyan))',
-    },
-  ),
-
-  css('.beam-status').styles(
-    margin: .only(top: 16.px),
-    padding: .symmetric(vertical: 12.px, horizontal: 16.px),
-    fontSize: 0.82.rem,
-    display: Display.flex,
-    alignItems: AlignItems.center,
-    justifyContent: JustifyContent.spaceBetween,
-    flexWrap: FlexWrap.wrap,
-    gap: Gap(row: 10.px, column: 10.px),
-    backgroundColor: AppColors.surfaceElevated,
-    border: Border.all(color: AppColors.border, width: 1.px),
-  ),
-
-  css('.workbench-subtitle').styles(
-    fontSize: 0.76.rem,
+  css('.hero-demo-footer a').styles(
     color: AppColors.cyan,
-  ),
-  css('.beam-label').styles(
-    fontSize: 0.82.rem,
-    color: AppColors.inkMuted,
-  ),
-  css('.beam-path').styles(
-    color: AppColors.cyan,
-    fontWeight: FontWeight.w600,
-    margin: .only(left: 8.px),
-  ),
-  css('.beam-type').styles(
-    color: AppColors.amber,
-    fontWeight: FontWeight.w600,
-    margin: .only(left: 8.px),
-  ),
-  css('.beam-verified').styles(
-    color: AppColors.green,
-    fontWeight: FontWeight.w600,
+    textDecoration: TextDecoration.none,
   ),
 
-  // Section (top/bottom padding for every home <section>)
   css('section').styles(
     padding: .only(top: 72.px, bottom: 56.px),
   ),

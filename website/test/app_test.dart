@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:jaspr_test/jaspr_test.dart';
 import 'package:website/components/code_section.dart';
+import 'package:website/components/demo/hero_login_demo.dart';
 import 'package:website/components/hero_section.dart';
 import 'package:website/components/navbar.dart';
-import 'package:website/components/optics_raytracer.dart';
 import 'package:website/pages/docs_page.dart';
 import 'package:website/pages/landing_page.dart';
 
@@ -21,7 +21,6 @@ void main() {
       expect(find.text('Playground'), findsOneComponent);
 
       // Section Kickers
-      expect(find.text('// LIVE RESOLUTION ENGINE'), findsOneComponent);
       expect(find.text('// ARCHITECTURAL INVARIANTS'), findsOneComponent);
       expect(find.text('// MEASURED TELEMETRY'), findsOneComponent);
       expect(find.text('// CAPABILITY MATRIX'), findsOneComponent);
@@ -76,16 +75,6 @@ void main() {
       expect(find.textContaining("Don't Worry About Optics / Lenses!"), findsOneComponent);
     });
 
-    testComponents('OpticsRaytracer starts with target node active and updates', (
-      tester,
-    ) async {
-      tester.pumpComponent(const OpticsRaytracer());
-
-      expect(find.text('TourFields.stop(ref).nights'), findsOneComponent);
-      expect(find.text('FieldRef<TourSchema, int>'), findsOneComponent);
-      expect(find.text('[ COMPILE-TIME VERIFIED ]'), findsOneComponent);
-    });
-
     testComponents('CodeSection switches tabs on click', (tester) async {
       tester.pumpComponent(const CodeSection());
 
@@ -122,24 +111,28 @@ void main() {
       expect(find.text('// 100% Typo-Proof'), findsOneComponent);
     });
 
-    testComponents('HeroSection renders headline, tagline and command bar', (
-      tester,
-    ) async {
+    testComponents('HeroSection renders headline, command bar and CTAs', (tester) async {
       tester.pumpComponent(const HeroSection());
 
-      expect(
-        find.text('System Specification · Zero-Allocation Keyed Optics'),
-        findsOneComponent,
-      );
-      expect(
-        find.text('flutter pub add keyed_form_flutter keyed_form_schema'),
-        findsOneComponent,
-      );
+      expect(find.text('Big forms. Less code.'), findsOneComponent);
+      expect(find.text('One rebuild per keystroke.'), findsOneComponent);
+      for (final chip in ['MIT', 'Pure Dart core', 'Flutter']) {
+        expect(find.text(chip), findsOneComponent);
+      }
+      expect(find.text('flutter pub add keyed_form_flutter keyed_form_schema'), findsOneComponent);
       expect(find.text('COPY'), findsOneComponent);
-      expect(
-        find.text('Start with keyed_form_flutter →'),
-        findsOneComponent,
-      );
+      expect(find.text('Build your first form →'), findsOneComponent);
+      expect(find.text('Open full playground →'), findsOneComponent);
+    });
+
+    // Typing is exercised in a real browser (see the redesign's CDP checks):
+    // jaspr_test can't synthesise an input event carrying a value.
+    testComponents('HeroLoginDemo starts with both rebuild counters at zero', (tester) async {
+      tester.pumpComponent(const HeroLoginDemo());
+
+      expect(find.text('Email'), findsOneComponent);
+      expect(find.text('Password'), findsOneComponent);
+      expect(find.text('rebuilds: 0'), findsNComponents(2));
     });
   });
 
@@ -157,7 +150,7 @@ void main() {
       expect(
         content,
         contains(
-          '<title>keyed_form — typed, O(1) Flutter forms built on keyed optics</title>',
+          '<title>keyed_form — big Flutter forms, one rebuild per keystroke</title>',
         ),
       );
 
@@ -169,7 +162,6 @@ void main() {
       expect(content, contains(':root:not([data-theme="light"])'));
 
       // Critical sections present
-      expect(content, contains('id="optics"'));
       expect(content, contains('id="problems"'));
       expect(content, contains('id="benchmarks"'));
       expect(content, contains('id="matrix"'));
@@ -198,7 +190,6 @@ void main() {
       // Mobile Responsive & Overflow Containment verification
       expect(content, contains('@media screen and (max-width: 768px)'));
       expect(content, contains('overflow-x: clip'));
-      expect(content, contains('word-break: break-all'));
       expect(content, contains('flex: 1'));
       expect(content, contains('min-width: 0'));
       expect(content, contains('border-collapse: collapse'));

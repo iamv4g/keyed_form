@@ -14,17 +14,17 @@ class App extends StatelessComponent {
       routes: [
         Route(
           path: '/',
-          title: 'keyed_form — typed, O(1) Flutter forms built on keyed optics',
+          title: 'keyed_form — big Flutter forms, one rebuild per keystroke',
           builder: (context, state) => const LandingPage(),
         ),
         Route(
           path: '/docs',
-          title: 'Documentation · keyed_form — typed, O(1) Flutter forms on keyed optics',
+          title: 'Documentation · keyed_form',
           builder: (context, state) => const DocsPage(),
         ),
         Route(
           path: '/playground',
-          title: 'Playground · keyed_form — typed, O(1) Flutter forms on keyed optics',
+          title: 'Playground · keyed_form',
           builder: (context, state) => const PlaygroundPage(),
         ),
       ],

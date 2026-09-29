@@ -6,6 +6,8 @@
 
 import 'package:jaspr/client.dart';
 
+import 'package:website/components/demo/hero_login_demo.dart'
+    deferred as _hero_login_demo;
 import 'package:website/components/docs/docs_menu_toggle.dart'
     deferred as _docs_menu_toggle;
 import 'package:website/components/docs/docs_sidebar.dart'
@@ -15,8 +17,6 @@ import 'package:website/components/playground/playground_demo.dart'
     deferred as _playground_demo;
 import 'package:website/components/code_section.dart' deferred as _code_section;
 import 'package:website/components/copy_button.dart' deferred as _copy_button;
-import 'package:website/components/optics_raytracer.dart'
-    deferred as _optics_raytracer;
 import 'package:website/components/theme_toggle.dart' deferred as _theme_toggle;
 
 /// Default [ClientOptions] for use with your Jaspr project.
@@ -49,6 +49,10 @@ ClientOptions get defaultClientOptions => ClientOptions(
       ),
       loader: _copy_button.loadLibrary,
     ),
+    'hero_login_demo': ClientLoader(
+      (p) => _hero_login_demo.HeroLoginDemo(),
+      loader: _hero_login_demo.loadLibrary,
+    ),
     'docs_menu_toggle': ClientLoader(
       (p) => _docs_menu_toggle.DocsMenuToggle(),
       loader: _docs_menu_toggle.loadLibrary,
@@ -60,10 +64,6 @@ ClientOptions get defaultClientOptions => ClientOptions(
     'docs_toc': ClientLoader(
       (p) => _docs_toc.DocsToc(),
       loader: _docs_toc.loadLibrary,
-    ),
-    'optics_raytracer': ClientLoader(
-      (p) => _optics_raytracer.OpticsRaytracer(),
-      loader: _optics_raytracer.loadLibrary,
     ),
     'playground_demo': ClientLoader(
       (p) => _playground_demo.PlaygroundDemo(),

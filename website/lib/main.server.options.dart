@@ -5,6 +5,8 @@
 // Generated with jaspr_builder
 
 import 'package:jaspr/server.dart';
+import 'package:website/components/demo/hero_login_demo.dart'
+    as _hero_login_demo;
 import 'package:website/components/docs/docs_menu_toggle.dart'
     as _docs_menu_toggle;
 import 'package:website/components/docs/docs_sidebar.dart' as _docs_sidebar;
@@ -13,7 +15,6 @@ import 'package:website/components/playground/playground_demo.dart'
     as _playground_demo;
 import 'package:website/components/code_section.dart' as _code_section;
 import 'package:website/components/copy_button.dart' as _copy_button;
-import 'package:website/components/optics_raytracer.dart' as _optics_raytracer;
 import 'package:website/components/theme_toggle.dart' as _theme_toggle;
 import 'package:website/styles/a_shared_styles.dart' as _a_shared_styles;
 import 'package:website/styles/b_home_styles.dart' as _b_home_styles;
@@ -49,14 +50,14 @@ ServerOptions get defaultServerOptions => ServerOptions(
       'copy_button',
       params: __copy_buttonCopyButton,
     ),
+    _hero_login_demo.HeroLoginDemo:
+        ClientTarget<_hero_login_demo.HeroLoginDemo>('hero_login_demo'),
     _docs_menu_toggle.DocsMenuToggle:
         ClientTarget<_docs_menu_toggle.DocsMenuToggle>('docs_menu_toggle'),
     _docs_sidebar.DocsSidebar: ClientTarget<_docs_sidebar.DocsSidebar>(
       'docs_sidebar',
     ),
     _docs_toc.DocsToc: ClientTarget<_docs_toc.DocsToc>('docs_toc'),
-    _optics_raytracer.OpticsRaytracer:
-        ClientTarget<_optics_raytracer.OpticsRaytracer>('optics_raytracer'),
     _playground_demo.PlaygroundDemo:
         ClientTarget<_playground_demo.PlaygroundDemo>('playground_demo'),
     _theme_toggle.ThemeToggle: ClientTarget<_theme_toggle.ThemeToggle>(

@@ -99,6 +99,11 @@ List<StyleRule> get responsiveStyles => [
     css('.nav-playground, .nav-divider').styles(
       display: Display.none,
     ),
+
+    // Hero stacks: copy first, demo underneath.
+    css('.hero').styles(
+      raw: {'grid-template-columns': 'minmax(0, 1fr)'},
+    ),
   ]),
 
   css.media(MediaQuery.screen(maxWidth: 768.px), [
@@ -136,13 +141,8 @@ List<StyleRule> get responsiveStyles => [
     css('.hero').styles(
       padding: .only(top: 38.px, bottom: 32.px),
     ),
-    css('.telemetry-tag').styles(
-      fontSize: 0.68.rem,
-      padding: .symmetric(vertical: 4.px, horizontal: 10.px),
-      letterSpacing: 0.05.em,
-      whiteSpace: WhiteSpace.normal,
-      lineHeight: 1.4.em,
-      margin: .only(bottom: 18.px),
+    css('.hero-chips').styles(
+      margin: .only(bottom: 16.px),
     ),
     css('.hero h1').styles(
       lineHeight: 1.15.em,
@@ -203,46 +203,8 @@ List<StyleRule> get responsiveStyles => [
       fontSize: 0.88.rem,
     ),
 
-    // Optics Workbench Mobile
-    css('.workbench').styles(
-      margin: .only(top: 32.px),
-      padding: .symmetric(vertical: 16.px, horizontal: 12.px),
-    ),
-    css('.workbench-header').styles(
-      flexDirection: FlexDirection.column,
-      alignItems: AlignItems.start,
-      gap: Gap(row: 6.px),
-      margin: .only(bottom: 14.px),
-      padding: .only(bottom: 10.px),
-    ),
-    css('.optics-canvas').styles(
-      width: 100.percent,
-      maxWidth: 100.percent,
-      boxSizing: BoxSizing.borderBox,
-      overflow: Overflow.only(x: Overflow.auto),
-      padding: .only(bottom: 6.px),
-      raw: {
-        '-webkit-overflow-scrolling': 'touch',
-      },
-    ),
-    css('.optics-canvas svg').styles(
-      minWidth: 640.px,
-      width: 100.percent,
-      height: Unit.auto,
-      display: Display.block,
-    ),
-    css('.beam-status').styles(
-      flexDirection: FlexDirection.column,
-      alignItems: AlignItems.start,
-      gap: Gap(row: 8.px),
-      padding: .symmetric(vertical: 10.px, horizontal: 12.px),
-      fontSize: 0.78.rem,
-    ),
-    css('.beam-status div').styles(
-      width: 100.percent,
-      raw: {
-        'word-break': 'break-all',
-      },
+    css('.hero-demo').styles(
+      padding: .symmetric(vertical: 18.px, horizontal: 16.px),
     ),
 
     // Section Mobile
