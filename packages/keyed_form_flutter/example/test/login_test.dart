@@ -34,42 +34,4 @@ void main() {
     expect(find.text('Tour builder'), findsOneWidget);
     expect(find.text('signed in as ada@example.com'), findsOneWidget);
   });
-
-  testWidgets('Sign in disables itself and shows a spinner while submitting', (
-    tester,
-  ) async {
-    await openSignIn(tester);
-
-    await tester.enterText(find.byType(TextField).at(0), 'ada@example.com');
-    await tester.enterText(find.byType(TextField).at(1), 'lovelace1843');
-    await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
-    await tester.pump(); // flip `submitting` and let the reactive scope rebuild
-
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    expect(
-      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-      isNull,
-    );
-
-    await tester.pumpAndSettle();
-
-    expect(find.text('Tour builder'), findsOneWidget);
-  });
-
-  testWidgets('email field shows a spinner during its async check, then the '
-      'server error', (tester) async {
-    await openSignIn(tester);
-
-    await tester.enterText(find.byType(TextField).at(0), 'taken@example.com');
-    await tester.pump(); // let the field rebuild with the typed value
-    await tester.testTextInput.receiveAction(TextInputAction.done);
-    await tester.pump();
-
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-    await tester.pumpAndSettle();
-
-    expect(find.byType(CircularProgressIndicator), findsNothing);
-    expect(find.text('This email is already registered'), findsOneWidget);
-  });
 }

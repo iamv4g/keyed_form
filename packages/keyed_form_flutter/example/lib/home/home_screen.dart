@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../email_check/email_check_screen.dart';
 import '../invoice/invoice_screen.dart';
 import '../itinerary/itinerary_screen.dart';
 import '../login/login_screen.dart';
@@ -17,9 +18,14 @@ class _Demo {
 final _demos = <_Demo>[
   _Demo(
     'Sign in',
-    'Text fields, onTouched mode, async validation '
-        '(isValidating / isFailedValidation).',
+    'Text fields in onTouched mode, a shared field widget and handleSubmit.',
     (_) => const LoginScreen(),
+  ),
+  _Demo(
+    'Email check',
+    'Async validation: a server check with a spinner, a "taken" error and a '
+        'failed check (isValidating / isFailedValidation).',
+    (_) => const EmailCheckScreen(),
   ),
   _Demo(
     'Invoice',

@@ -38,7 +38,7 @@ int _mapHash(Map<Object?, Object?>? map) {
 const _unset = Object();
 
 abstract interface class LoginSchemaCopyWith<T> {
-  T call({String? email, String? password, bool? remember});
+  T call({String? email, String? password});
 }
 
 class _LoginSchemaCopyWithImpl implements LoginSchemaCopyWith<LoginSchema> {
@@ -46,49 +46,30 @@ class _LoginSchemaCopyWithImpl implements LoginSchemaCopyWith<LoginSchema> {
   final LoginSchema _value;
 
   @override
-  LoginSchema call({String? email, String? password, bool? remember}) =>
-      LoginSchema(
-        email: email ?? _value.email,
-        password: password ?? _value.password,
-        remember: remember ?? _value.remember,
-      );
+  LoginSchema call({String? email, String? password}) => LoginSchema(
+    email: email ?? _value.email,
+    password: password ?? _value.password,
+  );
 }
 
 class LoginSchema {
-  const LoginSchema({
-    this.email = '',
-    this.password = '',
-    this.remember = false,
-  });
+  const LoginSchema({this.email = '', this.password = ''});
 
   final String email;
   final String password;
-  final bool remember;
 
   /// Creates a new [LoginSchema] instance with auto-generated UUID if needed.
-  factory LoginSchema.create({
-    String? email,
-    String? password,
-    bool? remember,
-  }) {
-    return LoginSchema(
-      email: email ?? '',
-      password: password ?? '',
-      remember: remember ?? false,
-    );
+  factory LoginSchema.create({String? email, String? password}) {
+    return LoginSchema(email: email ?? '', password: password ?? '');
   }
 
   LoginSchemaCopyWith<LoginSchema> get copyWith =>
       _LoginSchemaCopyWithImpl(this);
 
   /// Converts this [LoginSchema] to a Map representation.
-  Map<String, Object?> toMap() => {
-    'email': email,
-    'password': password,
-    'remember': remember,
-  };
+  Map<String, Object?> toMap() => {'email': email, 'password': password};
 
-  List<Object?> get _validationValues => [email, password, remember];
+  List<Object?> get _validationValues => [email, password];
 
   /// Validates this [LoginSchema] against its schema. Pass [scope] (a `FieldKey`)
   /// to re-check only that subtree — see `KeyedFormController.scopeOf`.
@@ -120,12 +101,11 @@ class LoginSchema {
     if (identical(this, other)) return true;
     return other is LoginSchema &&
         email == other.email &&
-        password == other.password &&
-        remember == other.remember;
+        password == other.password;
   }
 
   @override
-  int get hashCode => Object.hash(email, password, remember);
+  int get hashCode => Object.hash(email, password);
 }
 
 abstract final class LoginFields {
@@ -141,12 +121,5 @@ abstract final class LoginFields {
         key: FieldKey.name('password'),
         get: (x) => x.password,
         set: (x, v) => x.copyWith(password: v),
-      );
-
-  static StrictFieldRef<LoginSchema, bool> get remember =>
-      StrictFieldRef<LoginSchema, bool>.of(
-        key: FieldKey.name('remember'),
-        get: (x) => x.remember,
-        set: (x, v) => x.copyWith(remember: v),
       );
 }
