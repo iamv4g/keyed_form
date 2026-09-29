@@ -3,7 +3,7 @@ import 'package:jaspr/jaspr.dart';
 
 import '../base_path.dart';
 import '../code/code_tabs.dart';
-import '../code/snippets/login_snippets.dart';
+import '../example_sources.dart';
 import 'demo/model_login_demo.dart';
 
 class ModelSection extends StatelessComponent {
@@ -24,21 +24,19 @@ class ModelSection extends StatelessComponent {
         div(classes: 'split-code', [
           CodeTabs(
             id: 'model-code',
-            tabs: const [
-              CodeTab('login_schema.dart', LoginSnippets.schema),
-              CodeTab('login_form.dart', LoginSnippets.form),
-              CodeTab('login_text_field.dart', LoginSnippets.textField),
+            tabs: [
+              for (final path in ExampleFiles.login) CodeTab(path.split('/').last, ExampleSources.of(context, path)),
             ],
             caption: Component.fragment([
-              .text('Trimmed for the page. '),
+              .text("The example app's own files. "),
               a(
                 href: 'https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter/example/lib/login',
                 target: Target.blank,
                 [
-                  strong([.text('Full example')]),
+                  strong([.text('Run the example')]),
                 ],
               ),
-              .text(' — async email check, remember-me and submit flow ↗'),
+              .text(' ↗'),
             ]),
           ),
         ]),

@@ -28,7 +28,7 @@ class ListsSection extends StatelessComponent {
               for (final path in ExampleFiles.packing) CodeTab(path.split('/').last, ExampleSources.of(context, path)),
             ],
             caption: Component.fragment([
-              .text('The example app\'s own files. '),
+              .text("The example app's own files. "),
               a(
                 href:
                     'https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter/example/lib/packing_list',

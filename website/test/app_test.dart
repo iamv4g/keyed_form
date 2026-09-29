@@ -87,13 +87,13 @@ void main() {
     });
 
     testComponents('ModelSection shows the three login files, the demo and the points', (tester) async {
-      tester.pumpComponent(const ModelSection());
+      tester.pumpComponent(ExampleSources(files: readExampleSources(), child: const ModelSection()));
 
       expect(find.text('// THE MODEL'), findsOneComponent);
       for (final file in ['login_schema.dart', 'login_form.dart', 'login_text_field.dart']) {
         expect(find.text(file), findsOneComponent);
       }
-      expect(find.text('Full example'), findsOneComponent);
+      expect(find.text('Run the example'), findsOneComponent);
       expect(find.text('// WATCH — form.value.toMap()'), findsOneComponent);
       expect(find.text('// ERRORS — form.visibleErrorKeys'), findsOneComponent);
       expect(find.text('Sign in'), findsOneComponent);
@@ -241,13 +241,21 @@ void main() {
   });
 
   group('Example sources', () {
-    test('the landing list demo schema matches the Flutter example schema', () {
-      String rules(String source) => source.substring(source.indexOf('final _packingSchema'));
-      expect(
-        rules(File('lib/demos/packing_schema.dart').readAsStringSync()),
-        rules(File('$exampleLibDir/${ExampleFiles.packingSchema}').readAsStringSync()),
-      );
-    });
+    // Formatting differs (website: 120 columns, example: 80), so compare
+    // without whitespace.
+    String rules(String source) => source.substring(source.indexOf('final _')).replaceAll(RegExp(r'\s'), '');
+
+    for (final (web, example) in [
+      ('lib/demos/login_schema.dart', ExampleFiles.loginSchema),
+      ('lib/demos/packing_schema.dart', ExampleFiles.packingSchema),
+    ]) {
+      test('$web matches the Flutter example schema', () {
+        expect(
+          rules(File(web).readAsStringSync()),
+          rules(File('$exampleLibDir/$example').readAsStringSync()),
+        );
+      });
+    }
   });
 
   group('Static Site Output Verification', () {
