@@ -38,6 +38,11 @@ const darkThemeTokens = <String, String>{
   '--red': '#ff4d4d',
   '--grid': 'rgba(0, 240, 255, 0.04)',
   '--card-shadow': '0 4px 20px rgba(0, 0, 0, 0.5)',
+  // `display` values for markup that exists once per theme (theme-toggle
+  // icons, the Jaspr badge) — `display: var(--dark-only)` rides the same
+  // prefers-color-scheme / data-theme cascade as every color token.
+  '--dark-only': 'inline-block',
+  '--light-only': 'none',
 };
 
 const lightThemeTokens = <String, String>{
@@ -57,4 +62,6 @@ const lightThemeTokens = <String, String>{
   '--red': '#d62828',
   '--grid': 'rgba(0, 135, 153, 0.05)',
   '--card-shadow': '0 4px 20px rgba(11, 25, 36, 0.06)',
+  '--dark-only': 'none',
+  '--light-only': 'inline-block',
 };

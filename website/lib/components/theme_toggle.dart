@@ -2,6 +2,8 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
 
+import 'icons.dart';
+
 @client
 class ThemeToggle extends StatefulComponent {
   const ThemeToggle({super.key});
@@ -54,15 +56,23 @@ class _ThemeToggleState extends State<ThemeToggle> {
     }
   }
 
+  // Both icons are always rendered; CSS shows the one matching the
+  // current theme (see `.theme-icon-*` in sharedStyles). The pre-rendered
+  // HTML can't know the visitor's theme, so a state-driven icon would
+  // flash the wrong one until hydration.
   @override
   Component build(BuildContext context) {
     return button(
-      classes: 'theme-toggle mono',
+      type: ButtonType.button,
+      classes: 'theme-toggle',
+      attributes: {
+        'aria-label': _isDark ? 'Switch to light theme' : 'Switch to dark theme',
+        'title': 'Toggle theme',
+      },
       onClick: _toggle,
       [
-        span(id: 'theme-label', [
-          .text(_isDark ? '☼ LIGHT' : '☽ DARK'),
-        ]),
+        SiteIcons.sun(classes: 'theme-icon-sun'),
+        SiteIcons.moon(classes: 'theme-icon-moon'),
       ],
     );
   }

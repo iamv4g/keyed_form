@@ -87,37 +87,17 @@ List<StyleRule> get responsiveStyles => [
       ),
     ),
 
-    // Navbar — wraps starting here (not 768px): the full link set overlaps
-    // the brand/theme-toggle well above phone widths, around 800-900px.
-    css('.nav-inner').styles(
-      height: Unit.auto,
-      minHeight: 56.px,
-      flexWrap: FlexWrap.wrap,
-      gap: Gap(row: 10.px, column: 10.px),
-      padding: .symmetric(vertical: 10.px),
-    ),
+    // Navbar — Docs + three icons fit a 320px phone on one row, so the
+    // row never wraps or scrolls. Playground drops out here; the hero links
+    // to it instead.
     css('.brand').styles(
       fontSize: 1.05.rem,
     ),
     css('.nav-links').styles(
-      width: 100.percent,
-      maxWidth: 100.percent,
-      overflow: Overflow.only(x: Overflow.auto),
       gap: Gap(column: 14.px),
-      padding: .only(top: 2.px, bottom: 6.px),
-      fontSize: 0.8.rem,
-      raw: {
-        'min-width': '0',
-        '-webkit-overflow-scrolling': 'touch',
-        'scrollbar-width': 'none',
-      },
     ),
-    css('.nav-links::-webkit-scrollbar').styles(
-      raw: {'display': 'none'},
-    ),
-    css('.nav-links a, .nav-links .theme-toggle').styles(
-      whiteSpace: WhiteSpace.noWrap,
-      flex: Flex(shrink: 0),
+    css('.nav-playground, .nav-divider').styles(
+      display: Display.none,
     ),
   ]),
 

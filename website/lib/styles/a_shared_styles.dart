@@ -122,22 +122,25 @@ List<StyleRule> get sharedStyles => [
   ),
 
   css('.theme-toggle').styles(
-    backgroundColor: AppColors.surfaceElevated,
+    backgroundColor: Colors.transparent,
     border: Border.all(color: AppColors.border, width: 1.px),
-    color: AppColors.ink,
-    padding: .symmetric(vertical: 6.px, horizontal: 12.px),
-    radius: BorderRadius.circular(4.px),
+    color: AppColors.inkMuted,
+    width: 34.px,
+    height: 34.px,
+    radius: BorderRadius.circular(6.px),
     cursor: Cursor.pointer,
-    fontSize: 0.78.rem,
-    display: Display.flex,
+    display: Display.inlineFlex,
     alignItems: AlignItems.center,
-    gap: Gap(column: 6.px),
+    justifyContent: JustifyContent.center,
     transition: const Transition('all', duration: Duration(milliseconds: 150)),
   ),
   css('.theme-toggle:hover').styles(
     color: AppColors.cyan,
     border: Border.all(color: AppColors.cyan, width: 1.px),
   ),
+  // Dark theme offers the sun (switch to light), light theme the moon.
+  css('.theme-icon-sun').styles(raw: {'display': 'var(--dark-only)'}),
+  css('.theme-icon-moon').styles(raw: {'display': 'var(--light-only)'}),
 
   css('.copy-btn').styles(
     backgroundColor: AppColors.surfaceElevated,

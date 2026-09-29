@@ -17,9 +17,8 @@ void main() {
 
       // Brand & Navigation
       expect(find.textContaining('keyed_form'), findsComponents);
-      expect(find.text('Invariants'), findsOneComponent);
-      expect(find.text('Benchmarks'), findsOneComponent);
-      expect(find.text('Architecture'), findsOneComponent);
+      expect(find.text('Docs'), findsOneComponent);
+      expect(find.text('Playground'), findsOneComponent);
 
       // Section Kickers
       expect(find.text('// LIVE RESOLUTION ENGINE'), findsOneComponent);
@@ -38,13 +37,20 @@ void main() {
       );
     });
 
-    testComponents('Navbar renders brand, Docs button and ThemeToggle', (tester) async {
+    testComponents('Navbar renders brand, text links, icon links and ThemeToggle', (tester) async {
       tester.pumpComponent(const Navbar());
 
       expect(find.textContaining('keyed_form'), findsOneComponent);
-      expect(find.text('v0.1.0'), findsNothing);
       expect(find.text('Docs'), findsOneComponent);
-      expect(find.text('☼ LIGHT'), findsOneComponent);
+      expect(find.text('Playground'), findsOneComponent);
+      // In-page anchors are gone from the header.
+      expect(find.text('Invariants'), findsNothing);
+      expect(find.text('Architecture'), findsNothing);
+      // pub.dev / GitHub are icon-only links, labelled for screen readers.
+      expect(find.tag('svg'), findsComponents);
+      expect(find.text('pub.dev ↗'), findsNothing);
+      expect(find.text('GitHub ↗'), findsNothing);
+      expect(find.tag('button'), findsOneComponent);
     });
 
     testComponents('DocsPage renders 6 developer chapters and reassurance callout', (

@@ -60,22 +60,46 @@ List<StyleRule> get homeStyles => [
     radius: BorderRadius.circular(2.px),
   ),
 
+  css('.nav-start').styles(
+    display: Display.flex,
+    alignItems: AlignItems.center,
+    gap: Gap(column: 10.px),
+  ),
+
   css('.nav-links', [
     css('&').styles(
       display: Display.flex,
       alignItems: AlignItems.center,
-      gap: Gap(column: 20.px),
+      gap: Gap(column: 18.px),
       fontSize: 0.85.rem,
     ),
     css('a').styles(
       color: AppColors.inkMuted,
       textDecoration: TextDecoration.none,
+      whiteSpace: WhiteSpace.noWrap,
       transition: const Transition('color', duration: Duration(milliseconds: 150)),
     ),
     css('a:hover').styles(
       color: AppColors.cyan,
     ),
   ]),
+
+  css('.nav-divider').styles(
+    width: 1.px,
+    height: 18.px,
+    backgroundColor: AppColors.border,
+  ),
+
+  // Icon-only links: a square hit area (not just the 18px glyph) so they're
+  // comfortable to tap on phones.
+  css('.nav-icon').styles(
+    display: Display.inlineFlex,
+    alignItems: AlignItems.center,
+    justifyContent: JustifyContent.center,
+    width: 34.px,
+    height: 34.px,
+    margin: .symmetric(horizontal: (-6).px),
+  ),
 
   // Hero Section
   css('.hero').styles(
