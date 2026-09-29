@@ -7,13 +7,14 @@
 import 'package:jaspr/server.dart';
 import 'package:website/components/demo/hero_login_demo.dart'
     as _hero_login_demo;
+import 'package:website/components/demo/model_login_demo.dart'
+    as _model_login_demo;
 import 'package:website/components/docs/docs_menu_toggle.dart'
     as _docs_menu_toggle;
 import 'package:website/components/docs/docs_sidebar.dart' as _docs_sidebar;
 import 'package:website/components/docs/docs_toc.dart' as _docs_toc;
 import 'package:website/components/playground/playground_demo.dart'
     as _playground_demo;
-import 'package:website/components/code_section.dart' as _code_section;
 import 'package:website/components/copy_button.dart' as _copy_button;
 import 'package:website/components/theme_toggle.dart' as _theme_toggle;
 import 'package:website/styles/a_shared_styles.dart' as _a_shared_styles;
@@ -44,15 +45,14 @@ import 'package:website/styles/f_code_styles.dart' as _f_code_styles;
 ServerOptions get defaultServerOptions => ServerOptions(
   clientId: 'main.client.dart.js',
   clients: {
-    _code_section.CodeSection: ClientTarget<_code_section.CodeSection>(
-      'code_section',
-    ),
     _copy_button.CopyButton: ClientTarget<_copy_button.CopyButton>(
       'copy_button',
       params: __copy_buttonCopyButton,
     ),
     _hero_login_demo.HeroLoginDemo:
         ClientTarget<_hero_login_demo.HeroLoginDemo>('hero_login_demo'),
+    _model_login_demo.ModelLoginDemo:
+        ClientTarget<_model_login_demo.ModelLoginDemo>('model_login_demo'),
     _docs_menu_toggle.DocsMenuToggle:
         ClientTarget<_docs_menu_toggle.DocsMenuToggle>('docs_menu_toggle'),
     _docs_sidebar.DocsSidebar: ClientTarget<_docs_sidebar.DocsSidebar>(

@@ -12,6 +12,7 @@ class ObservedField<Root, V> extends StatefulComponent {
     required this.field,
     required this.label,
     required this.builder,
+    this.showRebuilds = true,
     super.key,
   });
 
@@ -19,6 +20,9 @@ class ObservedField<Root, V> extends StatefulComponent {
   final FieldRef<Root, V> field;
   final String label;
   final Component Function(V? value, ValueChanged<V> onChange, VoidCallback onBlur) builder;
+
+  /// Whether to show the `rebuilds: n` badge next to the label.
+  final bool showRebuilds;
 
   @override
   State<ObservedField<Root, V>> createState() => _ObservedFieldState<Root, V>();
@@ -70,7 +74,7 @@ class _ObservedFieldState<Root, V> extends State<ObservedField<Root, V>> {
     return div(classes: 'playground-field', [
       div(classes: 'playground-field-label mono', [
         .text(component.label),
-        span(classes: 'playground-rebuild-badge mono', [.text('rebuilds: $_rebuilds')]),
+        if (component.showRebuilds) span(classes: 'playground-rebuild-badge mono', [.text('rebuilds: $_rebuilds')]),
       ]),
       component.builder(
         _lastValue,

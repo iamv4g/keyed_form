@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:jaspr_test/jaspr_test.dart';
 import 'package:website/code/code_tabs.dart';
 import 'package:website/code/highlight.dart';
-import 'package:website/components/code_section.dart';
 import 'package:website/components/demo/hero_login_demo.dart';
 import 'package:website/components/hero_section.dart';
+import 'package:website/components/model_section.dart';
 import 'package:website/components/navbar.dart';
 import 'package:website/pages/docs_page.dart';
 import 'package:website/pages/landing_page.dart';
@@ -28,7 +28,7 @@ void main() {
       expect(find.text('// ARCHITECTURAL INVARIANTS'), findsOneComponent);
       expect(find.text('// MEASURED TELEMETRY'), findsOneComponent);
       expect(find.text('// CAPABILITY MATRIX'), findsOneComponent);
-      expect(find.text('// IMPLEMENTATION PATTERN'), findsOneComponent);
+      expect(find.text('// THE MODEL'), findsOneComponent);
       expect(find.text('// WORKSPACE TOPOLOGY'), findsOneComponent);
 
       // Footer
@@ -79,40 +79,18 @@ void main() {
       expect(find.textContaining("Don't Worry About Optics / Lenses!"), findsOneComponent);
     });
 
-    testComponents('CodeSection switches tabs on click', (tester) async {
-      tester.pumpComponent(const CodeSection());
+    testComponents('ModelSection shows the three login files, the demo and the points', (tester) async {
+      tester.pumpComponent(const ModelSection());
 
-      // Initial tab is Schema DSL
-      expect(
-        find.text('1. Schema DSL (tour_schema.dart)'),
-        findsOneComponent,
-      );
-      expect(find.text('COPY SNIPPET'), findsOneComponent);
-      expect(find.text('@keyedSchema\n'), findsOneComponent);
-
-      // Switch to tab 2: Flutter UI Binding
-      final tab2Button = find.ancestor(
-        of: find.textContaining('2. Flutter UI Binding'),
-        matching: find.tag('button'),
-      );
-      await tester.click(tab2Button);
-
-      expect(
-        find.text('1. Schema DSL (tour_schema.dart)'),
-        findsOneComponent,
-      );
-      expect(find.text('@keyedSchema\n'), findsNothing);
-      expect(find.textContaining('KeyedForm<TourSchema>'), findsOneComponent);
-
-      // Switch to tab 3: Generated Optics
-      final tab3Button = find.ancestor(
-        of: find.textContaining('3. Generated Optics'),
-        matching: find.tag('button'),
-      );
-      await tester.click(tab3Button);
-
-      expect(find.textContaining('abstract final class'), findsOneComponent);
-      expect(find.text('// 100% Typo-Proof'), findsOneComponent);
+      expect(find.text('// THE MODEL'), findsOneComponent);
+      for (final file in ['login_schema.dart', 'login_form.dart', 'login_text_field.dart']) {
+        expect(find.text(file), findsOneComponent);
+      }
+      expect(find.text('Full example'), findsOneComponent);
+      expect(find.text('// WATCH — form.value.toMap()'), findsOneComponent);
+      expect(find.text('// ERRORS — form.visibleErrorKeys'), findsOneComponent);
+      expect(find.text('Sign in'), findsOneComponent);
+      expect(find.text('Quickstart in 5 minutes →'), findsOneComponent);
     });
 
     testComponents('HeroSection renders headline, command bar and CTAs', (tester) async {
@@ -200,7 +178,7 @@ void main() {
       expect(content, contains('id="problems"'));
       expect(content, contains('id="benchmarks"'));
       expect(content, contains('id="matrix"'));
-      expect(content, contains('id="code"'));
+      expect(content, contains('id="model"'));
       expect(content, contains('id="packages"'));
 
       // Client hydration script present

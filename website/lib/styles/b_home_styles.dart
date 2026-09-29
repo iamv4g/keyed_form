@@ -373,60 +373,76 @@ List<StyleRule> get homeStyles => [
     color: AppColors.inkMuted,
   ),
 
-  // Code Container (the landing page's CodeSection tabs)
-  css('.code-container').styles(
-    margin: .only(top: 36.px),
+  // Split: code on one side, the same code running on the other. Shared
+  // by the Model and Dynamic-list sections.
+  css('.split').styles(
+    display: Display.grid,
+    gap: Gap(column: 28.px, row: 20.px),
+    alignItems: AlignItems.start,
+    margin: .only(top: 32.px),
+    raw: {'grid-template-columns': 'minmax(0, 1.15fr) minmax(0, 1fr)'},
+  ),
+  css('.split-code, .split-demo').styles(minWidth: 0.px),
+  // The code column can run much taller than the demo; keep the demo in
+  // view while reading down it.
+  css('.split-demo').styles(position: Position.sticky(top: 88.px)),
+
+  css('.model-demo').styles(
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    gap: Gap(row: 14.px),
+  ),
+  css('.model-demo-form').styles(
+    padding: .all(22.px),
     radius: BorderRadius.circular(4.px),
-    overflow: Overflow.hidden,
-    backgroundColor: AppColors.surface,
-    border: Border.all(color: AppColors.border, width: 1.px),
   ),
-
-  css('.code-header-bar').styles(
+  css('.model-demo-actions').styles(
     display: Display.flex,
+    flexWrap: FlexWrap.wrap,
     alignItems: AlignItems.center,
-    justifyContent: JustifyContent.spaceBetween,
-    padding: .symmetric(vertical: 4.px, horizontal: 8.px),
-    backgroundColor: AppColors.surfaceElevated,
-    border: Border.only(
-      bottom: BorderSide.solid(color: AppColors.border, width: 1.px),
-    ),
+    gap: Gap(column: 14.px, row: 10.px),
+  ),
+  css('.model-demo-actions .btn').styles(cursor: Cursor.pointer),
+  css('.model-demo-status').styles(
+    fontSize: 0.78.rem,
+    color: AppColors.green,
   ),
 
-  css('.code-tabs').styles(
-    display: Display.flex,
-    gap: Gap(column: 4.px),
+  // Three bold-led points under a split, then a docs link.
+  css('.points').styles(
+    listStyle: ListStyle.none,
+    display: Display.grid,
+    gap: Gap(column: 28.px, row: 14.px),
+    margin: .only(top: 28.px),
+    gridTemplate: GridTemplate(
+      columns: GridTracks([GridTrack(TrackSize.fr(1)), GridTrack(TrackSize.fr(1)), GridTrack(TrackSize.fr(1))]),
+    ),
   ),
-  css('.tab-btn').styles(
-    padding: .symmetric(vertical: 9.px, horizontal: 18.px),
-    backgroundColor: Colors.transparent,
-    border: Border.unset,
-    fontSize: 0.82.rem,
-    cursor: Cursor.pointer,
-    radius: BorderRadius.circular(3.px),
-    transition: const Transition('all', duration: Duration(milliseconds: 150)),
+  css('.points li').styles(
+    fontSize: 0.92.rem,
+    lineHeight: 1.6.em,
     color: AppColors.inkMuted,
-  ),
-
-  css('.tab-btn.active').styles(
-    backgroundColor: AppColors.surface,
-    color: AppColors.cyan,
-    fontWeight: FontWeight.w600,
-    shadow: BoxShadow(
-      offsetX: 0.px,
-      offsetY: 1.px,
-      blur: 3.px,
-      color: Color('rgba(0, 0, 0, 0.2)'),
+    padding: .only(left: 14.px),
+    border: Border.only(
+      left: BorderSide.solid(color: AppColors.cyan, width: 2.px),
     ),
   ),
-
-  css('.code-content').styles(
-    padding: .all(24.px),
-    overflow: Overflow.only(x: Overflow.auto),
-    fontSize: 0.88.rem,
-    lineHeight: 1.68.em,
-    backgroundColor: AppColors.bg,
+  css('.points strong').styles(color: AppColors.ink),
+  css('.points code').styles(
+    fontSize: 0.85.em,
+    color: AppColors.ink,
+    backgroundColor: AppColors.surfaceElevated,
+    padding: .symmetric(horizontal: 5.px, vertical: 1.px),
+    radius: BorderRadius.circular(3.px),
   ),
+  css('.section-link').styles(
+    display: Display.inlineBlock,
+    margin: .only(top: 22.px),
+    fontSize: 0.85.rem,
+    color: AppColors.cyan,
+    textDecoration: TextDecoration.none,
+  ),
+  css('.section-link:hover').styles(raw: {'text-decoration': 'underline'}),
 
   // Topology Stack
   css('.topology-grid').styles(

@@ -104,6 +104,16 @@ List<StyleRule> get responsiveStyles => [
     css('.hero').styles(
       raw: {'grid-template-columns': 'minmax(0, 1fr)'},
     ),
+
+    // Splits stack with the running demo first — it's the hook; the code
+    // explaining it follows.
+    css('.split').styles(
+      raw: {'grid-template-columns': 'minmax(0, 1fr)'},
+    ),
+    css('.split-demo').styles(position: Position.static, raw: {'order': '-1'}),
+    css('.points').styles(
+      gridTemplate: GridTemplate(columns: GridTracks([GridTrack(TrackSize.fr(1))])),
+    ),
   ]),
 
   css.media(MediaQuery.screen(maxWidth: 768.px), [
@@ -320,52 +330,6 @@ List<StyleRule> get responsiveStyles => [
       gap: Gap(row: 12.px, column: 12.px),
       fontSize: 0.75.rem,
       margin: .only(top: 10.px),
-    ),
-
-    // Code Container Mobile
-    css('.code-container').styles(
-      margin: .only(top: 22.px),
-    ),
-    css('.code-header-bar').styles(
-      flexDirection: FlexDirection.column,
-      alignItems: AlignItems.stretch,
-      gap: Gap(row: 8.px),
-      padding: .all(8.px),
-    ),
-    css('.code-tabs').styles(
-      width: 100.percent,
-      maxWidth: 100.percent,
-      minWidth: 0.px,
-      overflow: Overflow.only(x: Overflow.auto),
-      whiteSpace: WhiteSpace.noWrap,
-      padding: .only(bottom: 4.px),
-      raw: {
-        'min-width': '0',
-        '-webkit-overflow-scrolling': 'touch',
-        'scrollbar-width': 'none',
-      },
-    ),
-    css('.code-tabs::-webkit-scrollbar').styles(
-      raw: {'display': 'none'},
-    ),
-    css('.tab-btn').styles(
-      padding: .symmetric(vertical: 8.px, horizontal: 12.px),
-      fontSize: 0.74.rem,
-      whiteSpace: WhiteSpace.noWrap,
-      flex: Flex(shrink: 0),
-    ),
-    css('.code-header-bar .copy-btn').styles(
-      alignSelf: AlignSelf.end,
-      padding: .symmetric(vertical: 5.px, horizontal: 12.px),
-    ),
-    css('.code-content').styles(
-      padding: .symmetric(vertical: 16.px, horizontal: 14.px),
-      fontSize: 0.78.rem,
-      lineHeight: 1.55.em,
-      overflow: Overflow.only(x: Overflow.auto),
-      raw: {
-        '-webkit-overflow-scrolling': 'touch',
-      },
     ),
 
     // Topology Grid Mobile
