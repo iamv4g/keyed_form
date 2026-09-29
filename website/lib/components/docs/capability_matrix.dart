@@ -1,23 +1,14 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
-class MatrixSection extends StatelessComponent {
-  const MatrixSection({super.key});
+/// Built-in vs wire-it-yourself, per form architecture. Lives in the
+/// benchmarks chapter (it used to be a landing-page section).
+class CapabilityMatrix extends StatelessComponent {
+  const CapabilityMatrix({super.key});
 
   @override
   Component build(BuildContext context) {
-    return section(id: 'matrix', classes: 'wrap', [
-      span(classes: 'section-kicker mono', [
-        .text('// CAPABILITY MATRIX'),
-      ]),
-      h2(classes: 'section-title display', [
-        .text('Built in by default vs built yourself'),
-      ]),
-      p(classes: 'section-lede', [
-        .text(
-          'Direct capability comparison across the major Flutter form architectures.',
-        ),
-      ]),
+    return Component.fragment([
       div(classes: 'table-scroll', [
         table(classes: 'matrix', [
           thead([

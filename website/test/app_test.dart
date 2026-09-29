@@ -33,7 +33,6 @@ void main() {
       // Section Kickers
       expect(find.text('// FEATURES'), findsOneComponent);
       expect(find.text('// MEASURED'), findsOneComponent);
-      expect(find.text('// CAPABILITY MATRIX'), findsOneComponent);
       expect(find.text('// THE MODEL'), findsOneComponent);
       expect(find.text('// AGENT SKILL'), findsOneComponent);
       expect(find.text('// DYNAMIC LISTS'), findsOneComponent);
@@ -78,6 +77,7 @@ void main() {
       expect(find.text('Real-World Production Recipes'), findsOneComponent);
       expect(find.text('Testing Without Widgets: Pure Dart in < 2ms'), findsOneComponent);
       expect(find.text('API Reference'), findsComponents);
+      expect(find.text('Capability Matrix'), findsComponents);
 
       // Reassurance Callout
       expect(find.textContaining("Don't Worry About Optics / Lenses!"), findsOneComponent);
@@ -249,7 +249,6 @@ void main() {
       // Critical sections present
       expect(content, contains('id="features"'));
       expect(content, contains('id="benchmarks"'));
-      expect(content, contains('id="matrix"'));
       expect(content, contains('id="model"'));
       expect(content, contains('id="packages"'));
 

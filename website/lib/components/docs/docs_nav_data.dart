@@ -78,6 +78,7 @@ const docsNavGroups = <NavGroup>[
     kicker: '07 · BENCHMARKS',
     items: [
       NavLinkItem(title: 'Methodology & Full Results', href: '#benchmarks-methodology'),
+      NavLinkItem(title: 'Capability Matrix', href: '#capability-matrix'),
     ],
   ),
 ];

@@ -7,7 +7,6 @@ import '../components/feature_grid.dart';
 import '../components/footer.dart';
 import '../components/hero_section.dart';
 import '../components/lists_section.dart';
-import '../components/matrix_section.dart';
 import '../components/model_section.dart';
 import '../components/navbar.dart';
 import '../components/telemetry_section.dart';
@@ -31,8 +30,6 @@ class LandingPage extends StatelessComponent {
       const TelemetrySection(),
       const hr(classes: 'rule'),
       const FeatureGrid(),
-      const hr(classes: 'rule'),
-      const MatrixSection(),
       const hr(classes: 'rule'),
       const TopologySection(),
       const hr(classes: 'rule'),

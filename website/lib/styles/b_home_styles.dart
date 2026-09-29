@@ -297,7 +297,7 @@ List<StyleRule> get homeStyles => [
     raw: {'fill': 'var(--ink-muted)', 'font-size': '12px'},
   ),
 
-  // Matrix
+  // Capability matrix (docs benchmarks chapter)
   css('table.matrix').styles(
     width: 100.percent,
     minWidth: 720.px,
