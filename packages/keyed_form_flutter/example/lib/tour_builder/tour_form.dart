@@ -162,7 +162,6 @@ class _StopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ref = (stop: id);
     return Card(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 12, 4, 8),
@@ -174,7 +173,7 @@ class _StopCard extends StatelessWidget {
                 Expanded(
                   flex: 3,
                   child: KeyedText<TourSchema>(
-                    field: TourFields.stop(ref).city,
+                    field: TourFields.stop(stopClientId: id).city,
                     label: 'City',
                   ),
                 ),
@@ -182,7 +181,7 @@ class _StopCard extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: KeyedStepper<TourSchema>(
-                    field: TourFields.stop(ref).nights,
+                    field: TourFields.stop(stopClientId: id).nights,
                     label: 'Nights',
                     min: 1,
                     max: 14,

@@ -377,10 +377,15 @@ void main() {
         // 'categories' ('ies' branch) -> navigator 'category'.
         expect(
           code,
-          contains('static CategoryFieldRefs category(CategoryRef at) =>'),
+          contains(
+            'static CategoryFieldRefs category({required String categoryClientId}) =>',
+          ),
         );
         // 'boxes' (regex '(ss|x|z|ch|sh)es$' branch) -> navigator 'box'.
-        expect(code, contains('static BoxFieldRefs box(BoxRef at) =>'));
+        expect(
+          code,
+          contains('static BoxFieldRefs box({required String boxClientId}) =>'),
+        );
       },
     );
 

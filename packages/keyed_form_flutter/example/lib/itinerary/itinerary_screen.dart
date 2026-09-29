@@ -100,7 +100,6 @@ class _DayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dayRef = (day: dayId);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -112,7 +111,7 @@ class _DayCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: KeyedText<ItinerarySchema>(
-                    field: ItineraryFields.day(dayRef).label,
+                    field: ItineraryFields.day(dayClientId: dayId).label,
                     label: 'Day label',
                   ),
                 ),
@@ -124,16 +123,16 @@ class _DayCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             KeyedFieldList<ItinerarySchema, ActivitySchema>(
-              field: ItineraryFields.dayActivities(dayRef),
+              field: ItineraryFields.dayActivities(dayClientId: dayId),
               builder: (context, activities, activityList) => Column(
                 children: [
                   for (final activity in activities)
                     _ActivityRow(
                       key: ValueKey(activity.clientId),
-                      fields: ItineraryFields.activity((
-                        day: dayId,
-                        activity: activity.clientId,
-                      )),
+                      fields: ItineraryFields.activity(
+                        dayClientId: dayId,
+                        activityClientId: activity.clientId,
+                      ),
                       onChangeKind: (kind) => activityList.updateById(
                         activity.clientId,
                         (current) => kind == 'sightseeing'
