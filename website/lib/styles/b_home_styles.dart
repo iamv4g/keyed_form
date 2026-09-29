@@ -446,6 +446,93 @@ List<StyleRule> get homeStyles => [
   ),
   css('.cmd-block .copy-btn').styles(flex: Flex(shrink: 0)),
 
+  // Dynamic-list demo
+  css('.pack-demo').styles(
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    gap: Gap(row: 14.px),
+  ),
+  css('.pack-box').styles(
+    padding: .all(22.px),
+    radius: BorderRadius.circular(4.px),
+  ),
+  css('.pack-list').styles(
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    gap: Gap(row: 8.px),
+  ),
+  css('.pack-slot').styles(
+    position: Position.relative(),
+    transition: const Transition('transform', duration: Duration(milliseconds: 150)),
+  ),
+  // The dragged row follows the pointer 1:1 and floats above its siblings.
+  css('.pack-slot.dragging').styles(
+    zIndex: ZIndex(2),
+    raw: {'transition': 'none'},
+  ),
+  css('.pack-slot.dragging .pack-row').styles(
+    border: Border.all(color: AppColors.cyan, width: 1.px),
+    raw: {'box-shadow': 'var(--card-shadow)'},
+  ),
+  css('.pack-row').styles(
+    display: Display.flex,
+    alignItems: AlignItems.start,
+    gap: Gap(column: 10.px),
+    padding: .all(6.px),
+    backgroundColor: AppColors.surface,
+    border: Border.all(color: Colors.transparent, width: 1.px),
+    radius: BorderRadius.circular(4.px),
+  ),
+  css('.pack-row input[type="checkbox"]').styles(
+    margin: .only(top: 12.px),
+    raw: {'accent-color': 'var(--cyan)'},
+  ),
+  css('.pack-field').styles(
+    raw: {'flex': '1', 'min-width': '0'},
+  ),
+  css('.pack-field .playground-field-error').styles(margin: .only(top: 4.px)),
+  // Touch drags start on the handle only, so it opts out of scrolling.
+  css('.pack-handle').styles(
+    display: Display.inlineFlex,
+    alignItems: AlignItems.center,
+    justifyContent: JustifyContent.center,
+    width: 28.px,
+    height: 38.px,
+    color: AppColors.inkMuted,
+    fontSize: 1.1.rem,
+    cursor: Cursor.grab,
+    raw: {'touch-action': 'none', 'user-select': 'none'},
+  ),
+  css('.pack-handle:hover').styles(color: AppColors.cyan),
+  css('.pack-remove, .pack-add').styles(
+    backgroundColor: Colors.transparent,
+    color: AppColors.inkMuted,
+    cursor: Cursor.pointer,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(3.px),
+  ),
+  css('.pack-remove').styles(
+    width: 38.px,
+    height: 38.px,
+    flex: Flex(shrink: 0),
+  ),
+  css('.pack-remove:disabled').styles(opacity: 0.35, cursor: Cursor.notAllowed),
+  css('.pack-add').styles(
+    margin: .only(top: 12.px),
+    padding: .symmetric(vertical: 8.px, horizontal: 14.px),
+    fontSize: 0.8.rem,
+  ),
+  css('.pack-remove:hover:not(:disabled), .pack-add:hover').styles(
+    color: AppColors.cyan,
+    border: Border.all(color: AppColors.cyan, width: 1.px),
+  ),
+  css('.demo-credit').styles(
+    margin: .only(top: 10.px),
+    fontSize: 0.74.rem,
+    color: AppColors.inkMuted,
+  ),
+  css('.demo-credit a').styles(color: AppColors.cyan, textDecoration: TextDecoration.none),
+
   // Three bold-led points under a split, then a docs link.
   css('.points').styles(
     listStyle: ListStyle.none,

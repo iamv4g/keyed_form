@@ -9,6 +9,7 @@ environment:
 resolution: workspace
 
 dependencies:
+  dnd_kit_jaspr: ^0.6.0
   jaspr: ^0.23.4
   jaspr_router: ^0.8.2
   keyed_form: ^0.1.0

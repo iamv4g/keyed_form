@@ -9,6 +9,7 @@ import 'package:website/components/demo/hero_login_demo.dart'
     as _hero_login_demo;
 import 'package:website/components/demo/model_login_demo.dart'
     as _model_login_demo;
+import 'package:website/components/demo/packing_demo.dart' as _packing_demo;
 import 'package:website/components/docs/docs_menu_toggle.dart'
     as _docs_menu_toggle;
 import 'package:website/components/docs/docs_sidebar.dart' as _docs_sidebar;
@@ -53,6 +54,9 @@ ServerOptions get defaultServerOptions => ServerOptions(
         ClientTarget<_hero_login_demo.HeroLoginDemo>('hero_login_demo'),
     _model_login_demo.ModelLoginDemo:
         ClientTarget<_model_login_demo.ModelLoginDemo>('model_login_demo'),
+    _packing_demo.PackingDemo: ClientTarget<_packing_demo.PackingDemo>(
+      'packing_demo',
+    ),
     _docs_menu_toggle.DocsMenuToggle:
         ClientTarget<_docs_menu_toggle.DocsMenuToggle>('docs_menu_toggle'),
     _docs_sidebar.DocsSidebar: ClientTarget<_docs_sidebar.DocsSidebar>(

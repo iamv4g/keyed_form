@@ -6,6 +6,7 @@ import 'package:website/code/highlight.dart';
 import 'package:website/components/agent_skill_section.dart';
 import 'package:website/components/demo/hero_login_demo.dart';
 import 'package:website/components/hero_section.dart';
+import 'package:website/components/lists_section.dart';
 import 'package:website/components/model_section.dart';
 import 'package:website/components/navbar.dart';
 import 'package:website/pages/docs_page.dart';
@@ -31,6 +32,7 @@ void main() {
       expect(find.text('// CAPABILITY MATRIX'), findsOneComponent);
       expect(find.text('// THE MODEL'), findsOneComponent);
       expect(find.text('// AGENT SKILL'), findsOneComponent);
+      expect(find.text('// DYNAMIC LISTS'), findsOneComponent);
       expect(find.text('// WORKSPACE TOPOLOGY'), findsOneComponent);
 
       // Footer
@@ -106,6 +108,18 @@ void main() {
       );
       expect(find.text('COPY'), findsNComponents(2));
       expect(find.text('Read SKILL.md →'), findsOneComponent);
+    });
+
+    testComponents('ListsSection shows the packing files, the demo rows and the dnd_kit credit', (tester) async {
+      tester.pumpComponent(const ListsSection());
+
+      expect(find.text('// DYNAMIC LISTS'), findsOneComponent);
+      for (final file in ['packing_schema.dart', 'packing_list.dart', 'packing_row.dart']) {
+        expect(find.text(file), findsOneComponent);
+      }
+      expect(find.text('// ROWS — index · clientId · label'), findsOneComponent);
+      expect(find.text('⠿'), findsNComponents(3));
+      expect(find.text('dnd_kit'), findsOneComponent);
     });
 
     testComponents('HeroSection renders headline, command bar and CTAs', (tester) async {

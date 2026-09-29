@@ -10,6 +10,8 @@ import 'package:website/components/demo/hero_login_demo.dart'
     deferred as _hero_login_demo;
 import 'package:website/components/demo/model_login_demo.dart'
     deferred as _model_login_demo;
+import 'package:website/components/demo/packing_demo.dart'
+    deferred as _packing_demo;
 import 'package:website/components/docs/docs_menu_toggle.dart'
     deferred as _docs_menu_toggle;
 import 'package:website/components/docs/docs_sidebar.dart'
@@ -53,6 +55,10 @@ ClientOptions get defaultClientOptions => ClientOptions(
     'model_login_demo': ClientLoader(
       (p) => _model_login_demo.ModelLoginDemo(),
       loader: _model_login_demo.loadLibrary,
+    ),
+    'packing_demo': ClientLoader(
+      (p) => _packing_demo.PackingDemo(),
+      loader: _packing_demo.loadLibrary,
     ),
     'docs_menu_toggle': ClientLoader(
       (p) => _docs_menu_toggle.DocsMenuToggle(),

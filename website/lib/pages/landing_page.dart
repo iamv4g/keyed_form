@@ -5,6 +5,7 @@ import '../components/agent_skill_section.dart';
 import '../components/footer.dart';
 import '../components/hero_section.dart';
 import '../components/invariants_grid.dart';
+import '../components/lists_section.dart';
 import '../components/matrix_section.dart';
 import '../components/model_section.dart';
 import '../components/navbar.dart';
@@ -23,6 +24,8 @@ class LandingPage extends StatelessComponent {
       const ModelSection(),
       const hr(classes: 'rule'),
       const AgentSkillSection(),
+      const hr(classes: 'rule'),
+      const ListsSection(),
       const hr(classes: 'rule'),
       const InvariantsGrid(),
       const hr(classes: 'rule'),
