@@ -11,16 +11,17 @@ Touch the fields for the current step, then check their errors before changing t
 
 ```dart
 void next() {
-  form.touch(CheckoutFields.customerName.key);
-  if (form.field(CheckoutFields.customerName).error == null) {
-    setState(() => currentStep++);
-    return;
+  if (currentStep == 0) {
+    form.touch(CheckoutFields.customerName.key);
+    if (form.field(CheckoutFields.customerName).error == null) {
+      setState(() => currentStep++);
+    }
+  } else {
+    form.handleSubmit(context, (data) async {
+      await api.submitOrder(data);
+    });
   }
-
-  form.handleSubmit(context, (data) async {
-    await api.submitOrder(data);
-  });
 }
 ```
 
-Set the controller's initial value, mode, and schema resolver once. Dispose it when the wizard screen is removed.
+The step check matters: validate only the fields for the current step before advancing, then submit the complete form on the last step. Keep the controller above the switched step subtree, set its initial value, mode, and schema resolver once, and dispose it when the wizard screen is removed.
