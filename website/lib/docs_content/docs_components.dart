@@ -4,12 +4,14 @@ import 'package:jaspr_content/jaspr_content.dart';
 
 import '../code/code_tabs.dart';
 import '../code/highlight.dart';
+import '../components/copy_button.dart';
 import '../components/demo/packing_demo.dart';
 import '../components/docs/package_topology.dart';
 import '../components/docs/capability_matrix.dart';
 import '../example_sources.dart';
 
-/// Fenced code blocks, highlighted with the site's own tk-* classes.
+/// Fenced code blocks, highlighted with the site's own tk-* classes: a
+/// caption bar with the language and a copy button over the code.
 class KfCodeBlock extends CustomComponent {
   const KfCodeBlock() : super.base();
 
@@ -18,8 +20,14 @@ class KfCodeBlock extends CustomComponent {
     if (node case ElementNode(tag: 'pre', children: [ElementNode(tag: 'code', :final children, :final attributes)])) {
       final source = (children ?? const <Node>[]).map((c) => c.innerText).join().trimRight();
       final language = attributes['class']?.replaceFirst('language-', '');
-      return pre(classes: 'md-code mono', [
-        code(language == 'dart' ? highlightDart(source) : [.text(source)]),
+      return figure(classes: 'md-codeblock', [
+        figcaption(classes: 'md-codeblock-bar', [
+          span(classes: 'md-codeblock-lang mono', [.text(language ?? 'text')]),
+          CopyButton(text: source, label: 'Copy', classes: 'md-codeblock-copy'),
+        ]),
+        pre(classes: 'md-code mono', [
+          code(language == 'dart' ? highlightDart(source) : [.text(source)]),
+        ]),
       ]);
     }
     return null;

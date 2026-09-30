@@ -16,6 +16,7 @@ import 'build_inputs.dart';
 import 'code/highlight.dart';
 import 'docs_content/docs_components.dart';
 import 'docs_content/docs_layout.dart';
+import 'docs_content/heading_anchors.dart';
 import 'docs_content/search_index.dart';
 import 'example_sources.dart';
 import 'main.server.options.dart';
@@ -87,7 +88,7 @@ Future<void> main() async {
               loaders: [FilesystemLoader('content')],
               configResolver: PageConfig.all(
                 parsers: [MarkdownParser()],
-                extensions: [TableOfContentsExtension(maxHeaderDepth: 2)],
+                extensions: [TableOfContentsExtension(maxHeaderDepth: 2), const KfHeadingAnchors()],
                 components: [
                   const KfCodeBlock(),
                   const ExampleCode(),
