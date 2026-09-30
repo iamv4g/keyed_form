@@ -1,7 +1,7 @@
 import 'package:jaspr/jaspr.dart';
 
-/// One searchable section of a docs page: `title`, `section` (empty for the
-/// page intro), `url` (with base path and anchor) and `text`.
+/// One searchable section: `title`, Markdown `section`, `docSection` and
+/// `docSectionTitle`, plus `url` (base-prefixed with anchor) and plain `text`.
 typedef SearchEntry = Map<String, String>;
 
 /// The docs search index, built by `main.server.dart` from `content/docs/`.

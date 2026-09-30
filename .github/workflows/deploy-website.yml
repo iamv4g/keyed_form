@@ -66,6 +66,12 @@ jobs:
           set -e
           test -f index.html || { echo "ERROR: index.html not found"; exit 1; }
           test -f docs/index.html || { echo "ERROR: docs page not found"; exit 1; }
+          test -f docs/guides/index.html || { echo "ERROR: Guides page not found"; exit 1; }
+          test -f docs/schema/index.html || { echo "ERROR: Schema page not found"; exit 1; }
+          test -f docs/form-state/index.html || { echo "ERROR: Form State page not found"; exit 1; }
+          test -f docs/flutter/index.html || { echo "ERROR: Flutter page not found"; exit 1; }
+          test -f docs/schema/code-generation/index.html || { echo "ERROR: Code generation page not found"; exit 1; }
+          test -f docs/schema/code-generation/index.html.md || { echo "ERROR: Code generation Markdown copy not found"; exit 1; }
           test -f docs/quickstart/index.html || { echo "ERROR: quickstart page not found"; exit 1; }
           test -f playground/index.html || { echo "ERROR: playground page not found"; exit 1; }
           test -f main.client.dart.js || { echo "ERROR: client bundle not found"; exit 1; }

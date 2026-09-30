@@ -36,9 +36,11 @@ class KfDocsLayout implements PageLayout {
     final data = page.data.page;
     final title = data['title'] as String?;
     final description = data['description'] as String?;
-    final index = docsPages.indexWhere((entry) => entry.path == page.url);
-    final prev = index > 0 ? docsPages[index - 1] : null;
-    final next = index >= 0 && index < docsPages.length - 1 ? docsPages[index + 1] : null;
+    final entry = docsPageForPath(page.url);
+    final sectionPages = docsPagesFor(entry.section);
+    final index = sectionPages.indexOf(entry);
+    final prev = index > 0 ? sectionPages[index - 1] : null;
+    final next = index < sectionPages.length - 1 ? sectionPages[index + 1] : null;
     final toc = page.data['toc'];
     final tocEntries = toc is TableOfContents && toc.entries.isNotEmpty ? toc : null;
 
@@ -47,9 +49,9 @@ class KfDocsLayout implements PageLayout {
         title: title == null ? 'Documentation · keyed_form' : '$title · keyed_form',
         meta: {'description': ?description},
       ),
-      const DocsHeader(section: 'docs', hasSidebar: true),
+      DocsHeader(section: entry.section, hasSidebar: true),
       div(classes: 'docs-shell docs-body', [
-        _Sidebar(current: page.url),
+        _Sidebar(current: page.url, section: entry.section, pages: sectionPages),
         div(classes: 'docs-main', [
           main_(classes: 'docs-article md-content', [
             div(classes: 'docs-page-header', [
@@ -63,6 +65,11 @@ class KfDocsLayout implements PageLayout {
               ]),
               if (description != null) p(classes: 'docs-description', [.text(description)]),
             ]),
+            if (entry.section == DocsSection.docs)
+              p(classes: 'md-note', [
+                .text('Comparison copy: this is the previous documentation and may contain outdated guidance. '),
+                a(href: '$siteBasePath/docs/guides', [.text('Read the reorganized guides')]),
+              ]),
             child,
             nav(
               classes: 'md-pager',
@@ -115,7 +122,7 @@ class KfDocsLayout implements PageLayout {
 const _keepScroll = '''
 (function () {
   var nav = document.currentScript.parentElement.querySelector('.md-sidebar-scroll');
-  var key = 'kf-sidebar-scroll';
+  var key = 'kf-sidebar-scroll:' + nav.dataset.docsSection;
   try {
     var saved = sessionStorage.getItem(key);
     sessionStorage.removeItem(key);
@@ -135,17 +142,20 @@ const _keepScroll = '''
 })();
 ''';
 
+
 /// The chapters list: a sticky column on wide screens, a drawer from the
 /// left (opened from the header's tab row) on narrow ones. Site links sit on
 /// top, then one labelled group per chapter.
 class _Sidebar extends StatelessComponent {
-  const _Sidebar({required this.current});
+  const _Sidebar({required this.current, required this.section, required this.pages});
 
   final String current;
+  final DocsSection section;
+  final List<DocsEntry> pages;
 
   @override
   Component build(BuildContext context) {
-    final groups = {for (final entry in docsPages) entry.group};
+    final groups = {for (final entry in pages) entry.group};
     return div(classes: 'md-sidebar', [
       const DocsMenuBackdrop(),
       aside(classes: 'md-sidebar-panel', [
@@ -153,7 +163,7 @@ class _Sidebar extends StatelessComponent {
         div(classes: 'md-sidebar-fade bottom', []),
         nav(
           classes: 'md-sidebar-scroll',
-          attributes: {'aria-label': 'Documentation'},
+          attributes: {'aria-label': 'Documentation', 'data-docs-section': section.id},
           [
             ul(classes: 'md-sidebar-links', [
               _siteLink('Website', '$siteBasePath/', lucide.Globe(width: 16.px, height: 16.px)),
@@ -165,7 +175,7 @@ class _Sidebar extends StatelessComponent {
                 if (i > 0) div(classes: 'md-group-separator', []),
                 div(classes: 'md-group-label', [.text(group)]),
                 ul(classes: 'md-group-items', [
-                  for (final entry in docsPages.where((e) => e.group == group)) _item(entry),
+                  for (final entry in pages.where((e) => e.group == group)) _item(entry),
                 ]),
               ]),
           ],
