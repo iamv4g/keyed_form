@@ -384,6 +384,11 @@ void main() {
         contains('<meta property="og:image" content="https://keyed-form.v4g.space/images/logo.png"/>'),
       );
       expect(File('build/jaspr/images/logo.png').existsSync(), isTrue);
+      final robots = File('build/jaspr/robots.txt');
+      expect(robots.existsSync(), isTrue);
+      final robotsRules = robots.readAsStringSync();
+      expect(robotsRules, contains('User-agent: facebookexternalhit\nAllow: /'));
+      expect(robotsRules, contains('User-agent: Facebot\nAllow: /'));
 
       // System Theme & Preference restore script
       expect(content, contains('localStorage.getItem(\'theme\')'));
