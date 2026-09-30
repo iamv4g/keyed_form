@@ -22,6 +22,13 @@ import 'example_sources.dart';
 import 'main.server.options.dart';
 import 'package_versions.dart';
 
+const _siteTitle = 'keyed_form — big Flutter forms, one rebuild per keystroke';
+const _siteDescription =
+    'Typed Flutter forms from one schema: each widget listens to its own slice of state, dynamic lists keep their identity across reorders, and form logic is plain Dart you can test without a widget tree.';
+const _siteUrl = 'https://keyed-form.v4g.space/';
+const _shareImageUrl = '${_siteUrl}images/logo.png';
+const _shareImageAlt = 'keyed_form logo';
+
 Future<void> main() async {
   await initHighlighter();
 
@@ -32,19 +39,25 @@ Future<void> main() async {
   runApp(
     Document(
       base: '$siteBasePath/',
-      title: 'keyed_form — big Flutter forms, one rebuild per keystroke',
+      title: _siteTitle,
       lang: 'en',
       meta: {
-        'description':
-            'Typed Flutter forms from one schema: each widget listens to its own slice of state, dynamic lists keep their identity across reorders, and form logic is plain Dart you can test without a widget tree.',
-        'og:title': 'keyed_form — big Flutter forms, one rebuild per keystroke',
-        'og:description':
-            'Typed Flutter forms from one schema: each widget listens to its own slice of state, dynamic lists keep their identity across reorders, and form logic is plain Dart you can test without a widget tree.',
-        'og:type': 'website',
-        'og:url': 'https://keyed-form.v4g.space/',
-        'twitter:card': 'summary_large_image',
+        'description': _siteDescription,
+        'twitter:card': 'summary',
+        'twitter:title': _siteTitle,
+        'twitter:description': _siteDescription,
+        'twitter:image': _shareImageUrl,
+        'twitter:image:alt': _shareImageAlt,
       },
       head: [
+        meta(attributes: {'property': 'og:title', 'content': _siteTitle}),
+        meta(attributes: {'property': 'og:description', 'content': _siteDescription}),
+        meta(attributes: {'property': 'og:type', 'content': 'website'}),
+        meta(attributes: {'property': 'og:url', 'content': _siteUrl}),
+        meta(attributes: {'property': 'og:image', 'content': _shareImageUrl}),
+        meta(attributes: {'property': 'og:image:alt', 'content': _shareImageAlt}),
+        meta(attributes: {'property': 'og:image:width', 'content': '512'}),
+        meta(attributes: {'property': 'og:image:height', 'content': '512'}),
         link(
           rel: 'icon',
           href: '$siteBasePath/favicon.ico',

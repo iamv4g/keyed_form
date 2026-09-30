@@ -374,6 +374,16 @@ void main() {
           '<title>keyed_form — big Flutter forms, one rebuild per keystroke</title>',
         ),
       );
+      expect(content, contains('<meta name="twitter:card" content="summary"/>'));
+      expect(
+        content,
+        contains('<meta name="twitter:image" content="https://keyed-form.v4g.space/images/logo.png"/>'),
+      );
+      expect(
+        content,
+        contains('<meta property="og:image" content="https://keyed-form.v4g.space/images/logo.png"/>'),
+      );
+      expect(File('build/jaspr/images/logo.png').existsSync(), isTrue);
 
       // System Theme & Preference restore script
       expect(content, contains('localStorage.getItem(\'theme\')'));
@@ -405,7 +415,6 @@ void main() {
       final jsFile = File('build/jaspr/main.client.dart.js');
       expect(jsFile.existsSync(), isTrue);
       expect(jsFile.lengthSync(), greaterThan(10000));
-
     });
   });
 }
