@@ -53,7 +53,7 @@ List<StyleRule> get markdownStyles => [
   ),
   css('.docs-article').styles(
     minWidth: 0.px,
-    padding: .only(top: 40.px, bottom: 48.px, left: 24.px, right: 24.px),
+    padding: .only(top: 40.px, left: 24.px, right: 24.px),
     raw: {'flex': '1'},
   ),
   css('.docs-toc').styles(
@@ -370,34 +370,62 @@ List<StyleRule> get markdownStyles => [
   ),
   css('.md-note > :last-child').styles(margin: .only(bottom: 0.px)),
 
-  css('.md-page-footer').styles(
-    margin: .only(top: 56.px),
-    padding: .only(top: 24.px),
+  // Previous / next: secondary buttons at the end of the article.
+  css('.md-pager').styles(
+    display: Display.flex,
+    margin: .only(top: 48.px),
+    justifyContent: JustifyContent.spaceBetween,
+    gap: Gap(column: 16.px),
+  ),
+  css('.md-content .md-pager-link').styles(
+    display: Display.inlineFlex,
+    height: 32.px,
+    padding: .symmetric(horizontal: 10.px),
+    alignItems: AlignItems.center,
+    gap: Gap(column: 6.px),
+    radius: BorderRadius.circular(10.px),
+    color: AppColors.ink,
+    backgroundColor: AppColors.surfaceElevated,
+    fontSize: 0.875.rem,
+    fontWeight: FontWeight.w500,
+    textDecoration: TextDecoration.none,
+  ),
+  css('.md-content .md-pager-link:hover').styles(opacity: 0.8),
+  css('.md-pager-link.next').styles(raw: {'margin-left': 'auto'}),
+
+  // Footer inside the article column.
+  css('.docs-footer').styles(
+    display: Display.flex,
+    margin: .only(top: 48.px),
+    padding: .symmetric(vertical: 48.px),
+    flexWrap: FlexWrap.wrap,
+    alignItems: AlignItems.center,
+    justifyContent: JustifyContent.spaceBetween,
+    gap: Gap(row: 16.px, column: 16.px),
+    backgroundColor: Colors.transparent,
     border: Border.only(
       top: BorderSide.solid(color: AppColors.border, width: 1.px),
     ),
   ),
-  css('.md-pager').styles(
-    display: Display.flex,
-    justifyContent: JustifyContent.spaceBetween,
-    gap: Gap(column: 16.px),
+  css('.docs-footer .docs-footer-text').styles(
+    margin: .zero,
+    fontSize: 0.8.rem,
+    color: AppColors.inkMuted,
+    opacity: 1,
   ),
-  css('.md-pager-link').styles(
-    display: Display.flex,
-    flexDirection: FlexDirection.column,
-    gap: Gap(row: 2.px),
-    padding: .symmetric(vertical: 12.px, horizontal: 16.px),
-    border: Border.all(color: AppColors.border, width: 1.px),
-    radius: BorderRadius.circular(6.px),
+  css('.docs-footer .docs-footer-text a').styles(
+    color: AppColors.inkMuted,
+    fontWeight: FontWeight.w400,
     textDecoration: TextDecoration.none,
-    raw: {'flex': '1', 'max-width': '50%'},
   ),
-  css('.md-pager-link:hover').styles(
-    border: Border.all(color: AppColors.cyan, width: 1.px),
+  css('.docs-footer .docs-footer-text a:hover').styles(color: AppColors.ink),
+  css('.docs-footer-icons').styles(
+    display: Display.flex,
+    alignItems: AlignItems.center,
+    gap: Gap(column: 4.px),
   ),
-  css('.md-pager-link.next').styles(alignItems: AlignItems.end, raw: {'margin-left': 'auto'}),
-  css('.md-pager-label').styles(fontSize: 0.8.rem, color: AppColors.inkMuted),
-  css('.md-pager-title').styles(color: AppColors.cyan, fontWeight: FontWeight.w600),
+  css('.docs-footer .header-icon-button').styles(color: AppColors.ink),
+  css('.docs-footer-icons .jaspr-badge').styles(margin: .only(left: 8.px)),
 
   css('.md-toc-mobile').styles(display: Display.none),
 

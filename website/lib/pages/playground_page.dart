@@ -1,7 +1,7 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
-import '../components/footer.dart';
+import '../components/docs/docs_footer.dart';
 import '../components/docs_header.dart';
 import '../components/playground/playground_demo.dart';
 
@@ -21,8 +21,8 @@ class PlaygroundPage extends StatelessComponent {
           ),
         ]),
         const PlaygroundDemo(),
+        const DocsFooter(),
       ]),
-      const Footer(),
     ]);
   }
 }

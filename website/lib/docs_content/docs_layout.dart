@@ -7,7 +7,7 @@ import '../base_path.dart';
 import '../components/docs/copy_page.dart';
 import '../components/docs/docs_menu_backdrop.dart';
 import '../components/docs_header.dart';
-import '../components/footer.dart';
+import '../components/docs/docs_footer.dart';
 import 'docs_nav.dart';
 
 const _editBase = 'https://github.com/iamv4g/keyed_form/edit/main/website/content/';
@@ -68,12 +68,33 @@ class KfDocsLayout implements PageLayout {
                 _toc(tocEntries.entries, page.url),
               ]),
             child,
-            div(classes: 'md-page-footer', [
-              nav(classes: 'md-pager', [
-                if (prev != null) _pagerLink(prev, 'Previous', 'prev') else span([]),
-                if (next != null) _pagerLink(next, 'Next', 'next'),
-              ]),
-            ]),
+            nav(
+              classes: 'md-pager',
+              attributes: {'aria-label': 'Previous and next page'},
+              [
+                if (prev != null)
+                  a(
+                    classes: 'md-pager-link',
+                    href: '$siteBasePath${prev.path}',
+                    attributes: {'rel': 'prev'},
+                    [
+                      lucide.ArrowLeft(width: 16.px, height: 16.px),
+                      span([.text(prev.title)]),
+                    ],
+                  ),
+                if (next != null)
+                  a(
+                    classes: 'md-pager-link next',
+                    href: '$siteBasePath${next.path}',
+                    attributes: {'rel': 'next'},
+                    [
+                      span([.text(next.title)]),
+                      lucide.ArrowRight(width: 16.px, height: 16.px),
+                    ],
+                  ),
+              ],
+            ),
+            const DocsFooter(),
           ]),
           aside(classes: 'docs-toc', [
             if (tocEntries != null)
@@ -84,7 +105,6 @@ class KfDocsLayout implements PageLayout {
           ]),
         ]),
       ]),
-      const Footer(),
     ]);
   }
 
@@ -96,13 +116,6 @@ class KfDocsLayout implements PageLayout {
         if (entry.children.isNotEmpty) _toc(entry.children, url),
       ]),
   ]);
-
-  static Component _pagerLink(DocsEntry entry, String label, String classes) {
-    return a(classes: 'md-pager-link $classes', href: '$siteBasePath${entry.path}', [
-      span(classes: 'md-pager-label', [.text(label)]),
-      span(classes: 'md-pager-title', [.text(entry.title)]),
-    ]);
-  }
 }
 
 // Saves the list's scroll offset when one of its links is clicked and

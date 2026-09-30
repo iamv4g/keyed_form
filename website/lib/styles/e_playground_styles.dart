@@ -7,7 +7,7 @@ import 'theme_tokens.dart';
 List<StyleRule> get playgroundStyles => [
   // Inside the docs shell, inset like a docs article.
   css('.docs-shell.playground-page').styles(
-    padding: .only(top: 40.px, bottom: 72.px, left: 40.px, right: 40.px),
+    padding: .only(top: 40.px, left: 40.px, right: 40.px),
   ),
 
   css('.playground-grid').styles(
