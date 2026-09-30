@@ -56,8 +56,8 @@ jobs:
       # an unpinned global CLI drifting from the SDK.
       # *.kfg.dart is committed (repo convention), so no separate
       # build_runner step is needed before this.
-      - name: Build static site
-        run: dart run jaspr_cli:jaspr build --verbose --dart-define=SITE_BASE_PATH=/keyed_form
+      - name: Build static site for the custom-domain root
+        run: dart run jaspr_cli:jaspr build --verbose
         working-directory: website
 
       - name: Verify build output
@@ -75,7 +75,7 @@ jobs:
           test -f docs/quickstart/index.html || { echo "ERROR: quickstart page not found"; exit 1; }
           test -f playground/index.html || { echo "ERROR: playground page not found"; exit 1; }
           test -f main.client.dart.js || { echo "ERROR: client bundle not found"; exit 1; }
-          grep -q '<base href="/keyed_form/"/>' index.html || { echo "ERROR: base href not rewritten to /keyed_form/"; exit 1; }
+          grep -q '<base href="/"/>' index.html || { echo "ERROR: base href must target the custom-domain root"; exit 1; }
           echo "Build output OK"
 
       # Disables Jekyll processing on GitHub Pages, which otherwise ignores
