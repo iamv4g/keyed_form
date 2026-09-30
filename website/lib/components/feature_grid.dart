@@ -29,7 +29,7 @@ const _features = [
         'Server checks with a timeout. A check that throws or times out marks the field failed, not invalid, so '
         'retrying is the obvious next step.',
     api: ['validateAsync', 'isFailedValidation'],
-    page: 'async-validation',
+    page: 'form-state/async-validation',
   ),
   _Feature(
     icon:
@@ -38,7 +38,7 @@ const _features = [
     title: 'Cross-field rules',
     body: 'Rules that read the whole draft, switch on and off with a condition, and pin their error to one field.',
     api: ['.refine(when:, path:)'],
-    page: 'validation',
+    page: 'schema/refinements',
   ),
   _Feature(
     icon: 'M5 12h14 M12 5l7 7-7 7',
@@ -47,28 +47,28 @@ const _features = [
         "One field writes another. The text binding tells a derived write from the user's own typing, so the "
         'caret never jumps.',
     api: ['addRelation'],
-    page: 'relations',
+    page: 'form-state/relations',
   ),
   _Feature(
     icon: 'M12 2L2 7l10 5 10-5-10-5z M2 17l10 5 10-5 M2 12l10 5 10-5',
     title: 'Nested objects & unions',
     body: 'Objects, lists of objects and discriminated unions, with typed refs all the way down to the leaf.',
     api: ['ks.object', 'ks.list', 'ks.discriminatedUnion'],
-    page: 'unions',
+    page: 'schema/unions',
   ),
   _Feature(
     icon: 'M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z M7 11V7a5 5 0 0 1 10 0v4',
     title: 'Freeze a subtree',
     body: 'One call freezes a field, a row or a whole section against writes. Frozen fields still validate.',
     api: ['markReadOnly'],
-    page: 'field-handles',
+    page: 'form-state/field-handles',
   ),
   _Feature(
     icon: 'M12 5v14 M19 12l-7 7-7-7',
     title: 'Scroll to first error',
     body: 'Works in lazy lists too: it jumps to the right section first, then reveals the exact field.',
     api: ['revealFirst'],
-    page: 'scroll-to-first-error',
+    page: 'flutter/scroll-to-first-error',
   ),
   _Feature(
     icon: 'M22 2L11 13 M22 2l-7 20-4-9-9-4 20-7z',
@@ -77,7 +77,7 @@ const _features = [
         'Validate everything, reveal errors, scroll to the first one or run your callback, and track submitting — '
         'in one call.',
     api: ['handleSubmit'],
-    page: 'quickstart',
+    page: 'flutter/scroll-to-first-error',
   ),
   _Feature(
     icon:
@@ -86,14 +86,14 @@ const _features = [
     title: 'Server errors',
     body: "Put a 422's messages on the right fields, by key or by wire path — shown at once, touched or not.",
     api: ['setServerErrors'],
-    page: 'server-errors',
+    page: 'form-state/server-errors',
   ),
   _Feature(
     icon: 'M9 11l3 3L22 4 M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',
     title: 'Test without widgets',
     body: 'The controller is plain Dart. Drive a whole form in a unit test, with no widget tree to pump.',
     api: ['KeyedFormController'],
-    page: 'testing',
+    page: 'guides/testing',
   ),
 ];
 

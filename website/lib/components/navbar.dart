@@ -20,7 +20,7 @@ class Navbar extends StatelessComponent {
           ]),
         ]),
         nav(classes: 'nav-links mono', [
-          a(href: '$siteBasePath/docs', [.text('Docs')]),
+          a(href: '$siteBasePath/docs/guides', [.text('Docs')]),
           a(classes: 'nav-playground', href: '$siteBasePath/playground', [.text('Playground')]),
           span(classes: 'nav-divider', attributes: {'aria-hidden': 'true'}, []),
           const SiteIconLinks(),

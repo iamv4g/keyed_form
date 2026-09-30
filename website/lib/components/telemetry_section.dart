@@ -44,7 +44,7 @@ class TelemetrySection extends StatelessComponent {
           ]),
         ]),
       ]),
-      a(classes: 'section-link mono', href: '$siteBasePath/docs/benchmarks', [
+      a(classes: 'section-link mono', href: '$siteBasePath/docs/guides/benchmarks', [
         .text('Benchmarks & methodology →'),
       ]),
     ]);

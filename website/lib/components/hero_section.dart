@@ -37,7 +37,7 @@ class HeroSection extends StatelessComponent {
         ]),
         div(classes: 'cta-group mono', [
           a(
-            href: '$siteBasePath/docs/quickstart',
+            href: '$siteBasePath/docs/guides/quickstart',
             classes: 'btn btn-cyan',
             [.text('Build your first form →')],
           ),
