@@ -6,6 +6,7 @@ import 'package:jaspr_lucide/jaspr_lucide.dart' as lucide;
 import '../base_path.dart';
 import '../components/docs/copy_page.dart';
 import '../components/docs/docs_menu_backdrop.dart';
+import '../components/docs/docs_toc.dart';
 import '../components/docs_header.dart';
 import '../components/docs/docs_footer.dart';
 import 'docs_nav.dart';
@@ -62,11 +63,6 @@ class KfDocsLayout implements PageLayout {
               ]),
               if (description != null) p(classes: 'docs-description', [.text(description)]),
             ]),
-            if (tocEntries != null)
-              details(classes: 'md-toc-mobile', [
-                summary([.text('On this page')]),
-                _toc(tocEntries.entries, page.url),
-              ]),
             child,
             nav(
               classes: 'md-pager',
@@ -97,11 +93,7 @@ class KfDocsLayout implements PageLayout {
             const DocsFooter(),
           ]),
           aside(classes: 'docs-toc', [
-            if (tocEntries != null)
-              div(classes: 'docs-toc-inner', [
-                div(classes: 'docs-toc-header', [.text('On this page')]),
-                div(classes: 'md-toc', [_toc(tocEntries.entries, page.url)]),
-              ]),
+            if (tocEntries != null) DocsToc(entries: _tocEntries(tocEntries.entries, page.url)),
           ]),
         ]),
       ]),
@@ -109,13 +101,12 @@ class KfDocsLayout implements PageLayout {
   }
 
   // Links carry the base path: a bare `#id` would resolve against <base>.
-  static Component _toc(List<TocEntry> entries, String url) => ul([
-    for (final entry in entries)
-      li([
-        a(href: '$siteBasePath$url#${entry.id}', [.text(entry.text)]),
-        if (entry.children.isNotEmpty) _toc(entry.children, url),
-      ]),
-  ]);
+  static List<Map<String, String>> _tocEntries(List<TocEntry> entries, String url, [int depth = 0]) => [
+    for (final entry in entries) ...[
+      {'text': entry.text, 'id': entry.id, 'href': '$siteBasePath$url#${entry.id}', 'depth': '$depth'},
+      ..._tocEntries(entry.children, url, depth + 1),
+    ],
+  ];
 }
 
 // Saves the list's scroll offset when one of its links is clicked and

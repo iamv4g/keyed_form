@@ -16,6 +16,7 @@ import 'package:website/components/docs/docs_menu_backdrop.dart'
 import 'package:website/components/docs/docs_menu_toggle.dart'
     as _docs_menu_toggle;
 import 'package:website/components/docs/docs_search.dart' as _docs_search;
+import 'package:website/components/docs/docs_toc.dart' as _docs_toc;
 import 'package:website/components/playground/playground_demo.dart'
     as _playground_demo;
 import 'package:website/components/copy_button.dart' as _copy_button;
@@ -75,6 +76,10 @@ ServerOptions get defaultServerOptions => ServerOptions(
       'docs_search',
       params: __docs_searchDocsSearch,
     ),
+    _docs_toc.DocsToc: ClientTarget<_docs_toc.DocsToc>(
+      'docs_toc',
+      params: __docs_tocDocsToc,
+    ),
     _playground_demo.PlaygroundDemo:
         ClientTarget<_playground_demo.PlaygroundDemo>('playground_demo'),
     _theme_toggle.ThemeToggle: ClientTarget<_theme_toggle.ThemeToggle>(
@@ -103,5 +108,8 @@ Map<String, Object?> __copy_pageCopyPageButton(_copy_page.CopyPageButton c) => {
   'editUrl': c.editUrl,
 };
 Map<String, Object?> __docs_searchDocsSearch(_docs_search.DocsSearch c) => {
+  'entries': c.entries,
+};
+Map<String, Object?> __docs_tocDocsToc(_docs_toc.DocsToc c) => {
   'entries': c.entries,
 };

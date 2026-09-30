@@ -427,40 +427,32 @@ List<StyleRule> get markdownStyles => [
   css('.docs-footer .header-icon-button').styles(color: AppColors.ink),
   css('.docs-footer-icons .jaspr-badge').styles(margin: .only(left: 8.px)),
 
-  css('.md-toc-mobile').styles(display: Display.none),
-
-  css('.md-toc ul').styles(
+  // On this page: a left rule, the section being read marked on it.
+  css('.md-toc').styles(
     listStyle: ListStyle.none,
-    padding: .only(left: 12.px),
     border: Border.only(
       left: BorderSide.solid(color: AppColors.border, width: 1.px),
     ),
   ),
-  css('.md-toc li').styles(margin: .only(bottom: 8.px)),
-  css('.md-toc a').styles(
-    fontSize: 0.85.rem,
+  css('.md-toc-link').styles(
+    display: Display.block,
+    padding: .only(top: 4.px, bottom: 4.px, left: 12.px),
+    margin: .only(left: (-1).px),
+    border: Border.only(
+      left: BorderSide.solid(color: Colors.transparent, width: 1.px),
+    ),
     color: AppColors.inkMuted,
+    fontSize: 0.875.rem,
+    lineHeight: 1.25.rem,
     textDecoration: TextDecoration.none,
+    transition: const Transition('color', duration: Duration(milliseconds: 150)),
   ),
-  css('.md-toc a:hover').styles(color: AppColors.cyan),
-
-  ContainerStyleRule('(max-width: 48rem)', [
-    css('.md-toc-mobile').styles(
-      display: Display.block,
-      margin: .only(bottom: 24.px),
-      padding: .symmetric(vertical: 10.px, horizontal: 14.px),
-      border: Border.all(color: AppColors.border, width: 1.px),
-      radius: BorderRadius.circular(6.px),
-      fontSize: 0.92.rem,
-    ),
-    css('.md-toc-mobile summary').styles(color: AppColors.ink, cursor: Cursor.pointer),
-    css('.md-toc-mobile ul').styles(
-      listStyle: ListStyle.none,
-      margin: .only(top: 8.px),
-      padding: .zero,
-    ),
-    css('.md-toc-mobile a').styles(color: AppColors.inkMuted, textDecoration: TextDecoration.none),
-  ]),
+  css('.md-toc-link.nested').styles(padding: .only(left: 24.px)),
+  css('.md-toc-link:hover').styles(color: AppColors.ink),
+  css('.md-toc-link.active').styles(
+    color: AppColors.ink,
+    raw: {'border-left-color': 'var(--cyan)'},
+  ),
   // At md the sidebar becomes a drawer from the left, opened from the
   // header's tab row (html.docs-menu-open): 75% wide (24rem cap from sm),
   // fading in over a light, blurred backdrop.
