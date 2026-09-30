@@ -153,26 +153,91 @@ List<StyleRule> get markdownStyles => [
     lineHeight: 1.7.em,
     color: AppColors.inkMuted,
   ),
-  css('.md-eyebrow').styles(
-    display: Display.block,
-    margin: .only(bottom: 8.px),
-    fontSize: 0.88.rem,
-    fontWeight: FontWeight.w600,
-    color: AppColors.cyan,
+  // Title row: the page title with Copy page on its right, then the
+  // description.
+  css('.docs-page-header').styles(margin: .only(bottom: 32.px)),
+  css('.docs-title-row').styles(
+    display: Display.flex,
+    alignItems: AlignItems.center,
+    gap: Gap(column: 16.px),
   ),
   css('.md-content h1').styles(
     fontFamily: const .list([FontFamily('Space Grotesk'), FontFamilies.sansSerif]),
-    fontSize: 2.3.rem,
+    fontSize: 1.875.rem,
     lineHeight: 1.2.em,
     fontWeight: FontWeight.w700,
     color: AppColors.ink,
+    raw: {'flex': '1', 'min-width': '0'},
   ),
-  css('.md-lead').styles(
-    margin: .only(top: 12.px, bottom: 28.px),
-    fontSize: 1.25.rem,
-    lineHeight: 1.55.em,
+  css.media(MediaQuery.screen(minWidth: 768.px), [
+    css('.md-content h1').styles(fontSize: 2.25.rem),
+  ]),
+  css('.docs-description').styles(
+    margin: .only(top: 8.px),
+    fontSize: 1.125.rem,
+    lineHeight: 1.75.rem,
     color: AppColors.inkMuted,
   ),
+  css('.copy-page').styles(position: Position.relative(), raw: {'flex': 'none'}),
+  // One outlined block: each button is fully rounded, the group trims the
+  // inner corners and the shared border.
+  css('.copy-page-group').styles(display: Display.flex, alignItems: AlignItems.stretch),
+  css('.copy-page-button').styles(
+    display: Display.inlineFlex,
+    height: 32.px,
+    padding: .symmetric(horizontal: 10.px),
+    alignItems: AlignItems.center,
+    gap: Gap(column: 8.px),
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(8.px),
+    cursor: Cursor.pointer,
+    color: AppColors.ink,
+    fontFamily: const .list([FontFamily('Inter'), FontFamilies.sansSerif]),
+    fontSize: 0.875.rem,
+    fontWeight: FontWeight.w500,
+    whiteSpace: WhiteSpace.noWrap,
+    raw: {'flex': 'none', 'background-color': 'var(--control-bg)', 'border-color': 'var(--control-border)'},
+  ),
+  css('.copy-page-group > :not(:first-child)').styles(
+    raw: {'border-top-left-radius': '0', 'border-bottom-left-radius': '0', 'border-left-width': '0'},
+  ),
+  css('.copy-page-group > :not(:last-child)').styles(
+    raw: {'border-top-right-radius': '0', 'border-bottom-right-radius': '0'},
+  ),
+  css('.copy-page-trigger').styles(
+    padding: .only(left: 8.px, right: 10.px),
+  ),
+  css('.copy-page-button:hover, .copy-page-trigger[aria-expanded="true"]').styles(
+    raw: {'background-color': 'var(--surface-elevated)'},
+  ),
+  css('.copy-page-menu').styles(
+    display: Display.flex,
+    position: Position.absolute(top: Unit.expression('calc(100% + 4px)'), right: 0.px),
+    zIndex: ZIndex(50),
+    minWidth: 200.px,
+    padding: .all(4.px),
+    flexDirection: FlexDirection.column,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(10.px),
+    backgroundColor: AppColors.bg,
+    raw: {'box-shadow': 'var(--card-shadow)'},
+  ),
+  css('.md-content .copy-page-item').styles(
+    display: Display.flex,
+    height: 32.px,
+    padding: .symmetric(horizontal: 8.px),
+    alignItems: AlignItems.center,
+    gap: Gap(column: 8.px),
+    radius: BorderRadius.circular(6.px),
+    color: AppColors.ink,
+    fontSize: 0.875.rem,
+    textDecoration: TextDecoration.none,
+    whiteSpace: WhiteSpace.noWrap,
+  ),
+  css('.md-content .copy-page-item:hover').styles(backgroundColor: AppColors.surfaceElevated),
+  css.media(MediaQuery.screen(maxWidth: 767.px), [
+    css('.copy-page-label').styles(display: Display.none),
+  ]),
   css('.md-content h2').styles(
     margin: .only(top: 48.px, bottom: 12.px),
     fontFamily: const .list([FontFamily('Space Grotesk'), FontFamilies.sansSerif]),
@@ -270,12 +335,6 @@ List<StyleRule> get markdownStyles => [
   css('.md-pager-link.next').styles(alignItems: AlignItems.end, raw: {'margin-left': 'auto'}),
   css('.md-pager-label').styles(fontSize: 0.8.rem, color: AppColors.inkMuted),
   css('.md-pager-title').styles(color: AppColors.cyan, fontWeight: FontWeight.w600),
-  css('.md-edit').styles(
-    display: Display.inlineBlock,
-    margin: .only(top: 20.px),
-    fontSize: 0.85.rem,
-    color: AppColors.inkMuted,
-  ),
 
   css('.md-toc-mobile').styles(display: Display.none),
 

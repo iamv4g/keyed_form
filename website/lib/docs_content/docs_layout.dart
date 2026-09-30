@@ -4,13 +4,23 @@ import 'package:jaspr_content/jaspr_content.dart';
 import 'package:jaspr_lucide/jaspr_lucide.dart' as lucide;
 
 import '../base_path.dart';
+import '../components/docs/copy_page.dart';
 import '../components/docs/docs_menu_backdrop.dart';
 import '../components/docs_header.dart';
 import '../components/footer.dart';
-import '../components/icons.dart';
 import 'docs_nav.dart';
 
 const _editBase = 'https://github.com/iamv4g/keyed_form/edit/main/website/content/';
+
+/// The title and description that head a page's Markdown copy and its
+/// `index.html.md` output; the body only starts at the first section.
+String pageMarkdownHeader(Page page) {
+  final data = page.data.page;
+  return [
+    if (data['title'] case final String title) '# $title\n',
+    if (data['description'] case final String description) description,
+  ].join('\n');
+}
 
 /// Renders a Markdown page inside the site's own `Document` (a [PageLayout],
 /// not a `PageLayoutBase`, so it doesn't open a second one).
@@ -26,7 +36,6 @@ class KfDocsLayout implements PageLayout {
     final title = data['title'] as String?;
     final description = data['description'] as String?;
     final index = docsPages.indexWhere((entry) => entry.path == page.url);
-    final entry = index < 0 ? null : docsPages[index];
     final prev = index > 0 ? docsPages[index - 1] : null;
     final next = index >= 0 && index < docsPages.length - 1 ? docsPages[index + 1] : null;
     final toc = page.data['toc'];
@@ -42,9 +51,17 @@ class KfDocsLayout implements PageLayout {
         _Sidebar(current: page.url),
         div(classes: 'docs-main', [
           main_(classes: 'docs-article md-content', [
-            if (entry != null) span(classes: 'md-eyebrow', [.text(entry.group)]),
-            if (title != null) h1([.text(title)]),
-            if (description != null) p(classes: 'md-lead', [.text(description)]),
+            div(classes: 'docs-page-header', [
+              div(classes: 'docs-title-row', [
+                if (title != null) h1([.text(title)]),
+                CopyPageButton(
+                  markdown: '${pageMarkdownHeader(page)}\n\n${page.content.trim()}\n',
+                  markdownUrl: '$siteBasePath${page.url}/index.html.md',
+                  editUrl: '$_editBase${page.path}',
+                ),
+              ]),
+              if (description != null) p(classes: 'docs-description', [.text(description)]),
+            ]),
             if (tocEntries != null)
               details(classes: 'md-toc-mobile', [
                 summary([.text('On this page')]),
@@ -55,9 +72,6 @@ class KfDocsLayout implements PageLayout {
               nav(classes: 'md-pager', [
                 if (prev != null) _pagerLink(prev, 'Previous', 'prev') else span([]),
                 if (next != null) _pagerLink(next, 'Next', 'next'),
-              ]),
-              a(classes: 'md-edit', href: '$_editBase${page.path}', target: Target.blank, [
-                .text('Edit this page on GitHub ↗'),
               ]),
             ]),
           ]),

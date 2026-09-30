@@ -12,6 +12,7 @@ import 'package:website/components/demo/model_login_demo.dart'
     deferred as _model_login_demo;
 import 'package:website/components/demo/packing_demo.dart'
     deferred as _packing_demo;
+import 'package:website/components/docs/copy_page.dart' deferred as _copy_page;
 import 'package:website/components/docs/docs_menu_backdrop.dart'
     deferred as _docs_menu_backdrop;
 import 'package:website/components/docs/docs_menu_toggle.dart'
@@ -60,6 +61,14 @@ ClientOptions get defaultClientOptions => ClientOptions(
     'packing_demo': ClientLoader(
       (p) => _packing_demo.PackingDemo(),
       loader: _packing_demo.loadLibrary,
+    ),
+    'copy_page': ClientLoader(
+      (p) => _copy_page.CopyPageButton(
+        markdown: p['markdown'] as String,
+        markdownUrl: p['markdownUrl'] as String,
+        editUrl: p['editUrl'] as String,
+      ),
+      loader: _copy_page.loadLibrary,
     ),
     'docs_menu_backdrop': ClientLoader(
       (p) => _docs_menu_backdrop.DocsMenuBackdrop(),

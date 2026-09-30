@@ -97,6 +97,7 @@ Future<void> main() async {
                   const Note(),
                 ],
                 layouts: [const KfDocsLayout()],
+                secondaryOutputs: [MarkdownOutput(createHeader: pageMarkdownHeader)],
                 theme: ContentTheme.none(),
               ),
               routerBuilder: (routes) => Router(routes: [...appRoutes, for (final r in routes) ...r]),

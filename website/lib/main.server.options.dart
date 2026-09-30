@@ -10,6 +10,7 @@ import 'package:website/components/demo/hero_login_demo.dart'
 import 'package:website/components/demo/model_login_demo.dart'
     as _model_login_demo;
 import 'package:website/components/demo/packing_demo.dart' as _packing_demo;
+import 'package:website/components/docs/copy_page.dart' as _copy_page;
 import 'package:website/components/docs/docs_menu_backdrop.dart'
     as _docs_menu_backdrop;
 import 'package:website/components/docs/docs_menu_toggle.dart'
@@ -60,6 +61,10 @@ ServerOptions get defaultServerOptions => ServerOptions(
     _packing_demo.PackingDemo: ClientTarget<_packing_demo.PackingDemo>(
       'packing_demo',
     ),
+    _copy_page.CopyPageButton: ClientTarget<_copy_page.CopyPageButton>(
+      'copy_page',
+      params: __copy_pageCopyPageButton,
+    ),
     _docs_menu_backdrop.DocsMenuBackdrop:
         ClientTarget<_docs_menu_backdrop.DocsMenuBackdrop>(
           'docs_menu_backdrop',
@@ -91,6 +96,11 @@ Map<String, Object?> __copy_buttonCopyButton(_copy_button.CopyButton c) => {
   'text': c.text,
   'label': c.label,
   'classes': c.classes,
+};
+Map<String, Object?> __copy_pageCopyPageButton(_copy_page.CopyPageButton c) => {
+  'markdown': c.markdown,
+  'markdownUrl': c.markdownUrl,
+  'editUrl': c.editUrl,
 };
 Map<String, Object?> __docs_searchDocsSearch(_docs_search.DocsSearch c) => {
   'entries': c.entries,
