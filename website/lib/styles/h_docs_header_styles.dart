@@ -61,7 +61,7 @@ List<StyleRule> get docsHeaderStyles => [
     backgroundColor: AppColors.surfaceElevated,
     radius: BorderRadius.circular(10.px),
     overflow: Overflow.only(x: Overflow.auto),
-    raw: {'scrollbar-width': 'none', 'max-width': '100%'},
+    raw: {'scrollbar-width': 'none', 'max-width': '100%', 'min-width': '0', 'flex': '0 1 auto'},
   ),
   css('.docs-tab').styles(
     display: Display.inlineFlex,

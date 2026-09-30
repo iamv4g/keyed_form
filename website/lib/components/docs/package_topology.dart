@@ -37,9 +37,7 @@ class PackageTopology extends StatelessComponent {
     return div(classes: 'topology-grid mono', [
       for (final pkg in _packages)
         a(
-          classes: pkg.name == 'keyed_form_flutter'
-              ? 'blueprint-box topology-card flutter-layer'
-              : 'blueprint-box topology-card',
+          classes: 'blueprint-box topology-card',
           href: 'https://pub.dev/packages/${pkg.name}',
           target: Target.blank,
           [

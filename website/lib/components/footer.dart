@@ -26,11 +26,11 @@ class Footer extends StatelessComponent {
             _link('API reference', 'https://pub.dev/documentation/keyed_form_flutter/latest/', external: true),
           ]),
           _column('Docs', [
-            _link('Quickstart', '$siteBasePath/docs/quickstart'),
-            _link('Dynamic lists', '$siteBasePath/docs/dynamic-lists'),
-            _link('Validation', '$siteBasePath/docs/validation'),
-            _link('Testing', '$siteBasePath/docs/testing'),
-            _link('Benchmarks', '$siteBasePath/docs/benchmarks'),
+            _link('Quickstart', '$siteBasePath/docs/guides/quickstart'),
+            _link('Dynamic lists', '$siteBasePath/docs/guides/dynamic-lists'),
+            _link('Validation', '$siteBasePath/docs/schema/refinements'),
+            _link('Testing', '$siteBasePath/docs/guides/testing'),
+            _link('Benchmarks', '$siteBasePath/docs/guides/benchmarks'),
           ]),
           _column('Resources', [
             _link('Playground', '$siteBasePath/playground'),

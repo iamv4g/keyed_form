@@ -11,7 +11,7 @@ import 'package:universal_web/web.dart' as web;
 class DocsSearch extends StatefulComponent {
   const DocsSearch({required this.entries, super.key});
 
-  /// `title`, `section`, `url`, `text` per page section.
+  /// `title`, Markdown `section`, `docSection`, `docSectionTitle`, `url`, `text`.
   final List<Map<String, String>> entries;
 
   @override
@@ -78,6 +78,7 @@ class _DocsSearchState extends State<DocsSearch> {
     for (final entry in component.entries) {
       final title = entry['title']!.toLowerCase();
       final section = entry['section']!.toLowerCase();
+      final docSectionTitle = entry['docSectionTitle']!.toLowerCase();
       final text = entry['text']!.toLowerCase();
       var score = 0;
       for (final term in terms) {
@@ -85,7 +86,7 @@ class _DocsSearchState extends State<DocsSearch> {
           score += 3;
         } else if (section.contains(term)) {
           score += 2;
-        } else if (text.contains(term)) {
+        } else if (docSectionTitle.contains(term) || text.contains(term)) {
           score += 1;
         } else {
           score = 0;
@@ -151,7 +152,7 @@ class _DocsSearchState extends State<DocsSearch> {
                           href: results[i]['url']!,
                           [
                             span(classes: 'search-result-title', [
-                              .text(results[i]['title']!),
+                              .text('${results[i]['docSectionTitle']} › ${results[i]['title']}'),
                               if (results[i]['section']!.isNotEmpty) .text(' › ${results[i]['section']}'),
                             ]),
                             span(classes: 'search-result-text', [.text(results[i]['text']!)]),

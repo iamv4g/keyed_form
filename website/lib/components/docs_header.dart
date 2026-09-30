@@ -2,6 +2,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../base_path.dart';
+import '../docs_content/docs_nav.dart';
 import '../docs_content/search_index.dart';
 import 'brand_mark.dart';
 import 'docs/docs_menu_toggle.dart';
@@ -9,20 +10,12 @@ import 'docs/docs_search.dart';
 import 'icons.dart';
 import 'theme_toggle.dart';
 
-/// A section in the docs header's tab bar. Package docs (schema, flutter, …)
-/// join this list when they exist.
-const docsSections = [
-  (id: 'docs', label: 'Docs', path: '/docs'),
-  (id: 'playground', label: 'Playground', path: '/playground'),
-];
-
 /// The header for docs and the playground: brand and actions on top, the
-/// section tabs below. [hasSidebar] adds the chapters toggle, shown on
-/// narrow screens.
+/// section links below. [hasSidebar] adds the chapters toggle on narrow screens.
 class DocsHeader extends StatelessComponent {
-  const DocsHeader({required this.section, this.hasSidebar = false, super.key});
+  const DocsHeader({this.section, this.hasSidebar = false, super.key});
 
-  final String section;
+  final DocsSection? section;
   final bool hasSidebar;
 
   @override
@@ -49,18 +42,30 @@ class DocsHeader extends StatelessComponent {
             classes: 'docs-tabs',
             attributes: {'aria-label': 'Documentation sections'},
             [
-              for (final s in docsSections)
+              for (final item in docsSections)
                 a(
-                  classes: s.id == section ? 'docs-tab active' : 'docs-tab',
-                  href: '$siteBasePath${s.path}',
-                  attributes: {if (s.id == section) 'aria-current': 'page'},
-                  [.text(s.label)],
+                  classes: item == section ? 'docs-tab active' : 'docs-tab',
+                  href: '$siteBasePath${item.path}',
+                  attributes: {if (item == section) 'aria-current': 'location'},
+                  [.text(item.label)],
                 ),
             ],
           ),
+          script(content: '''
+            (function () {
+              var tabs = document.currentScript.parentElement.querySelector('.docs-tabs');
+              var active = tabs && tabs.querySelector('.docs-tab.active');
+              if (!active) return;
+              var target = tabs.scrollLeft + active.getBoundingClientRect().left -
+                tabs.getBoundingClientRect().left -
+                (tabs.clientWidth - active.offsetWidth) / 2;
+              tabs.scrollLeft = Math.max(0, Math.min(tabs.scrollWidth - tabs.clientWidth, target));
+            })();
+          '''),
         ]),
         div(classes: 'docs-header-rule', []),
       ]),
     ]);
   }
 }
+

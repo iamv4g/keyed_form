@@ -66,7 +66,7 @@ class ModelSection extends StatelessComponent {
           ]),
         ]),
       ]),
-      a(classes: 'section-link mono', href: '$siteBasePath/docs/quickstart', [.text('Quickstart in 5 minutes →')]),
+      a(classes: 'section-link mono', href: '$siteBasePath/docs/guides/quickstart', [.text('Quickstart in 5 minutes →')]),
     ]);
   }
 }

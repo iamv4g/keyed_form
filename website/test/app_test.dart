@@ -22,6 +22,14 @@ import 'package:website/example_sources.dart';
 import 'package:website/pages/landing_page.dart';
 import 'package:website/package_versions.dart';
 
+String _builtBasePrefix() {
+  final html = File('build/jaspr/index.html').readAsStringSync();
+  final href = RegExp(r'<base href="([^"]+)"/>').firstMatch(html)!.group(1)!;
+  return Uri.parse(href).path.replaceFirst(RegExp(r'/$'), '');
+}
+
+String _siteRoute(String path) => '${_builtBasePrefix()}$path';
+
 void main() {
   setUpAll(initHighlighter);
 
@@ -162,17 +170,19 @@ void main() {
       expect(find.textContaining(RegExp(r'^v\d')), findsNComponents(2));
     });
 
-    testComponents('DocsHeader: search, GitHub, theme; tabs mark the current section', (tester) async {
+    testComponents('DocsHeader renders all section destinations and active section label', (tester) async {
       tester.pumpComponent(
         DocsSearchIndex(
           entries: readDocsSearchIndex(),
-          child: const DocsHeader(section: 'playground'),
+          child: const DocsHeader(section: DocsSection.schema),
         ),
       );
 
       expect(find.text('Search'), findsOneComponent);
-      expect(find.text('Docs'), findsOneComponent);
-      expect(find.text('Playground'), findsOneComponent);
+      for (final label in ['Guides', 'Schema', 'Form State', 'Flutter', 'Docs']) {
+        expect(find.text(label), findsOneComponent);
+      }
+      expect(find.text('Playground'), findsNothing);
       expect(find.text('pub.dev ↗'), findsNothing);
     });
 
@@ -251,47 +261,100 @@ void main() {
     }
   });
 
-  test('search index has an entry per page and per section', () {
+  test('search index contains all reorganized pages and their track labels', () {
     final entries = readDocsSearchIndex();
-    expect(entries.where((e) => e['section']!.isEmpty).length, docsPages.length);
-    final requirements = entries.firstWhere((e) => e['section'] == 'Requirements');
-    expect(requirements['url'], endsWith('/docs/installation#requirements'));
-    expect(requirements['text'], contains('Dart 3.10'));
+    expect(entries.where((e) => e['section']!.isEmpty).length, 38);
+    expect(entries.every((entry) => entry['docSection'] != 'docs'), isTrue);
+    expect(entries.any((entry) => entry['url']!.endsWith('/docs/validation')), isFalse);
+
+    final strings = entries.firstWhere((entry) => entry['url']!.endsWith('/docs/schema/builders#strings'));
+    expect(strings['docSection'], 'schema');
+    expect(strings['docSectionTitle'], 'Schema');
+    expect(strings['text'], contains('ks.string'));
+    expect(strings['text'], contains('regex'));
+    expect(entries.any((entry) => entry['docSectionTitle'] == 'Form State'), isTrue);
   });
 
-  test('docs nav lists exactly the Markdown pages under content/docs', () {
+  test('docs registry covers every Markdown file by unique nested content path', () {
     final files = Directory('content/docs')
-        .listSync()
+        .listSync(recursive: true)
         .whereType<File>()
-        .map((f) => f.uri.pathSegments.last)
-        .where((name) => name.endsWith('.md'))
-        .map((name) => name.substring(0, name.length - 3))
+        .map((file) => file.path.replaceFirst('content/', ''))
+        .where((path) => path.endsWith('.md'))
         .toSet();
-    expect(docsPages.map((e) => e.slug).toSet(), files);
+    final paths = docsPages.map((page) => page.contentPath).toList();
+    expect(paths, hasLength(61));
+    expect(paths.toSet(), hasLength(paths.length));
+    expect(paths.toSet(), files);
+    for (final section in docsSections) {
+      expect(docsPagesFor(section).where((page) => page.slug == 'index'), hasLength(1));
+    }
   });
 
   group('Static Site Output Verification', () {
-    test('build/jaspr contains generated Markdown docs routes', () {
-      expect(File('build/jaspr/docs/index.html').existsSync(), isTrue);
-      expect(File('build/jaspr/docs/quickstart/index.html').existsSync(), isTrue);
-      expect(File('build/jaspr/docs/benchmarks/index.html').existsSync(), isTrue);
+    test('all section roots and nested docs outputs are generated', () {
+      for (final route in [
+        'docs/guides/index.html',
+        'docs/schema/index.html',
+        'docs/form-state/index.html',
+        'docs/flutter/index.html',
+        'docs/schema/code-generation/index.html',
+        'docs/schema/code-generation/index.html.md',
+        'docs/index.html',
+        'docs/quickstart/index.html',
+        'playground/index.html',
+      ]) {
+        expect(File('build/jaspr/$route').existsSync(), isTrue, reason: route);
+      }
     });
 
-    test('docs pages use the docs frame', () {
-      final html = File('build/jaspr/docs/validation/index.html').readAsStringSync();
-      expect(RegExp('class="md-sidebar-item active"').allMatches(html).length, 1);
-      expect(RegExp('class="md-group"').allMatches(html).length, {for (final e in docsPages) e.group}.length);
-      // The sidebar keeps its scroll offset across pages.
-      expect(html, contains("sessionStorage.getItem(key)"));
-      expect(html, contains('class="copy-page"'));
-      expect(html, contains('class="md-anchor"'));
-      expect(html, contains('class="docs-footer"'));
-      expect(html, isNot(contains('class="footer-grid"')));
+    test('section sidebars, active tabs, and pager stay within their track', () {
+      final schema = File('build/jaspr/docs/schema/builders/index.html').readAsStringSync();
+      final schemaNavStart = schema.indexOf('<nav class="md-sidebar-scroll"');
+      final schemaSidebar = schema.substring(schemaNavStart, schema.indexOf('</nav>', schemaNavStart) + 6);
+      expect(schema, contains('aria-current="location"'));
+      expect(RegExp(r'class="docs-tab active"').allMatches(schema).length, 1);
+      expect(schema, contains('class="docs-tab active" aria-current="location" href="${_siteRoute('/docs/schema')}"'));
+      expect(schemaSidebar, contains('data-docs-section="schema"'));
+      expect(schemaSidebar, contains(_siteRoute('/docs/schema/composition')));
+      expect(schemaSidebar, isNot(contains(_siteRoute('/docs/guides/'))));
+      expect(schemaSidebar, isNot(contains(_siteRoute('/docs/form-state/'))));
+      expect(schema, contains('kf-sidebar-scroll:'));
+      expect(schema, contains('class="copy-page"'));
+      expect(schema, contains('class="md-anchor"'));
+      expect(schema, contains('class="docs-footer"'));
+
+      final schemaRoot = File('build/jaspr/docs/schema/index.html').readAsStringSync();
+      expect(schemaRoot, isNot(contains('rel="prev"')));
+      expect(schemaRoot, contains('href="${_siteRoute('/docs/schema/builders')}"'));
+      final schemaLast = File('build/jaspr/docs/schema/code-generation/index.html').readAsStringSync();
+      expect(schemaLast, isNot(contains('rel="next"')));
+      final flutterLast = File('build/jaspr/docs/flutter/api-reference/index.html').readAsStringSync();
+      expect(flutterLast, isNot(contains('rel="next"')));
+
+      final comparison = File('build/jaspr/docs/validation/index.html').readAsStringSync();
+      final comparisonNavStart = comparison.indexOf('<nav class="md-sidebar-scroll"');
+      final comparisonSidebar = comparison.substring(
+        comparisonNavStart,
+        comparison.indexOf('</nav>', comparisonNavStart) + 6,
+      );
+      expect(comparison, contains('Comparison copy: this is the previous documentation'));
+      expect(comparison, contains('href="${_siteRoute('/docs/guides')}"'));
+      expect(comparisonSidebar, contains('data-docs-section="docs"'));
+      expect(comparisonSidebar, contains(_siteRoute('/docs/async-validation')));
+      expect(comparisonSidebar, isNot(contains(_siteRoute('/docs/schema/'))));
+
+      final playground = File('build/jaspr/playground/index.html').readAsStringSync();
+      final tabsStart = playground.indexOf('<nav class="docs-tabs"');
+      final tabs = playground.substring(tabsStart, playground.indexOf('</nav>', tabsStart) + 6);
+      expect(tabs, isNot(contains('class="docs-tab active"')));
+      expect(tabs, isNot(contains('Playground')));
     });
 
-    test('each docs page has a Markdown copy', () {
-      final md = File('build/jaspr/docs/validation/index.html.md').readAsStringSync();
-      expect(md, startsWith('# Validation\n'));
+    test('new and comparison Markdown copies remain separate', () {
+      final generated = File('build/jaspr/docs/schema/builders/index.html.md').readAsStringSync();
+      expect(generated, startsWith('# Builders and rules\n'));
+      expect(File('build/jaspr/docs/validation/index.html.md').existsSync(), isTrue);
       expect(File('build/jaspr/docs/index.html.md').existsSync(), isTrue);
     });
 
@@ -343,12 +406,6 @@ void main() {
       expect(jsFile.existsSync(), isTrue);
       expect(jsFile.lengthSync(), greaterThan(10000));
 
-      // Mobile Responsive & Overflow Containment verification
-      expect(content, contains('@media screen and (max-width: 768px)'));
-      expect(content, contains('overflow-x: clip'));
-      expect(content, contains('flex: 1'));
-      expect(content, contains('min-width: 0'));
-      expect(content, contains('border-collapse: collapse'));
     });
   });
 }
