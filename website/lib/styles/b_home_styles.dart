@@ -575,11 +575,6 @@ List<StyleRule> get homeStyles => [
     whiteSpace: WhiteSpace.noWrap,
   ),
 
-  css('.topology-card.flutter-layer').styles(
-    backgroundColor: AppColors.surfaceElevated,
-    border: Border.all(color: AppColors.cyan, width: 1.px),
-  ),
-
   css('.topology-title').styles(
     fontSize: 0.92.rem,
     fontWeight: FontWeight.w600,
