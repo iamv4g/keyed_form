@@ -277,6 +277,24 @@ void main() {
       expect(File('build/jaspr/docs/benchmarks/index.html').existsSync(), isTrue);
     });
 
+    test('docs pages use the docs frame', () {
+      final html = File('build/jaspr/docs/validation/index.html').readAsStringSync();
+      expect(RegExp('class="md-sidebar-item active"').allMatches(html).length, 1);
+      expect(RegExp('class="md-group"').allMatches(html).length, {for (final e in docsPages) e.group}.length);
+      // The sidebar keeps its scroll offset across pages.
+      expect(html, contains("sessionStorage.getItem(key)"));
+      expect(html, contains('class="copy-page"'));
+      expect(html, contains('class="md-anchor"'));
+      expect(html, contains('class="docs-footer"'));
+      expect(html, isNot(contains('class="footer-grid"')));
+    });
+
+    test('each docs page has a Markdown copy', () {
+      final md = File('build/jaspr/docs/validation/index.html.md').readAsStringSync();
+      expect(md, startsWith('# Validation\n'));
+      expect(File('build/jaspr/docs/index.html.md').existsSync(), isTrue);
+    });
+
     test('build/jaspr contains valid production static assets', () {
       final htmlFile = File('build/jaspr/index.html');
       expect(htmlFile.existsSync(), isTrue);
