@@ -17,10 +17,32 @@ List<StyleRule> get markdownStyles => [
     raw: {'flex': 'none'},
   ),
   css('.md-sidebar-panel').styles(
+    display: Display.flex,
     position: Position.sticky(top: Unit.expression('var(--docs-header-h)')),
     height: Unit.expression('calc(100svh - var(--docs-header-h))'),
+    flexDirection: FlexDirection.column,
+  ),
+  css('.md-sidebar-scroll').styles(
+    minHeight: 0.px,
     padding: .only(top: 32.px, bottom: 32.px, left: 8.px),
     overflow: Overflow.only(y: Overflow.auto),
+    raw: {'flex': '1', 'scrollbar-width': 'none'},
+  ),
+  css('.md-sidebar-scroll::-webkit-scrollbar').styles(display: Display.none),
+  // The list fades out under the header and at the bottom edge.
+  css('.md-sidebar-fade').styles(
+    position: Position.absolute(left: 0.px, right: 0.px),
+    zIndex: ZIndex(1),
+    height: 48.px,
+    pointerEvents: PointerEvents.none,
+  ),
+  css('.md-sidebar-fade.top').styles(
+    position: Position.absolute(top: 0.px),
+    raw: {'background': 'linear-gradient(to bottom, var(--bg), transparent)'},
+  ),
+  css('.md-sidebar-fade.bottom').styles(
+    position: Position.absolute(bottom: 0.px),
+    raw: {'background': 'linear-gradient(to top, var(--bg), transparent)'},
   ),
   // The article's padding and the TOC follow this column's width, not the
   // viewport's.
@@ -63,28 +85,68 @@ List<StyleRule> get markdownStyles => [
     color: AppColors.ink,
   ),
   css('.md-backdrop').styles(display: Display.none),
-  css('.md-sidebar-group').styles(
-    margin: .only(top: 20.px, bottom: 8.px),
-    fontSize: 0.78.rem,
-    fontWeight: FontWeight.w600,
+  css('.md-sidebar ul').styles(listStyle: ListStyle.none),
+  css('.md-sidebar a').styles(textDecoration: TextDecoration.none),
+  css('.md-sidebar-links').styles(
+    display: Display.flex,
+    padding: .only(left: 8.px),
+    flexDirection: FlexDirection.column,
+    gap: Gap(row: 12.px),
+  ),
+  css('.md-sidebar-link').styles(
+    display: Display.flex,
+    alignItems: AlignItems.center,
+    gap: Gap(column: 8.px),
     color: AppColors.ink,
   ),
-  css('.md-sidebar-group:first-child').styles(
-    margin: .only(top: 0.px, bottom: 8.px),
+  css('.md-sidebar-icon').styles(
+    display: Display.inlineFlex,
+    width: 28.px,
+    height: 28.px,
+    alignItems: AlignItems.center,
+    justifyContent: JustifyContent.center,
+    border: Border.all(color: AppColors.border, width: 1.px),
+    radius: BorderRadius.circular(8.px),
+    raw: {'flex': 'none', 'background-color': 'var(--control-bg)', 'border-color': 'var(--control-border)'},
   ),
-  css('.md-sidebar ul').styles(listStyle: ListStyle.none),
-  css('.md-sidebar a').styles(
-    display: Display.block,
-    padding: .symmetric(vertical: 6.px, horizontal: 10.px),
+  css('.md-sidebar-link:hover .md-sidebar-icon').styles(backgroundColor: AppColors.surfaceElevated),
+  css('.md-separator, .md-group-separator').styles(height: 1.px, backgroundColor: AppColors.border),
+  css('.md-separator').styles(margin: .symmetric(vertical: 16.px)),
+  css('.md-group-separator').styles(margin: .only(bottom: 16.px)),
+  css('.md-group').styles(padding: .all(8.px)),
+  css('.md-group-label').styles(
+    display: Display.flex,
+    height: 32.px,
+    padding: .symmetric(horizontal: 8.px),
+    margin: .only(bottom: 4.px),
+    alignItems: AlignItems.center,
+    color: AppColors.ink,
+    opacity: 0.7,
+    fontSize: 0.75.rem,
+    fontWeight: FontWeight.w500,
+  ),
+  css('.md-group-items').styles(
+    display: Display.flex,
+    flexDirection: FlexDirection.column,
+    gap: Gap(row: 4.px),
+  ),
+  css('.md-sidebar-item').styles(
+    display: Display.flex,
+    minHeight: 32.px,
+    padding: .all(8.px),
+    alignItems: AlignItems.center,
+    gap: Gap(column: 8.px),
+    radius: BorderRadius.circular(8.px),
     color: AppColors.inkMuted,
-    textDecoration: TextDecoration.none,
-    radius: BorderRadius.circular(6.px),
+    fontSize: 0.875.rem,
+    lineHeight: 1.25.rem,
   ),
-  css('.md-sidebar a:hover').styles(color: AppColors.ink),
-  css('.md-sidebar a.active').styles(
-    color: AppColors.cyan,
-    backgroundColor: AppColors.cyanGlow,
+  css('.md-sidebar-item svg').styles(raw: {'flex': 'none'}),
+  css('.md-sidebar-item:hover, .md-sidebar-item.active').styles(
+    color: AppColors.ink,
+    backgroundColor: AppColors.surfaceElevated,
   ),
+  css('.md-sidebar-item.active').styles(fontWeight: FontWeight.w500),
 
   css('.md-content').styles(
     fontSize: 1.rem,
@@ -250,31 +312,47 @@ List<StyleRule> get markdownStyles => [
     css('.md-toc-mobile a').styles(color: AppColors.inkMuted, textDecoration: TextDecoration.none),
   ]),
   // At md the sidebar becomes a drawer from the left, opened from the
-  // header's tab row (html.docs-menu-open).
+  // header's tab row (html.docs-menu-open): 75% wide (24rem cap from sm),
+  // fading in over a light, blurred backdrop.
   css.media(MediaQuery.screen(maxWidth: 768.px), [
     css('.md-sidebar').styles(width: 0.px),
     css('.md-backdrop').styles(
       display: Display.block,
       position: Position.fixed(top: 0.px, left: 0.px, right: 0.px, bottom: 0.px),
       zIndex: ZIndex(1150),
-      backgroundColor: Color('rgba(0, 0, 0, 0.55)'),
-      raw: {'visibility': 'hidden', 'opacity': '0', 'transition': 'opacity 0.2s, visibility 0.2s'},
+      backgroundColor: Color('rgba(0, 0, 0, 0.1)'),
+      raw: {
+        'backdrop-filter': 'blur(4px)',
+        '-webkit-backdrop-filter': 'blur(4px)',
+        'visibility': 'hidden',
+        'opacity': '0',
+        'transition': 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out',
+      },
     ),
     css('.md-sidebar-panel').styles(
       position: Position.fixed(top: 0.px, left: 0.px, bottom: 0.px),
       zIndex: ZIndex(1200),
-      width: 80.percent,
-      maxWidth: 300.px,
+      width: 75.percent,
       height: Unit.expression('100svh'),
-      padding: .all(20.px),
       backgroundColor: AppColors.bg,
       border: Border.only(
         right: BorderSide.solid(color: AppColors.border, width: 1.px),
       ),
-      transform: Transform.translate(x: (-105).percent),
-      transition: const Transition('transform', duration: Duration(milliseconds: 200)),
+      transform: Transform.translate(x: (-2.5).rem),
+      raw: {
+        'box-shadow': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+        'visibility': 'hidden',
+        'opacity': '0',
+        'transition': 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out, visibility 0.2s ease-in-out',
+      },
     ),
     css('html.docs-menu-open .md-backdrop').styles(raw: {'visibility': 'visible', 'opacity': '1'}),
-    css('html.docs-menu-open .md-sidebar-panel').styles(transform: Transform.translate(x: 0.percent)),
+    css('html.docs-menu-open .md-sidebar-panel').styles(
+      transform: Transform.translate(x: 0.px),
+      raw: {'visibility': 'visible', 'opacity': '1'},
+    ),
+  ]),
+  css.media(MediaQuery.screen(minWidth: 640.px, maxWidth: 768.px), [
+    css('.md-sidebar-panel').styles(maxWidth: 24.rem),
   ]),
 ];

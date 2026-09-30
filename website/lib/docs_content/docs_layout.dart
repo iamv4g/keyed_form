@@ -1,11 +1,13 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
 import 'package:jaspr_content/jaspr_content.dart';
+import 'package:jaspr_lucide/jaspr_lucide.dart' as lucide;
 
 import '../base_path.dart';
 import '../components/docs/docs_menu_backdrop.dart';
 import '../components/docs_header.dart';
 import '../components/footer.dart';
+import '../components/icons.dart';
 import 'docs_nav.dart';
 
 const _editBase = 'https://github.com/iamv4g/keyed_form/edit/main/website/content/';
@@ -89,8 +91,35 @@ class KfDocsLayout implements PageLayout {
   }
 }
 
+// Saves the list's scroll offset when one of its links is clicked and
+// restores it on the next page. Without a saved offset (direct visit,
+// reload), scrolls the current page's item into view if it is hidden.
+const _keepScroll = '''
+(function () {
+  var nav = document.currentScript.parentElement.querySelector('.md-sidebar-scroll');
+  var key = 'kf-sidebar-scroll';
+  try {
+    var saved = sessionStorage.getItem(key);
+    sessionStorage.removeItem(key);
+    if (saved !== null) {
+      nav.scrollTop = +saved;
+    } else {
+      var item = nav.querySelector('.md-sidebar-item.active');
+      if (item) {
+        var r = item.getBoundingClientRect(), n = nav.getBoundingClientRect();
+        if (r.top < n.top || r.bottom > n.bottom) nav.scrollTop += r.top - n.top - (n.height - r.height) / 2;
+      }
+    }
+    nav.addEventListener('click', function (e) {
+      if (e.target.closest('a')) sessionStorage.setItem(key, String(nav.scrollTop));
+    });
+  } catch (_) {}
+})();
+''';
+
 /// The chapters list: a sticky column on wide screens, a drawer from the
-/// left (opened from the header's tab row) on narrow ones.
+/// left (opened from the header's tab row) on narrow ones. Site links sit on
+/// top, then one labelled group per chapter.
 class _Sidebar extends StatelessComponent {
   const _Sidebar({required this.current});
 
@@ -102,22 +131,85 @@ class _Sidebar extends StatelessComponent {
     return div(classes: 'md-sidebar', [
       const DocsMenuBackdrop(),
       aside(classes: 'md-sidebar-panel', [
-        nav([
-          for (final group in groups) ...[
-            div(classes: 'md-sidebar-group', [.text(group)]),
-            ul([
-              for (final entry in docsPages.where((e) => e.group == group))
-                li([
-                  a(
-                    classes: entry.path == current ? 'active' : null,
-                    href: '$siteBasePath${entry.path}',
-                    [.text(entry.title)],
-                  ),
-                ]),
+        div(classes: 'md-sidebar-fade top', []),
+        div(classes: 'md-sidebar-fade bottom', []),
+        nav(
+          classes: 'md-sidebar-scroll',
+          attributes: {'aria-label': 'Documentation'},
+          [
+            ul(classes: 'md-sidebar-links', [
+              _siteLink('Website', '$siteBasePath/', lucide.Globe(width: 16.px, height: 16.px)),
+              _siteLink('Playground', '$siteBasePath/playground', lucide.Code(width: 16.px, height: 16.px)),
             ]),
+            div(classes: 'md-separator', []),
+            for (final (i, group) in groups.indexed)
+              div(classes: 'md-group', [
+                if (i > 0) div(classes: 'md-group-separator', []),
+                div(classes: 'md-group-label', [.text(group)]),
+                ul(classes: 'md-group-items', [
+                  for (final entry in docsPages.where((e) => e.group == group)) _item(entry),
+                ]),
+              ]),
           ],
-        ]),
+        ),
+        // Pages are separate documents, so the list would reopen at the top.
+        // Runs while the page parses, before the first paint.
+        script(content: _keepScroll),
       ]),
     ]);
+  }
+
+  static Component _siteLink(String label, String href, Component icon) {
+    return li([
+      a(classes: 'md-sidebar-link', href: href, [
+        span(classes: 'md-sidebar-icon', [icon]),
+        span([.text(label)]),
+      ]),
+    ]);
+  }
+
+  Component _item(DocsEntry entry) {
+    final active = entry.path == current;
+    return li([
+      a(
+        classes: active ? 'md-sidebar-item active' : 'md-sidebar-item',
+        href: '$siteBasePath${entry.path}',
+        attributes: {if (active) 'aria-current': 'page'},
+        [
+          _icon(entry.icon),
+          span([.text(entry.title)]),
+        ],
+      ),
+    ]);
+  }
+
+  static Component _icon(String name) {
+    final size = 16.px;
+    return switch (name) {
+      'book-open' => lucide.BookOpen(width: size, height: size),
+      'download' => lucide.Download(width: size, height: size),
+      'rocket' => lucide.Rocket(width: size, height: size),
+      'workflow' => lucide.Workflow(width: size, height: size),
+      'package' => lucide.Package(width: size, height: size),
+      'sliders-horizontal' => lucide.SlidersHorizontal(width: size, height: size),
+      'text-cursor-input' => lucide.TextCursorInput(width: size, height: size),
+      'shield-check' => lucide.ShieldCheck(width: size, height: size),
+      'hourglass' => lucide.Hourglass(width: size, height: size),
+      'link' => lucide.Link(width: size, height: size),
+      'grip-vertical' => lucide.GripVertical(width: size, height: size),
+      'list' => lucide.List(width: size, height: size),
+      'arrow-down-to-line' => lucide.ArrowDownToLine(width: size, height: size),
+      'list-checks' => lucide.ListChecks(width: size, height: size),
+      'server-crash' => lucide.ServerCrash(width: size, height: size),
+      'list-tree' => lucide.ListTree(width: size, height: size),
+      'toggle-right' => lucide.ToggleRight(width: size, height: size),
+      'split' => lucide.Split(width: size, height: size),
+      'flask-conical' => lucide.FlaskConical(width: size, height: size),
+      'file-code' => lucide.FileCode(width: size, height: size),
+      'arrow-right-left' => lucide.ArrowRightLeft(width: size, height: size),
+      'circle-question-mark' => lucide.CircleQuestionMark(width: size, height: size),
+      'gauge' => lucide.Gauge(width: size, height: size),
+      _ => throw ArgumentError.value(name, 'icon', 'No sidebar icon with this name'),
+    };
   }
 }
