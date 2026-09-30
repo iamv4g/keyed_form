@@ -75,6 +75,9 @@ jobs:
           test -f docs/quickstart/index.html || { echo "ERROR: quickstart page not found"; exit 1; }
           test -f playground/index.html || { echo "ERROR: playground page not found"; exit 1; }
           test -f main.client.dart.js || { echo "ERROR: client bundle not found"; exit 1; }
+          test -f robots.txt || { echo "ERROR: robots.txt not found"; exit 1; }
+          grep -q 'User-agent: facebookexternalhit' robots.txt || { echo "ERROR: Facebook crawler not allowed"; exit 1; }
+          grep -q 'User-agent: Facebot' robots.txt || { echo "ERROR: Facebot not allowed"; exit 1; }
           grep -q '<base href="/"/>' index.html || { echo "ERROR: base href must target the custom-domain root"; exit 1; }
           echo "Build output OK"
 
