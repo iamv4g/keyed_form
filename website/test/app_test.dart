@@ -8,6 +8,7 @@ import 'package:website/code/highlight.dart';
 import 'package:website/components/agent_skill_section.dart';
 import 'package:website/components/demo/hero_login_demo.dart';
 import 'package:website/components/docs/package_topology.dart';
+import 'package:website/components/docs_header.dart';
 import 'package:website/components/feature_grid.dart';
 import 'package:website/components/footer.dart';
 import 'package:website/components/hero_section.dart';
@@ -15,7 +16,8 @@ import 'package:website/components/lists_section.dart';
 import 'package:website/components/model_section.dart';
 import 'package:website/components/telemetry_section.dart';
 import 'package:website/components/navbar.dart';
-import 'package:website/pages/docs_page.dart';
+import 'package:website/docs_content/docs_nav.dart';
+import 'package:website/docs_content/search_index.dart';
 import 'package:website/example_sources.dart';
 import 'package:website/pages/landing_page.dart';
 import 'package:website/package_versions.dart';
@@ -60,30 +62,6 @@ void main() {
       expect(find.text('pub.dev ↗'), findsNothing);
       expect(find.text('GitHub ↗'), findsNothing);
       expect(find.tag('button'), findsOneComponent);
-    });
-
-    testComponents('DocsPage renders 6 developer chapters and reassurance callout', (
-      tester,
-    ) async {
-      tester.pumpComponent(const DocsPage());
-
-      // Navigation & Branding — shares the same Navbar as every other page
-      expect(find.text(' keyed_form'), findsOneComponent);
-      expect(find.text('Docs'), findsComponents); // navbar + footer column
-
-      // Section titles
-      expect(find.text('Overview & The Problem with Traditional Forms'), findsOneComponent);
-      expect(find.text('Thinking in Keyed Optics'), findsComponents);
-      expect(find.text('Quickstart in 5 Minutes'), findsOneComponent);
-      expect(find.text('Form Controller & State Lifecycle'), findsOneComponent);
-      expect(find.text('Lazy Scroll, Virtualization & State Preservation'), findsOneComponent);
-      expect(find.text('Real-World Production Recipes'), findsOneComponent);
-      expect(find.text('Testing Without Widgets: Pure Dart in < 2ms'), findsOneComponent);
-      expect(find.text('API Reference'), findsComponents);
-      expect(find.text('Capability Matrix'), findsComponents);
-
-      // Reassurance Callout
-      expect(find.textContaining("Don't Worry About Optics / Lenses!"), findsOneComponent);
     });
 
     testComponents('ModelSection shows the three login files, the demo and the points', (tester) async {
@@ -184,6 +162,20 @@ void main() {
       expect(find.textContaining(RegExp(r'^v\d')), findsNComponents(2));
     });
 
+    testComponents('DocsHeader: search, GitHub, theme; tabs mark the current section', (tester) async {
+      tester.pumpComponent(
+        DocsSearchIndex(
+          entries: readDocsSearchIndex(),
+          child: const DocsHeader(section: 'playground'),
+        ),
+      );
+
+      expect(find.text('Search'), findsOneComponent);
+      expect(find.text('Docs'), findsOneComponent);
+      expect(find.text('Playground'), findsOneComponent);
+      expect(find.text('pub.dev ↗'), findsNothing);
+    });
+
     testComponents('HeroSection renders headline, command bar and CTAs', (tester) async {
       tester.pumpComponent(const HeroSection());
 
@@ -259,7 +251,50 @@ void main() {
     }
   });
 
+  test('search index has an entry per page and per section', () {
+    final entries = readDocsSearchIndex();
+    expect(entries.where((e) => e['section']!.isEmpty).length, docsPages.length);
+    final requirements = entries.firstWhere((e) => e['section'] == 'Requirements');
+    expect(requirements['url'], endsWith('/docs/installation#requirements'));
+    expect(requirements['text'], contains('Dart 3.10'));
+  });
+
+  test('docs nav lists exactly the Markdown pages under content/docs', () {
+    final files = Directory('content/docs')
+        .listSync()
+        .whereType<File>()
+        .map((f) => f.uri.pathSegments.last)
+        .where((name) => name.endsWith('.md'))
+        .map((name) => name.substring(0, name.length - 3))
+        .toSet();
+    expect(docsPages.map((e) => e.slug).toSet(), files);
+  });
+
   group('Static Site Output Verification', () {
+    test('build/jaspr contains generated Markdown docs routes', () {
+      expect(File('build/jaspr/docs/index.html').existsSync(), isTrue);
+      expect(File('build/jaspr/docs/quickstart/index.html').existsSync(), isTrue);
+      expect(File('build/jaspr/docs/benchmarks/index.html').existsSync(), isTrue);
+    });
+
+    test('docs pages use the docs frame', () {
+      final html = File('build/jaspr/docs/validation/index.html').readAsStringSync();
+      expect(RegExp('class="md-sidebar-item active"').allMatches(html).length, 1);
+      expect(RegExp('class="md-group"').allMatches(html).length, {for (final e in docsPages) e.group}.length);
+      // The sidebar keeps its scroll offset across pages.
+      expect(html, contains("sessionStorage.getItem(key)"));
+      expect(html, contains('class="copy-page"'));
+      expect(html, contains('class="md-anchor"'));
+      expect(html, contains('class="docs-footer"'));
+      expect(html, isNot(contains('class="footer-grid"')));
+    });
+
+    test('each docs page has a Markdown copy', () {
+      final md = File('build/jaspr/docs/validation/index.html.md').readAsStringSync();
+      expect(md, startsWith('# Validation\n'));
+      expect(File('build/jaspr/docs/index.html.md').existsSync(), isTrue);
+    });
+
     test('build/jaspr contains valid production static assets', () {
       final htmlFile = File('build/jaspr/index.html');
       expect(htmlFile.existsSync(), isTrue);

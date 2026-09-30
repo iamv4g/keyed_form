@@ -31,21 +31,6 @@ List<StyleRule> get responsiveStyles => [
       padding: .only(right: 0.px),
       margin: .only(bottom: 0.px),
     ),
-    css('.navbar-docs-toggle').styles(
-      display: Display.inlineFlex,
-      alignItems: AlignItems.center,
-      justifyContent: JustifyContent.center,
-      // The ☰ glyph's own ink sits low in its line box in most fonts —
-      // asymmetric padding (less above, more below) recenters it visually
-      // without changing the button's overall height (top+bottom still 8px).
-      padding: .only(top: 2.px, bottom: 6.px, left: 8.px, right: 8.px),
-      backgroundColor: AppColors.surface,
-      border: Border.all(color: AppColors.border, width: 1.px),
-      color: AppColors.ink,
-      fontSize: 1.1.rem,
-      lineHeight: 1.em,
-      radius: BorderRadius.circular(4.px),
-    ),
     css('.docs-sidebar-backdrop').styles(
       display: Display.block,
       position: Position.fixed(top: 0.px, left: 0.px, right: 0.px, bottom: 0.px),

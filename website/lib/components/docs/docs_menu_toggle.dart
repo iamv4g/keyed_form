@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/js_interop.dart';
@@ -14,11 +16,29 @@ const docsMenuCloseEvent = 'docsmenu:close';
 void closeDocsMenu() {
   if (!kIsWeb) return;
   web.document.documentElement?.classList.remove(docsMenuOpenClass);
+  _markDialog(false);
   web.document.dispatchEvent(web.Event(docsMenuCloseEvent));
 }
 
-/// The "☰" button embedded in the shared Navbar, shown only on /docs at
-/// mobile widths (see [Navbar.showDocsMenuToggle]).
+// While open, the sidebar panel is a modal dialog; on wide screens it is a
+// plain column again.
+void _markDialog(bool open) {
+  final panel = web.document.querySelector('.md-sidebar-panel');
+  if (panel == null) return;
+  if (open) {
+    panel
+      ..setAttribute('role', 'dialog')
+      ..setAttribute('aria-modal', 'true')
+      ..setAttribute('aria-label', 'Sidebar');
+  } else {
+    panel
+      ..removeAttribute('role')
+      ..removeAttribute('aria-modal')
+      ..removeAttribute('aria-label');
+  }
+}
+
+/// The sidebar toggle in the docs header's tab row, shown on narrow screens.
 @client
 class DocsMenuToggle extends StatefulComponent {
   const DocsMenuToggle({super.key});
@@ -30,6 +50,7 @@ class DocsMenuToggle extends StatefulComponent {
 class _DocsMenuToggleState extends State<DocsMenuToggle> {
   bool _open = false;
   JSFunction? _closeListener;
+  StreamSubscription<web.KeyboardEvent>? _keys;
 
   @override
   void initState() {
@@ -37,6 +58,9 @@ class _DocsMenuToggleState extends State<DocsMenuToggle> {
     if (kIsWeb) {
       _closeListener = (() => setState(() => _open = false)).toJS;
       web.document.addEventListener(docsMenuCloseEvent, _closeListener);
+      _keys = web.EventStreamProviders.keyDownEvent.forTarget(web.document).listen((e) {
+        if (_open && e.key == 'Escape') closeDocsMenu();
+      });
     }
   }
 
@@ -44,11 +68,13 @@ class _DocsMenuToggleState extends State<DocsMenuToggle> {
     if (!kIsWeb) return;
     final next = !_open;
     web.document.documentElement?.classList.toggle(docsMenuOpenClass, next);
+    _markDialog(next);
     setState(() => _open = next);
   }
 
   @override
   void dispose() {
+    _keys?.cancel();
     if (kIsWeb && _closeListener != null) {
       web.document.removeEventListener(docsMenuCloseEvent, _closeListener);
     }
@@ -59,10 +85,28 @@ class _DocsMenuToggleState extends State<DocsMenuToggle> {
   Component build(BuildContext context) {
     return button(
       type: ButtonType.button,
-      classes: 'navbar-docs-toggle mono',
-      attributes: {'aria-label': _open ? 'Close chapters menu' : 'Open chapters menu'},
+      classes: 'sidebar-trigger',
+      attributes: {'aria-label': _open ? 'Close sidebar' : 'Open sidebar'},
       onClick: _toggle,
-      [.text('☰')],
+      [
+        svg(
+          viewBox: '0 0 24 24',
+          width: 16.px,
+          height: 16.px,
+          attributes: {
+            'fill': 'none',
+            'stroke': 'currentColor',
+            'stroke-width': '2',
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+            'aria-hidden': 'true',
+          },
+          [
+            rect(x: '3', y: '3', width: '18', height: '18', attributes: {'rx': '2'}, []),
+            path(d: 'M9 3v18', []),
+          ],
+        ),
+      ],
     );
   }
 }

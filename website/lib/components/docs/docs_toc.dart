@@ -1,85 +1,73 @@
+import 'dart:async';
+
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
-import 'package:universal_web/js_interop.dart';
 import 'package:universal_web/web.dart' as web;
 
-import '../../base_path.dart';
-import 'docs_nav_data.dart';
-
-/// "ON THIS PAGE" — unlike [DocsSidebar] (the full site map), this only shows
-/// the headings inside whichever chapter is currently scrolled into view, so
-/// the two navs don't just duplicate each other on this single long page.
+/// "On this page": the page's h2/h3 list, marking the section being read.
 @client
 class DocsToc extends StatefulComponent {
-  const DocsToc({super.key});
+  const DocsToc({required this.entries, super.key});
+
+  /// `text`, `id`, `href` and `depth` (`0` for h2, `1` for h3) per heading.
+  final List<Map<String, String>> entries;
 
   @override
   State<DocsToc> createState() => _DocsTocState();
 }
 
 class _DocsTocState extends State<DocsToc> {
-  int _activeGroupIndex = 0;
-  String? _activeHref;
-  JSFunction? _scrollListener;
+  String? _active;
+  StreamSubscription<web.Event>? _scroll;
 
   @override
   void initState() {
     super.initState();
     if (kIsWeb) {
-      _scrollListener = _onScroll.toJS;
-      web.window.addEventListener('scroll', _scrollListener);
-      _onScroll();
+      _scroll = web.EventStreamProviders.scrollEvent.forTarget(web.window).listen((_) => _update());
+      Future(_update);
     }
   }
 
   @override
   void dispose() {
-    if (kIsWeb && _scrollListener != null) {
-      web.window.removeEventListener('scroll', _scrollListener);
-    }
+    _scroll?.cancel();
     super.dispose();
   }
 
-  // The last heading whose top has scrolled above the sticky header is the
-  // one currently being read.
-  void _onScroll() {
-    const headerOffset = 120.0;
-    var bestGroup = 0;
-    String? bestHref;
-
-    for (var g = 0; g < docsNavGroups.length; g++) {
-      for (final item in docsNavGroups[g].items) {
-        final anchor = web.document.getElementById(item.href.substring(1));
-        if (anchor == null) continue;
-        if (anchor.getBoundingClientRect().top <= headerOffset) {
-          bestGroup = g;
-          bestHref = item.href;
-        }
+  // The last heading that has scrolled up to the header's bottom edge; the
+  // last one outright once the page bottoms out.
+  void _update() {
+    final entries = component.entries;
+    if (entries.isEmpty) return;
+    String? active = entries.first['id'];
+    final atBottom = web.window.innerHeight + web.window.scrollY >= web.document.documentElement!.scrollHeight - 2;
+    if (atBottom) {
+      active = entries.last['id'];
+    } else {
+      for (final entry in entries) {
+        final el = web.document.getElementById(entry['id']!);
+        if (el != null && el.getBoundingClientRect().top <= 120) active = entry['id'];
       }
     }
-
-    if (bestGroup != _activeGroupIndex || bestHref != _activeHref) {
-      setState(() {
-        _activeGroupIndex = bestGroup;
-        _activeHref = bestHref;
-      });
-    }
+    if (active != _active) setState(() => _active = active);
   }
 
   @override
   Component build(BuildContext context) {
-    final group = docsNavGroups[_activeGroupIndex];
-
-    return aside(classes: 'docs-toc', [
-      div(classes: 'docs-toc-header mono', [.text('ON THIS PAGE')]),
-      div(classes: 'docs-toc-group-title mono', [.text(group.kicker)]),
-      ul(classes: 'docs-toc-list', [
-        for (final item in group.items)
+    return div(classes: 'docs-toc-inner', [
+      div(classes: 'docs-toc-header', [.text('On this page')]),
+      ul(classes: 'md-toc', [
+        for (final entry in component.entries)
           li([
             a(
-              href: '$siteBasePath/docs${item.href}',
-              classes: item.href == _activeHref ? 'active' : '',
-              [.text(item.title)],
+              classes: [
+                'md-toc-link',
+                if (entry['depth'] == '1') 'nested',
+                if (entry['id'] == _active) 'active',
+              ].join(' '),
+              href: entry['href']!,
+              [.text(entry['text']!)],
             ),
           ]),
       ]),

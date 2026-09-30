@@ -6,11 +6,18 @@ library;
 
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/server.dart';
+import 'package:jaspr_content/jaspr_content.dart';
+import 'package:jaspr_content/theme.dart';
+import 'package:jaspr_router/jaspr_router.dart';
 
 import 'app.dart';
 import 'base_path.dart';
 import 'build_inputs.dart';
 import 'code/highlight.dart';
+import 'docs_content/docs_components.dart';
+import 'docs_content/docs_layout.dart';
+import 'docs_content/heading_anchors.dart';
+import 'docs_content/search_index.dart';
 import 'example_sources.dart';
 import 'main.server.options.dart';
 import 'package_versions.dart';
@@ -73,7 +80,31 @@ Future<void> main() async {
       ],
       body: PackageVersions(
         versions: readPackageVersions(),
-        child: ExampleSources(files: readExampleSources(), child: const App()),
+        child: DocsSearchIndex(
+          entries: readDocsSearchIndex(),
+          child: ExampleSources(
+            files: readExampleSources(),
+            child: ContentApp.custom(
+              loaders: [FilesystemLoader('content')],
+              configResolver: PageConfig.all(
+                parsers: [MarkdownParser()],
+                extensions: [TableOfContentsExtension(maxHeaderDepth: 2), const KfHeadingAnchors()],
+                components: [
+                  const KfCodeBlock(),
+                  const ExampleCode(),
+                  const PackingDemoTag(),
+                  const PackageTopologyTag(),
+                  const CapabilityMatrixTag(),
+                  const Note(),
+                ],
+                layouts: [const KfDocsLayout()],
+                secondaryOutputs: [MarkdownOutput(createHeader: pageMarkdownHeader)],
+                theme: ContentTheme.none(),
+              ),
+              routerBuilder: (routes) => Router(routes: [...appRoutes, for (final r in routes) ...r]),
+            ),
+          ),
+        ),
       ),
     ),
   );

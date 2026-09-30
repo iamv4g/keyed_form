@@ -5,8 +5,9 @@ import 'theme_tokens.dart';
 /// Styles for the /playground page — the live KeyedFormController demo.
 @css
 List<StyleRule> get playgroundStyles => [
-  css('.playground-page').styles(
-    padding: .only(top: 56.px, bottom: 72.px),
+  // Inside the docs shell, inset like a docs article.
+  css('.docs-shell.playground-page').styles(
+    padding: .only(top: 40.px, left: 40.px, right: 40.px),
   ),
 
   css('.playground-grid').styles(

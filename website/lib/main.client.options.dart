@@ -12,10 +12,13 @@ import 'package:website/components/demo/model_login_demo.dart'
     deferred as _model_login_demo;
 import 'package:website/components/demo/packing_demo.dart'
     deferred as _packing_demo;
+import 'package:website/components/docs/copy_page.dart' deferred as _copy_page;
+import 'package:website/components/docs/docs_menu_backdrop.dart'
+    deferred as _docs_menu_backdrop;
 import 'package:website/components/docs/docs_menu_toggle.dart'
     deferred as _docs_menu_toggle;
-import 'package:website/components/docs/docs_sidebar.dart'
-    deferred as _docs_sidebar;
+import 'package:website/components/docs/docs_search.dart'
+    deferred as _docs_search;
 import 'package:website/components/docs/docs_toc.dart' deferred as _docs_toc;
 import 'package:website/components/playground/playground_demo.dart'
     deferred as _playground_demo;
@@ -60,16 +63,36 @@ ClientOptions get defaultClientOptions => ClientOptions(
       (p) => _packing_demo.PackingDemo(),
       loader: _packing_demo.loadLibrary,
     ),
+    'copy_page': ClientLoader(
+      (p) => _copy_page.CopyPageButton(
+        markdown: p['markdown'] as String,
+        markdownUrl: p['markdownUrl'] as String,
+        editUrl: p['editUrl'] as String,
+      ),
+      loader: _copy_page.loadLibrary,
+    ),
+    'docs_menu_backdrop': ClientLoader(
+      (p) => _docs_menu_backdrop.DocsMenuBackdrop(),
+      loader: _docs_menu_backdrop.loadLibrary,
+    ),
     'docs_menu_toggle': ClientLoader(
       (p) => _docs_menu_toggle.DocsMenuToggle(),
       loader: _docs_menu_toggle.loadLibrary,
     ),
-    'docs_sidebar': ClientLoader(
-      (p) => _docs_sidebar.DocsSidebar(),
-      loader: _docs_sidebar.loadLibrary,
+    'docs_search': ClientLoader(
+      (p) => _docs_search.DocsSearch(
+        entries: (p['entries'] as List<Object?>)
+            .map((i) => (i as Map<String, Object?>).cast<String, String>())
+            .toList(),
+      ),
+      loader: _docs_search.loadLibrary,
     ),
     'docs_toc': ClientLoader(
-      (p) => _docs_toc.DocsToc(),
+      (p) => _docs_toc.DocsToc(
+        entries: (p['entries'] as List<Object?>)
+            .map((i) => (i as Map<String, Object?>).cast<String, String>())
+            .toList(),
+      ),
       loader: _docs_toc.loadLibrary,
     ),
     'playground_demo': ClientLoader(

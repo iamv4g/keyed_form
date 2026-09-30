@@ -1,8 +1,8 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
-import '../components/footer.dart';
-import '../components/navbar.dart';
+import '../components/docs/docs_footer.dart';
+import '../components/docs_header.dart';
 import '../components/playground/playground_demo.dart';
 
 class PlaygroundPage extends StatelessComponent {
@@ -11,8 +11,8 @@ class PlaygroundPage extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return Component.fragment([
-      const Navbar(),
-      main_(classes: 'wrap playground-page', [
+      const DocsHeader(section: 'playground'),
+      main_(classes: 'docs-shell playground-page', [
         span(classes: 'section-kicker mono', [.text('// LIVE PLAYGROUND')]),
         h1(classes: 'section-title display', [.text('See It Rebuild, Live')]),
         p(classes: 'section-lede', [
@@ -21,8 +21,8 @@ class PlaygroundPage extends StatelessComponent {
           ),
         ]),
         const PlaygroundDemo(),
+        const DocsFooter(),
       ]),
-      const Footer(),
     ]);
   }
 }

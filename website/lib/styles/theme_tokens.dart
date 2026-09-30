@@ -41,6 +41,9 @@ const darkThemeTokens = <String, String>{
   // For per-theme markup: `display: var(--dark-only)`.
   '--dark-only': 'inline-block',
   '--light-only': 'none',
+  // Raised controls on a muted strip (active tab, Search button).
+  '--control-bg': 'rgba(255, 255, 255, 0.045)',
+  '--control-border': 'rgba(255, 255, 255, 0.15)',
 };
 
 const lightThemeTokens = <String, String>{
@@ -62,4 +65,6 @@ const lightThemeTokens = <String, String>{
   '--card-shadow': '0 4px 20px rgba(11, 25, 36, 0.06)',
   '--dark-only': 'none',
   '--light-only': 'inline-block',
+  '--control-bg': '#ffffff',
+  '--control-border': 'rgba(11, 25, 36, 0.12)',
 };
