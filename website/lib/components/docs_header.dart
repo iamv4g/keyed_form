@@ -28,35 +28,38 @@ class DocsHeader extends StatelessComponent {
   @override
   Component build(BuildContext context) {
     return header(classes: 'docs-header', [
-      div(classes: 'docs-header-top', [
-        a(classes: 'brand display', href: '$siteBasePath/', [const BrandMark(), .text(' keyed_form')]),
-        div(classes: 'docs-header-actions', [
-          DocsSearch(entries: DocsSearchIndex.of(context)),
-          a(
-            classes: 'header-icon-button',
-            href: 'https://github.com/iamv4g/keyed_form',
-            target: Target.blank,
-            attributes: {'aria-label': 'GitHub', 'title': 'GitHub'},
-            [SiteIcons.github()],
-          ),
-          const ThemeToggle(),
+      div(classes: 'docs-shell', [
+        div(classes: 'docs-header-top', [
+          a(classes: 'brand display', href: '$siteBasePath/', [const BrandMark(), .text(' keyed_form')]),
+          div(classes: 'docs-header-actions', [
+            DocsSearch(entries: DocsSearchIndex.of(context)),
+            a(
+              classes: 'header-icon-button',
+              href: 'https://github.com/iamv4g/keyed_form',
+              target: Target.blank,
+              attributes: {'aria-label': 'GitHub', 'title': 'GitHub'},
+              [SiteIcons.github()],
+            ),
+            const ThemeToggle(),
+          ]),
         ]),
-      ]),
-      div(classes: 'docs-header-tabs', [
-        if (hasSidebar) const DocsMenuToggle(),
-        nav(
-          classes: 'docs-tabs',
-          attributes: {'aria-label': 'Documentation sections'},
-          [
-            for (final s in docsSections)
-              a(
-                classes: s.id == section ? 'docs-tab active' : 'docs-tab',
-                href: '$siteBasePath${s.path}',
-                attributes: {if (s.id == section) 'aria-current': 'page'},
-                [.text(s.label)],
-              ),
-          ],
-        ),
+        div(classes: 'docs-header-tabs', [
+          if (hasSidebar) const DocsMenuToggle(),
+          nav(
+            classes: 'docs-tabs',
+            attributes: {'aria-label': 'Documentation sections'},
+            [
+              for (final s in docsSections)
+                a(
+                  classes: s.id == section ? 'docs-tab active' : 'docs-tab',
+                  href: '$siteBasePath${s.path}',
+                  attributes: {if (s.id == section) 'aria-current': 'page'},
+                  [.text(s.label)],
+                ),
+            ],
+          ),
+        ]),
+        div(classes: 'docs-header-rule', []),
       ]),
     ]);
   }

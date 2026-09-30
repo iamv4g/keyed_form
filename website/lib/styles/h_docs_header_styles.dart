@@ -7,10 +7,24 @@ import 'theme_tokens.dart';
 /// tabs share its 10px radius; key caps use 6px.
 @css
 List<StyleRule> get docsHeaderStyles => [
+  // Shared by header and body: the header's height feeds the sticky
+  // columns and heading scroll margins.
+  css(':root').styles(raw: {'--docs-header-h': '97px', '--sidebar-width': '16rem'}),
+  // Docs and playground drop the landing's grid backdrop.
+  css('body:has(.docs-header)').styles(raw: {'background-image': 'none'}),
+  css('.docs-shell').styles(
+    width: 100.percent,
+    maxWidth: 96.rem,
+    margin: .symmetric(horizontal: .auto),
+    padding: .symmetric(horizontal: 16.px),
+  ),
   // Solid, no backdrop-filter: a filter would become the containing block of
-  // the search overlay (position: fixed) and trap it inside the header.
+  // the search overlay (position: fixed) and trap it inside the header. The
+  // bottom line is the inset `.docs-header-rule`, not a border.
   css('.docs-header').styles(
     backgroundColor: AppColors.bg,
+    border: Border.unset,
+    shadow: BoxShadow.none,
     fontFamily: const .list([FontFamily('Inter'), FontFamilies.sansSerif]),
     raw: {'backdrop-filter': 'none', '-webkit-backdrop-filter': 'none'},
   ),
@@ -19,8 +33,8 @@ List<StyleRule> get docsHeaderStyles => [
     alignItems: AlignItems.center,
     justifyContent: JustifyContent.spaceBetween,
     gap: Gap(column: 12.px),
-    padding: .only(top: 10.px, left: 20.px, right: 20.px),
-    height: 48.px,
+    height: 56.px,
+    padding: .symmetric(horizontal: 4.px),
   ),
   css('.docs-header-actions').styles(
     display: Display.flex,
@@ -31,7 +45,12 @@ List<StyleRule> get docsHeaderStyles => [
     display: Display.flex,
     alignItems: AlignItems.center,
     gap: Gap(column: 4.px),
-    padding: .only(top: 6.px, bottom: 10.px, left: 16.px, right: 16.px),
+    height: 32.px,
+  ),
+  css('.docs-header-rule').styles(
+    height: 1.px,
+    margin: .only(top: 8.px),
+    backgroundColor: AppColors.border,
   ),
 
   // Section tabs: a segmented control.
@@ -201,8 +220,5 @@ List<StyleRule> get docsHeaderStyles => [
     css('.search-label, .search-button .search-kbd').styles(display: Display.none),
     css('.search-button').styles(width: 32.px, padding: .zero, justifyContent: JustifyContent.center),
     css('.sidebar-trigger').styles(display: Display.inlineFlex),
-    css('.docs-header-top').styles(
-      padding: .only(top: 10.px, left: 16.px, right: 12.px),
-    ),
   ]),
 ];

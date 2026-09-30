@@ -1,38 +1,66 @@
 import 'package:jaspr/dom.dart';
 
+import 'container_rule.dart';
 import 'theme_tokens.dart';
 
 /// Markdown docs pages (`content/docs/`): one idea per page, plain type.
 @css
 List<StyleRule> get markdownStyles => [
-  css('.docs-container').styles(
-    maxWidth: 1440.px,
-    margin: .symmetric(horizontal: .auto),
-    padding: .symmetric(horizontal: 24.px),
+  // Sidebar | article + on-this-page, inside the header's `.docs-shell`.
+  css('.docs-body').styles(
+    display: Display.flex,
+    alignItems: AlignItems.start,
   ),
-  // Sidebar | content | on-this-page; the header is ~100px tall.
-  css('.md-layout').styles(
-    display: Display.grid,
-    gap: Gap(column: 36.px),
-    padding: .only(top: 32.px, bottom: 64.px),
-    raw: {'grid-template-columns': '240px minmax(0, 1fr) 210px'},
+  css('.md-sidebar').styles(
+    width: Unit.expression('var(--sidebar-width)'),
+    fontSize: 0.875.rem,
+    raw: {'flex': 'none'},
+  ),
+  css('.md-sidebar-panel').styles(
+    position: Position.sticky(top: Unit.expression('var(--docs-header-h)')),
+    height: Unit.expression('calc(100svh - var(--docs-header-h))'),
+    padding: .only(top: 32.px, bottom: 32.px, left: 8.px),
+    overflow: Overflow.only(y: Overflow.auto),
+  ),
+  // The article's padding and the TOC follow this column's width, not the
+  // viewport's.
+  css('.docs-main').styles(
+    display: Display.flex,
+    minWidth: 0.px,
+    raw: {'flex': '1', 'container-type': 'inline-size'},
+  ),
+  css('.docs-article').styles(
+    minWidth: 0.px,
+    padding: .only(top: 40.px, bottom: 48.px, left: 24.px, right: 24.px),
+    raw: {'flex': '1'},
   ),
   css('.docs-toc').styles(
-    position: Position.sticky(top: 116.px),
-    height: Unit.expression('calc(100vh - 128px)'),
+    display: Display.none,
+    width: 272.px,
+    raw: {'flex': 'none'},
+  ),
+  css('.docs-toc-inner').styles(
+    position: Position.sticky(top: Unit.expression('var(--docs-header-h)')),
+    maxHeight: Unit.expression('calc(100svh - var(--docs-header-h))'),
+    padding: .only(top: 40.px, bottom: 32.px),
     overflow: Overflow.only(y: Overflow.auto),
   ),
+  ContainerStyleRule('(min-width: 48rem)', [
+    css('.docs-article').styles(
+      padding: .only(left: 56.px, right: 56.px),
+    ),
+    css('.docs-toc').styles(display: Display.block),
+  ]),
+  ContainerStyleRule('(min-width: 64rem)', [
+    css('.docs-article').styles(
+      padding: .only(left: 64.px, right: 64.px),
+    ),
+  ]),
   css('.docs-toc-header').styles(
     margin: .only(bottom: 8.px),
-    fontSize: 0.72.rem,
-    fontWeight: FontWeight.w600,
-    color: AppColors.inkMuted,
-  ),
-  css('.md-sidebar').styles(fontSize: 0.92.rem),
-  css('.md-sidebar-panel').styles(
-    position: Position.sticky(top: 116.px),
-    maxHeight: Unit.expression('calc(100vh - 128px)'),
-    overflow: Overflow.only(y: Overflow.auto),
+    fontSize: 0.875.rem,
+    fontWeight: FontWeight.w500,
+    color: AppColors.ink,
   ),
   css('.md-backdrop').styles(display: Display.none),
   css('.md-sidebar-group').styles(
@@ -59,8 +87,7 @@ List<StyleRule> get markdownStyles => [
   ),
 
   css('.md-content').styles(
-    maxWidth: 760.px,
-    fontSize: 1.08.rem,
+    fontSize: 1.rem,
     lineHeight: 1.7.em,
     color: AppColors.inkMuted,
   ),
@@ -90,7 +117,7 @@ List<StyleRule> get markdownStyles => [
     fontSize: 1.5.rem,
     lineHeight: 1.3.em,
     color: AppColors.ink,
-    raw: {'scroll-margin-top': '116px'},
+    raw: {'scroll-margin-top': 'calc(var(--docs-header-h) + 16px)'},
   ),
   css('.md-content h3').styles(
     margin: .only(top: 32.px, bottom: 8.px),
@@ -205,9 +232,7 @@ List<StyleRule> get markdownStyles => [
   ),
   css('.md-toc a:hover').styles(color: AppColors.cyan),
 
-  css.media(MediaQuery.screen(maxWidth: 992.px), [
-    css('.md-layout').styles(raw: {'grid-template-columns': '220px minmax(0, 1fr)'}),
-    css('.md-content').styles(fontSize: 1.rem),
+  ContainerStyleRule('(max-width: 48rem)', [
     css('.md-toc-mobile').styles(
       display: Display.block,
       margin: .only(bottom: 24.px),
@@ -227,7 +252,7 @@ List<StyleRule> get markdownStyles => [
   // At md the sidebar becomes a drawer from the left, opened from the
   // header's tab row (html.docs-menu-open).
   css.media(MediaQuery.screen(maxWidth: 768.px), [
-    css('.md-layout').styles(raw: {'grid-template-columns': 'minmax(0, 1fr)'}),
+    css('.md-sidebar').styles(width: 0.px),
     css('.md-backdrop').styles(
       display: Display.block,
       position: Position.fixed(top: 0.px, left: 0.px, right: 0.px, bottom: 0.px),
@@ -240,7 +265,7 @@ List<StyleRule> get markdownStyles => [
       zIndex: ZIndex(1200),
       width: 80.percent,
       maxWidth: 300.px,
-      maxHeight: Unit.expression('100vh'),
+      height: Unit.expression('100svh'),
       padding: .all(20.px),
       backgroundColor: AppColors.bg,
       border: Border.only(

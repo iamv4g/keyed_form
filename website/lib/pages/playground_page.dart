@@ -12,7 +12,7 @@ class PlaygroundPage extends StatelessComponent {
   Component build(BuildContext context) {
     return Component.fragment([
       const DocsHeader(section: 'playground'),
-      main_(classes: 'wrap playground-page', [
+      main_(classes: 'docs-shell playground-page', [
         span(classes: 'section-kicker mono', [.text('// LIVE PLAYGROUND')]),
         h1(classes: 'section-title display', [.text('See It Rebuild, Live')]),
         p(classes: 'section-lede', [

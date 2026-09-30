@@ -36,10 +36,10 @@ class KfDocsLayout implements PageLayout {
         meta: {'description': ?description},
       ),
       const DocsHeader(section: 'docs', hasSidebar: true),
-      div(classes: 'docs-container', [
-        div(classes: 'md-layout', [
-          _Sidebar(current: page.url),
-          main_(classes: 'md-content', [
+      div(classes: 'docs-shell docs-body', [
+        _Sidebar(current: page.url),
+        div(classes: 'docs-main', [
+          main_(classes: 'docs-article md-content', [
             if (entry != null) span(classes: 'md-eyebrow', [.text(entry.group)]),
             if (title != null) h1([.text(title)]),
             if (description != null) p(classes: 'md-lead', [.text(description)]),
@@ -60,10 +60,11 @@ class KfDocsLayout implements PageLayout {
             ]),
           ]),
           aside(classes: 'docs-toc', [
-            if (tocEntries != null) ...[
-              div(classes: 'docs-toc-header mono', [.text('ON THIS PAGE')]),
-              div(classes: 'md-toc', [_toc(tocEntries.entries, page.url)]),
-            ],
+            if (tocEntries != null)
+              div(classes: 'docs-toc-inner', [
+                div(classes: 'docs-toc-header', [.text('On this page')]),
+                div(classes: 'md-toc', [_toc(tocEntries.entries, page.url)]),
+              ]),
           ]),
         ]),
       ]),
