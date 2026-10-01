@@ -30,16 +30,16 @@ gates that rule; an unrelated sibling error does not. Use nested
 references; the controller adds each stable `clientId` to the concrete error
 key.
 
-Rules can be nested under each keyed collection; callbacks then receive the
+Rules can be nested under each keyed list; callbacks then receive the
 local row value and the controller builds keys from the row's stable ID:
 
 ```dart
 asyncValidators: [
   .forEach(
-    collection: ItineraryFields.days,
+    list: ItineraryFields.days,
     rules: [
       .forEach(
-        collection: DayFields.activities,
+        list: DayFields.activities,
         rules: [
           .field(
             field: VariantRef<ActivitySchema, SightseeingActivitySchema>.type()

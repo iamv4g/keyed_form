@@ -45,7 +45,7 @@ void main() {
       resolver: validateTrip,
       asyncValidators: [
         .forEach(
-          collection: TripFields.stops,
+          list: TripFields.stops,
           rules: [
             .field(
               field: _StopFields.label,
@@ -441,7 +441,7 @@ void main() {
       asyncValidators: [
         .field(field: TripFields.days, validate: (_, _) => 'async days'),
         .forEach(
-          collection: TripFields.stops,
+          list: TripFields.stops,
           rules: [
             .field(field: _StopFields.label, validate: (_, _) => 'async label'),
           ],
@@ -482,7 +482,7 @@ void main() {
       resolver: validateTrip,
       asyncValidators: [
         .forEach(
-          collection: TripFields.stops,
+          list: TripFields.stops,
           rules: [
             .field(field: _StopFields.label, validate: (_, _) => gate.future),
           ],

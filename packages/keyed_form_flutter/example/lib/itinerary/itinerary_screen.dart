@@ -32,10 +32,10 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     resolver: ItinerarySchema.validateData,
     asyncValidators: [
       .forEach(
-        collection: ItineraryFields.days,
+        list: ItineraryFields.days,
         rules: [
           .forEach(
-            collection: DayFields.activities,
+            list: DayFields.activities,
             rules: [
               .field(
                 field:

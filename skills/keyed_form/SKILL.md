@@ -361,7 +361,7 @@ only when there are no value errors do blocking technical failures route to
 `onValidationUnavailable`.
 Independent checks start in parallel. Sync value errors gate only async rules
 at or below that field scope; an unrelated sibling error does not. Inside
-`.forEach(collection: ..., rules: [...])`, nested `.field` callbacks receive
+`.forEach(list: ..., rules: [...])`, nested `.field` callbacks receive
 the typed local row draft, and the controller builds concrete keys from each
 row's stable `clientId`. Missing paths or inactive union variants skip the
 rule; a present nullable value is still passed as its declared nullable type.

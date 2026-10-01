@@ -33,12 +33,12 @@ sealed class KeyedFormAsyncValidator<S> {
     onFailure: onFailure,
   );
 
-  /// Applies [rules] independently to every row in [collection].
+  /// Applies [rules] independently to every row in [list].
   static KeyedFormAsyncValidator<R> forEach<R, Item extends KeyedRow>({
-    required FieldRef<R, List<Item>> collection,
+    required FieldRef<R, List<Item>> list,
     required List<KeyedFormAsyncValidator<Item>> rules,
   }) => _ForEachAsyncValidator<R, Item>(
-    collection: collection,
+    list: list,
     rules: List.unmodifiable(rules),
   );
 }
@@ -94,10 +94,10 @@ final class _FieldAsyncValidator<R, V> extends KeyedFormAsyncValidator<R> {
 
 final class _ForEachAsyncValidator<R, Item extends KeyedRow>
     extends KeyedFormAsyncValidator<R> {
-  const _ForEachAsyncValidator({required this.collection, required this.rules})
+  const _ForEachAsyncValidator({required this.list, required this.rules})
     : super._();
 
-  final FieldRef<R, List<Item>> collection;
+  final FieldRef<R, List<Item>> list;
   final List<KeyedFormAsyncValidator<Item>> rules;
 
   @override
@@ -106,7 +106,7 @@ final class _ForEachAsyncValidator<R, Item extends KeyedRow>
     FieldKey prefix,
     KeyedFormAsyncValidatorVisitor visitor,
   ) {
-    final found = collection.find(draft);
+    final found = list.find(draft);
     if (found case Some(:final value)) {
       final ids = <String>{};
       for (final row in value) {
@@ -114,10 +114,10 @@ final class _ForEachAsyncValidator<R, Item extends KeyedRow>
           throw ArgumentError.value(
             row.clientId,
             'clientId',
-            'Duplicate row id in ${collection.key}',
+            'Duplicate row id in ${list.key}',
           );
         }
-        final rowPrefix = prefix + collection.key + .id(row.clientId);
+        final rowPrefix = prefix + list.key + .id(row.clientId);
         for (final rule in rules) {
           rule.resolve(row, rowPrefix, visitor);
         }
