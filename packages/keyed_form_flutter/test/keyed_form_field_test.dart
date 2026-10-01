@@ -163,6 +163,31 @@ void main() {
     expect(validations, 1);
   });
 
+  testWidgets('pointer focus change between fields blurs the field it leaves', (
+    tester,
+  ) async {
+    var validations = 0;
+    final form = KeyedFormController<Pair>(
+      initialValue: const Pair(),
+      mode: KeyedFormMode.onBlur,
+      resolver: (value, scope) {
+        validations++;
+        return _resolve(value, scope);
+      },
+    );
+    final builds = <String, int>{};
+    await tester.pumpWidget(_host(form, builds));
+
+    await tester.tap(find.byKey(const Key('a')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('b')));
+    await tester.pump();
+
+    expect(form.touched, contains(_a.key));
+    expect(form.touched, isNot(contains(_b.key)));
+    expect(validations, 1);
+  });
+
   testWidgets('Tab traverses between inputs and blurs the input it leaves', (
     tester,
   ) async {
@@ -316,6 +341,68 @@ void main() {
     expect(FocusManager.instance.primaryFocus, same(aNode));
     expect(form.touched, containsAll([_a.key, _b.key]));
     expect(validations, 2);
+  });
+
+  testWidgets('focus boundary cannot receive focus or stop traversal', (
+    tester,
+  ) async {
+    var validations = 0;
+    final form = KeyedFormController<Pair>(
+      initialValue: const Pair(),
+      mode: KeyedFormMode.onBlur,
+      resolver: (value, scope) {
+        validations++;
+        return _resolve(value, scope);
+      },
+    );
+    final inputNode = FocusNode();
+    final outsideNode = FocusNode();
+    addTearDown(inputNode.dispose);
+    addTearDown(outsideNode.dispose);
+    FocusNode? boundaryNode;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: KeyedForm<Pair>(
+            controller: form,
+            child: Column(
+              children: [
+                KeyedFormField<Pair, String>(
+                  field: _a,
+                  builder: (context, field) => Builder(
+                    builder: (context) {
+                      boundaryNode = Focus.of(context);
+                      return TextField(
+                        focusNode: inputNode,
+                        onChanged: field.onChanged,
+                      );
+                    },
+                  ),
+                ),
+                TextField(focusNode: outsideNode),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    boundaryNode!.requestFocus();
+    await tester.pump();
+    expect(FocusManager.instance.primaryFocus, isNot(same(boundaryNode)));
+    expect(validations, 0);
+
+    inputNode.requestFocus();
+    await tester.pump();
+    boundaryNode!.requestFocus();
+    await tester.pump();
+    expect(FocusManager.instance.primaryFocus, same(inputNode));
+    expect(validations, 0);
+
+    outsideNode.requestFocus();
+    await tester.pump();
+    expect(form.touched, contains(_a.key));
+    expect(validations, 1);
   });
 
   testWidgets('automatic focus loss into a root overlay is a blur', (
