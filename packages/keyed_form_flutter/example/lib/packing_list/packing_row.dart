@@ -22,18 +22,12 @@ class _PackingRow extends StatelessWidget {
         Expanded(
           child: KeyedFormField.text<PackingSchema>(
             field: fields.label,
-            builder: (context, f, controller) => Focus(
-              canRequestFocus: false,
-              onFocusChange: (hasFocus) {
-                if (!hasFocus) f.onBlur();
-              },
-              child: TextField(
-                controller: controller,
-                onTapOutside: (_) => FocusScope.of(context).unfocus(),
-                decoration: InputDecoration(
-                  labelText: 'Item',
-                  errorText: f.errorText,
-                ),
+            builder: (context, f, controller) => TextField(
+              controller: controller,
+              onTapOutside: (_) => FocusScope.of(context).unfocus(),
+              decoration: InputDecoration(
+                labelText: 'Item',
+                errorText: f.errorText,
               ),
             ),
           ),

@@ -66,30 +66,24 @@ KeyedForm<SignupSchema>(
     children: [
       KeyedFormField.text<SignupSchema>(
         field: SignupFields.email,
-        builder: (context, state, controller) => Focus(
-          canRequestFocus: false,
-          onFocusChange: (focused) {
-            if (!focused) state.onBlur();
-          },
-          child: TextField(
-            controller: controller,
-            onTapOutside: (_) => FocusScope.of(context).unfocus(),
-            decoration: InputDecoration(labelText: 'Email', errorText: state.errorText),
+        builder: (context, state, controller) => TextField(
+          controller: controller,
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+          decoration: InputDecoration(
+            labelText: 'Email',
+            errorText: state.errorText,
           ),
         ),
       ),
       KeyedFormField.text<SignupSchema>(
         field: SignupFields.password,
-        builder: (context, state, controller) => Focus(
-          canRequestFocus: false,
-          onFocusChange: (focused) {
-            if (!focused) state.onBlur();
-          },
-          child: TextField(
-            controller: controller,
-            obscureText: true,
-            onTapOutside: (_) => FocusScope.of(context).unfocus(),
-            decoration: InputDecoration(labelText: 'Password', errorText: state.errorText),
+        builder: (context, state, controller) => TextField(
+          controller: controller,
+          obscureText: true,
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+          decoration: InputDecoration(
+            labelText: 'Password',
+            errorText: state.errorText,
           ),
         ),
       ),
@@ -113,9 +107,12 @@ form.dispose();
 ```
 
 In `onTouched` mode, blur starts validation and later edits to a blurred field
-revalidate it. Submit always validates the current draft. `onTapOutside` only
-unfocuses the text input; wrap the field in `Focus` and report actual
-`onFocusChange(false)` as `state.onBlur()`. Enter does not count as blur.
+revalidate it. Submit always validates the current draft. `KeyedFormField`
+automatically reports focus leaving its widget subtree; ordinary text fields
+need no `Focus` wrapper. `onTapOutside` only unfocuses the text input. For a
+control whose logical focus extends into an overlay, set
+`autoDetectBlur: false` and call `state.onBlur()` when that logical interaction
+ends. Enter does not count as blur.
 
 ### Context and `handleSubmit`
 

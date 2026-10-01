@@ -265,34 +265,28 @@ class _ActivityRow extends StatelessWidget {
                       builder: (context, field, controller) => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Focus(
-                            canRequestFocus: false,
-                            onFocusChange: (hasFocus) {
-                              if (!hasFocus) field.onBlur();
-                            },
-                            child: TextField(
-                              controller: controller,
-                              onTapOutside: (_) =>
-                                  FocusScope.of(context).unfocus(),
-                              decoration: InputDecoration(
-                                labelText: 'Place',
-                                errorText: field.errorText,
-                                helperText: field.isFailedValidation
-                                    ? 'Availability check failed.'
-                                    : null,
-                                suffixIcon: field.isValidating
-                                    ? const Padding(
-                                        padding: EdgeInsets.all(14),
-                                        child: SizedBox(
-                                          width: 16,
-                                          height: 16,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                          ),
+                          TextField(
+                            controller: controller,
+                            onTapOutside: (_) =>
+                                FocusScope.of(context).unfocus(),
+                            decoration: InputDecoration(
+                              labelText: 'Place',
+                              errorText: field.errorText,
+                              helperText: field.isFailedValidation
+                                  ? 'Availability check failed.'
+                                  : null,
+                              suffixIcon: field.isValidating
+                                  ? const Padding(
+                                      padding: EdgeInsets.all(14),
+                                      child: SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
                                         ),
-                                      )
-                                    : null,
-                              ),
+                                      ),
+                                    )
+                                  : null,
                             ),
                           ),
                           if (field.isFailedValidation)

@@ -133,22 +133,15 @@ class _RebuildLabScreenState extends State<RebuildLabScreen> {
                       anchor: false,
                       builder: (context, f, controller) {
                         _fieldRebuilds[i]++;
-                        return Focus(
-                          canRequestFocus: false,
-                          onFocusChange: (hasFocus) {
-                            if (!hasFocus) f.onBlur();
-                          },
-                          child: TextField(
-                            controller: controller,
-                            onTapOutside: (_) =>
-                                FocusScope.of(context).unfocus(),
-                            decoration: InputDecoration(
-                              isDense: true,
-                              labelText:
-                                  'Field $i · rebuilt ${_fieldRebuilds[i]}×',
-                              errorText: f.errorText,
-                              border: const OutlineInputBorder(),
-                            ),
+                        return TextField(
+                          controller: controller,
+                          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            labelText:
+                                'Field $i · rebuilt ${_fieldRebuilds[i]}×',
+                            errorText: f.errorText,
+                            border: const OutlineInputBorder(),
                           ),
                         );
                       },

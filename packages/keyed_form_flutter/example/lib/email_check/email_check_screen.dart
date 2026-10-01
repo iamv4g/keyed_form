@@ -64,42 +64,34 @@ class _EmailCheckScreenState extends State<EmailCheckScreen> {
             const SizedBox(height: 24),
             KeyedFormField.text<EmailCheckSchema>(
               field: EmailCheckFields.email,
-              builder: (context, f, controller) => Focus(
-                canRequestFocus: false,
-                onFocusChange: (hasFocus) {
-                  if (!hasFocus) f.onBlur();
-                },
-                child: TextField(
-                  controller: controller,
-                  onTapOutside: (_) => FocusScope.of(context).unfocus(),
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    errorText: f.errorText,
-                    helperText: f.isFailedValidation
-                        ? "Couldn't verify this email — try again."
-                        : null,
-                    border: const OutlineInputBorder(),
-                    suffixIcon: f.isValidating
-                        ? const Padding(
-                            padding: EdgeInsets.all(14),
-                            child: SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          )
-                        : f.isFailedValidation
-                        ? IconButton(
-                            tooltip: 'Retry email check',
-                            onPressed: () async {
-                              await form
-                                  .field(EmailCheckFields.email)
-                                  .validate();
-                            },
-                            icon: const Icon(Icons.refresh),
-                          )
-                        : null,
-                  ),
+              builder: (context, f, controller) => TextField(
+                controller: controller,
+                onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  errorText: f.errorText,
+                  helperText: f.isFailedValidation
+                      ? "Couldn't verify this email — try again."
+                      : null,
+                  border: const OutlineInputBorder(),
+                  suffixIcon: f.isValidating
+                      ? const Padding(
+                          padding: EdgeInsets.all(14),
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : f.isFailedValidation
+                      ? IconButton(
+                          tooltip: 'Retry email check',
+                          onPressed: () async {
+                            await form.field(EmailCheckFields.email).validate();
+                          },
+                          icon: const Icon(Icons.refresh),
+                        )
+                      : null,
                 ),
               ),
             ),

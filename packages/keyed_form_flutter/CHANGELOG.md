@@ -7,9 +7,12 @@ Breaking validation lifecycle update, matching `keyed_form` 0.2.0.
 - `handleSubmit` routes blocking technical failures to
   `onValidationUnavailable`; value errors still use `onInvalid`, whose
   default behavior reveals the first visible error.
-- A field's blur callback is ignored if its binding no longer resolves.
-- Text-field examples now report actual focus loss. `onTapOutside` only moves
-  focus; Enter/submission does not simulate blur.
+- `KeyedFormField` and `.text` detect focus leaving the field subtree by
+  default. Set `autoDetectBlur: false` when a control owns a wider logical
+  focus lifecycle, then call `KeyedFieldState.onBlur` at its logical boundary.
+- `KeyedFieldState.onBlur` remains safe after its field binding disappears.
+- Text-field examples rely on the binding's focus boundary; `onTapOutside`
+  only moves focus, and Enter/submission does not simulate blur.
 
 ## 0.1.0
 
