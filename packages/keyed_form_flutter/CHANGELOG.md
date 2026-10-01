@@ -13,6 +13,7 @@ Breaking validation lifecycle update, matching `keyed_form` 0.2.0.
 - `KeyedFieldState.onBlur` remains safe after its field binding disappears.
 - Text-field examples rely on the binding's focus boundary; `onTapOutside`
   only moves focus, and Enter/submission does not simulate blur.
+- Add pub.dev topics for package discoverability.
 
 ## 0.1.0
 

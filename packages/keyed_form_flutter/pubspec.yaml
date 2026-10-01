@@ -8,6 +8,13 @@ homepage: https://github.com/iamv4g/keyed_form
 repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter
 issue_tracker: https://github.com/iamv4g/keyed_form/issues
 
+topics:
+  - flutter
+  - widget
+  - form
+  - validation
+  - state-management
+
 environment:
   sdk: ^3.10.0
 

@@ -8,6 +8,12 @@ version: 0.2.0
 homepage: https://github.com/iamv4g/keyed_form
 repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_gen
 issue_tracker: https://github.com/iamv4g/keyed_form/issues
+topics:
+  - dart
+  - codegen
+  - build-runner
+  - form
+  - immutable
 
 environment:
   sdk: ^3.10.0

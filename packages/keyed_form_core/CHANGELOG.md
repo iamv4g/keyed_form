@@ -1,6 +1,7 @@
 ## 0.2.0
 
-- Align the core package version with the keyed_form 0.2.0 release.
+- Add pub.dev topics for package discoverability.
+- Depend on `keyed_lens ^0.2.0`.
 
 ## 0.1.0
 

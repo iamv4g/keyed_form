@@ -14,6 +14,7 @@ Breaking validation lifecycle update.
   `onSubmit` is the default; `reValidateMode` defaults to `onChange`.
 - Removed manual `FieldHandle.validateAsync`, `setFieldValidating`, and
   `validateFieldAsync` APIs. Configure rules on the controller instead.
+- Add pub.dev topics for package discoverability.
 
 ## 0.1.0
 
