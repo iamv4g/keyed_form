@@ -3,7 +3,7 @@ description: >-
   A form-state controller for immutable aggregates, built on keyed_form_core:
   holds the working draft, FieldKey-addressed validation errors and
   touched/dirty/submit state.
-version: 0.1.0
+version: 0.2.0
 
 homepage: https://github.com/iamv4g/keyed_form
 repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form

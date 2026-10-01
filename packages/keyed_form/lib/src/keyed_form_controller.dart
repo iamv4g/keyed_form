@@ -4,10 +4,69 @@ import 'package:keyed_form_core/keyed_form_core.dart';
 import 'package:listen/listen.dart';
 import 'package:meta/meta.dart';
 
+import 'keyed_form_async_validator.dart';
 import 'keyed_form_list.dart';
 import 'keyed_form_mode.dart';
 import 'keyed_form_resolver.dart';
 import 'keyed_form_snapshot.dart';
+import 'keyed_form_validation_result.dart';
+
+typedef _ResolvedRule = ({
+  FieldKey key,
+  Object? draft,
+  FutureOr<String?> Function() validate,
+  Duration? timeout,
+  KeyedFormAsyncFailureMode? failureMode,
+  void Function(Object error, StackTrace stackTrace)? onFailure,
+});
+
+typedef _FailureObserver = ({
+  void Function(Object, StackTrace)? callback,
+  KeyedFormValidationFailure failure,
+});
+
+void _notifyFailureObservers(Iterable<_FailureObserver> observers) {
+  Object? firstError;
+  StackTrace? firstStackTrace;
+  for (final observer in observers) {
+    try {
+      observer.callback?.call(
+        observer.failure.error,
+        observer.failure.stackTrace,
+      );
+    } catch (error, stackTrace) {
+      firstError ??= error;
+      firstStackTrace ??= stackTrace;
+    }
+  }
+  if (firstError != null) {
+    Error.throwWithStackTrace(firstError, firstStackTrace!);
+  }
+}
+
+final class _RuleCollector implements KeyedFormAsyncValidatorVisitor {
+  final List<_ResolvedRule> rules = [];
+
+  @override
+  void field<R, V>({
+    required FieldKey key,
+    required R draft,
+    required V value,
+    required FutureOr<String?> Function(R, V) validate,
+    required Duration? timeout,
+    required KeyedFormAsyncFailureMode? failureMode,
+    required void Function(Object, StackTrace)? onFailure,
+  }) {
+    rules.add((
+      key: key,
+      draft: draft,
+      validate: () => validate(draft, value),
+      timeout: timeout,
+      failureMode: failureMode,
+      onFailure: onFailure,
+    ));
+  }
+}
 
 /// Owns one editable draft of [Root] and everything that hangs off it:
 /// validation errors keyed by [FieldKey], which fields have been touched,
@@ -38,32 +97,43 @@ class KeyedFormController<Root> extends ChangeNotifier {
   KeyedFormController({
     required Root initialValue,
     required this.resolver,
-    this.mode = .onTouched,
+    this.mode = KeyedFormMode.onSubmit,
+    this.reValidateMode = KeyedFormReValidateMode.onChange,
+    List<KeyedFormAsyncValidator<Root>> asyncValidators = const [],
+    this.asyncValidationFailureMode = KeyedFormAsyncFailureMode.blockSubmit,
     this.scopeOf,
   }) : _value = initialValue,
-       _original = initialValue;
+       _original = initialValue,
+       asyncValidators = List.unmodifiable(asyncValidators);
 
-  /// Validates a draft (or one subtree of it) — see [KeyedFormResolver].
   final KeyedFormResolver<Root> resolver;
-
-  /// When a field's error becomes visible — see [KeyedFormMode].
   final KeyedFormMode mode;
-
-  /// Maps a written field to the subtree to re-validate; `null` for
-  /// whole-draft validation on every write.
+  final KeyedFormReValidateMode reValidateMode;
+  final List<KeyedFormAsyncValidator<Root>> asyncValidators;
+  final KeyedFormAsyncFailureMode asyncValidationFailureMode;
   final KeyedFormScopeOf? scopeOf;
 
   Root _value;
   Root _original;
+  FieldErrors<String> _syncErrors = const FieldErrors.empty();
+  FieldErrors<String> _serverErrors = const FieldErrors.empty();
+  FieldErrors<String> _asyncErrors = const FieldErrors.empty();
   FieldErrors<String> _errors = const FieldErrors.empty();
+  final Map<FieldKey, KeyedFormValidationFailure> _failures = {};
   final Set<FieldKey> _touched = {};
   final Set<FieldKey> _revealed = {};
   final Set<FieldKey> _validating = {};
   final Set<FieldKey> _failed = {};
   final Set<FieldKey> _readOnly = {};
   final Map<FieldKey, int> _validationGeneration = {};
+  final Map<FieldKey, Set<Completer<void>>> _activeRunsByKey = {};
+  final Map<FieldKey, Object?> _ruleSnapshots = {};
   bool _submitted = false;
   bool _submitting = false;
+  int _epoch = 0;
+  int _revision = 0;
+  int? _submissionRevision;
+  bool _disposed = false;
 
   // --- reads -----------------------------------------------------------------
 
@@ -82,16 +152,15 @@ class KeyedFormController<Root> extends ChangeNotifier {
 
   bool get submitting => _submitting;
 
-  /// Whether [key] is currently mid-async-validation — see
-  /// [setFieldValidating] / [validateFieldAsync].
+  /// Whether [key] is currently mid-async-validation.
   bool isValidating(FieldKey key) => _validating.contains(key);
 
-  /// Whether [key]'s async validation last ended in a technical failure (the
-  /// check threw, or exceeded its timeout) rather than a verdict about the
-  /// value — see [validateFieldAsync]. Orthogonal to [errors]: this reports
-  /// "the check couldn't run", not "the value is invalid". Not sticky — the
-  /// next [validateFieldAsync] call on the same key clears it, win or lose.
+  /// Whether [key]'s latest async verdict ended in a technical failure.
   bool isFailedValidation(FieldKey key) => _failed.contains(key);
+
+  /// Current technical failures, independent of value errors.
+  Map<FieldKey, KeyedFormValidationFailure> get validationFailures =>
+      Map.unmodifiable(_failures);
 
   /// Whether [key] is frozen against [setField] / [updateField] / list
   /// mutation — see [markReadOnly]. Covers a key nested under a read-only
@@ -171,10 +240,12 @@ class KeyedFormController<Root> extends ChangeNotifier {
 
   bool _isVisible(FieldKey key) => switch (mode) {
     .all => true,
+    .onChange => _submitted || _revealedCovers(key),
+    .onBlur || .onTouched =>
+      _touched.any((touched) => touched == key || touched.contains(key)) ||
+          _submitted ||
+          _revealedCovers(key),
     .onSubmit => _submitted || _revealedCovers(key),
-    .onChange ||
-    .onBlur ||
-    .onTouched => _touched.contains(key) || _submitted || _revealedCovers(key),
   };
 
   bool _revealedCovers(FieldKey key) =>
@@ -230,7 +301,8 @@ class KeyedFormController<Root> extends ChangeNotifier {
   void _commit(FieldKey writtenKey, Root next) {
     if (next == _value) return;
     _value = next;
-    if (mode == .onChange) _touched.add(writtenKey);
+    _revision++;
+    _reconcileRuleBindings();
     _revalidateForWrite(writtenKey);
     notifyListeners();
   }
@@ -251,52 +323,115 @@ class KeyedFormController<Root> extends ChangeNotifier {
     final next = field.set(_value, after);
     if (next == _value) return;
     _value = next;
-
+    _revision++;
+    _reconcileRuleBindings();
     final survivingIds = {for (final row in after) row.clientId};
     for (final row in before) {
       if (!survivingIds.contains(row.clientId)) {
         final rowKey = field.key + FieldKey.id(row.clientId);
-        _errors = _errors.removeSubtree(rowKey);
+        _removeSubtree(rowKey);
         _revealed.removeWhere(rowKey.contains);
+        _touched.removeWhere(rowKey.contains);
       }
     }
-
-    if (mode == .onChange) _touched.add(field.key);
     _revalidateForWrite(field.key);
     notifyListeners();
   }
 
-  // --- validation / touch / reveal --------------------------------------
+  void _revalidateForWrite(FieldKey key) {
+    final shouldValidate = _submitted
+        ? reValidateMode == KeyedFormReValidateMode.onChange ||
+              mode == KeyedFormMode.all
+        : switch (mode) {
+            .onChange || .all => true,
+            .onTouched => _touched.any((touched) => touched.contains(key)),
+            .onBlur || .onSubmit => false,
+          };
+    if (shouldValidate) _automaticValidation(key);
+  }
 
-  /// Marks [key] touched and re-validates the subtree it belongs to (the whole
-  /// draft for an unscoped controller).
+  void _cancelRunsForKey(FieldKey key) {
+    final runs = _activeRunsByKey[key];
+    if (runs == null) return;
+    for (final run in runs) {
+      if (!run.isCompleted) run.complete();
+    }
+    _validationGeneration[key] = (_validationGeneration[key] ?? 0) + 1;
+    _validating.remove(key);
+  }
+
+  void _unlinkRun(List<_ResolvedRule> targets, Completer<void> run) {
+    for (final target in targets) {
+      final runs = _activeRunsByKey[target.key];
+      runs?.remove(run);
+      if (runs?.isEmpty ?? false) _activeRunsByKey.remove(target.key);
+    }
+  }
+
+  void _reconcileRuleBindings() {
+    final current = {
+      for (final target in _resolveRules(_value)) target.key: target.draft,
+    };
+    for (final entry in _ruleSnapshots.entries.toList()) {
+      if (current.containsKey(entry.key) && current[entry.key] == entry.value) {
+        continue;
+      }
+      _cancelRunsForKey(entry.key);
+      _removeSubtree(entry.key);
+      _ruleSnapshots.remove(entry.key);
+    }
+  }
+
+  void _invalidateRuns() {
+    _epoch++;
+    for (final key in _validating.toList()) {
+      _validationGeneration[key] = (_validationGeneration[key] ?? 0) + 1;
+    }
+    for (final runs in _activeRunsByKey.values) {
+      for (final run in runs) {
+        if (!run.isCompleted) run.complete();
+      }
+    }
+    _activeRunsByKey.clear();
+    _validating.clear();
+  }
+
+  void _removeSubtree(FieldKey root) {
+    for (final key in _activeRunsByKey.keys.where(root.contains).toList()) {
+      _cancelRunsForKey(key);
+    }
+    _ruleSnapshots.removeWhere((key, _) => root.contains(key));
+    _syncErrors = _syncErrors.removeSubtree(root);
+    _serverErrors = _serverErrors.removeSubtree(root);
+    _asyncErrors = _asyncErrors.removeSubtree(root);
+    _failures.removeWhere((key, _) => root.contains(key));
+    _failed.removeWhere(root.contains);
+    _validating.removeWhere(root.contains);
+    _mergeErrorSources();
+  }
+
+  /// Marks [key] touched and triggers validation when the configured mode
+  /// schedules blur validation.
   void touch(FieldKey key) {
     _touched.add(key);
-    _revalidateScopeOf(key);
-    notifyListeners();
-  }
-
-  /// Whole-draft validation. Sets [submitted] so every error becomes visible.
-  /// Returns whether the draft is valid.
-  bool validate() {
-    _errors = resolver(_value, null);
-    _submitted = true;
-    notifyListeners();
-    return _errors.isEmpty;
-  }
-
-  /// Re-validates each subtree in [scopes], force-reveals all of them, and
-  /// returns the ones that still carry an error — the "validate my dirty days
-  /// before saving" operation. Only meaningful on a scoped controller.
-  List<FieldKey> validateScopes(Iterable<FieldKey> scopes) {
-    final failing = <FieldKey>[];
-    for (final scope in scopes) {
-      _errors = _spliceScope(scope, resolver(_value, scope));
-      _revealed.add(scope);
-      if (_errors.keys.any(scope.contains)) failing.add(scope);
+    if (_shouldValidateOnBlur(key) &&
+        !(_submitting && _submissionRevision == _revision)) {
+      _automaticValidation(key);
     }
     notifyListeners();
-    return failing;
+  }
+
+  /// Validates the whole draft and its configured asynchronous rules.
+  Future<KeyedFormValidationResult> validate() =>
+      _runValidation(const [], revealAll: true);
+
+  /// Validates the requested subtrees. An empty iterable performs no work.
+  Future<KeyedFormValidationResult> validateScopes(Iterable<FieldKey> scopes) {
+    final normalized = _normalizeScopes(scopes);
+    if (normalized.isEmpty) {
+      return Future.value(_result(KeyedFormValidationStatus.valid, const {}));
+    }
+    return _runValidation(normalized, revealAll: false);
   }
 
   /// Force every error under each of [scopes] visible, without re-validating.
@@ -305,64 +440,351 @@ class KeyedFormController<Root> extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Validates the draft. If valid, runs [onValid] with the current [value],
-  /// toggling [submitting] around it. If invalid, runs [onInvalid] (if given)
-  /// with [visibleErrorKeys] — [validate] has already made every error
-  /// visible. Returns whether [onValid] ran.
-  ///
-  /// In `keyed_form_flutter`, `form.handleSubmit(context, onValid)` is the
-  /// Flutter-aware wrapper: same shape, but its default [onInvalid] scrolls
-  /// to the first error via the ambient `KeyedFieldRegistry`.
+  /// Validates a fresh snapshot before invoking exactly one matching callback.
   Future<bool> submit(
     FutureOr<void> Function(Root value) onValid, {
     FutureOr<void> Function(Iterable<FieldKey> errorKeys)? onInvalid,
+    FutureOr<void> Function(KeyedFormValidationResult result)?
+    onValidationUnavailable,
   }) async {
-    if (!validate()) {
-      if (onInvalid != null) await onInvalid(visibleErrorKeys);
-      return false;
-    }
-    setSubmitting(true);
+    if (_submitting) return false;
+    _submitting = true;
+    final token = _epoch;
+    final revision = _revision;
+    _submissionRevision = revision;
+    final draft = _value;
+    _revealed.add(FieldKey.root);
+    notifyListeners();
     try {
-      await onValid(value);
+      final result = await _runValidation(const [], revealAll: true);
+      if (_disposed ||
+          token != _epoch ||
+          revision != _revision ||
+          result.status == KeyedFormValidationStatus.superseded) {
+        return false;
+      }
+      if (result.errors.isNotEmpty) {
+        if (onInvalid != null) await onInvalid(result.errors.keys);
+        return false;
+      }
+      if (result.failures.values.any(
+        (failure) =>
+            failure.failureMode == KeyedFormAsyncFailureMode.blockSubmit,
+      )) {
+        if (onValidationUnavailable != null) {
+          await onValidationUnavailable(result);
+        }
+        return false;
+      }
+      await onValid(draft);
       return true;
     } finally {
-      setSubmitting(false);
+      if (!_disposed && token == _epoch) {
+        _submitting = false;
+        _submitted = true;
+        _submissionRevision = null;
+        notifyListeners();
+      }
     }
   }
 
-  void _revalidateForWrite(FieldKey writtenKey) =>
-      _revalidateScopeOf(writtenKey);
+  Future<KeyedFormValidationResult> _runValidation(
+    List<FieldKey> scopes, {
+    required bool revealAll,
+  }) async {
+    final root = _value;
+    final runEpoch = _epoch;
+    if (scopes.isEmpty) {
+      _syncErrors = resolver(root, null);
+      _serverErrors = const FieldErrors.empty();
+    } else {
+      for (final scope in scopes) {
+        _syncErrors = _spliceInto(_syncErrors, scope, resolver(root, scope));
+        _serverErrors = _serverErrors.removeSubtree(scope);
+      }
+    }
+    _clearSyncBlockedBindings();
+    _mergeErrorSources();
+    if (revealAll) {
+      _revealed.add(FieldKey.root);
+    } else {
+      _revealed.addAll(scopes);
+    }
+    final targets = _resolveRules(root)
+        .where(
+          (target) =>
+              scopes.isEmpty ||
+              scopes.any(
+                (scope) =>
+                    scope.contains(target.key) || target.key.contains(scope),
+              ),
+        )
+        .toList(growable: false);
+    final seen = <FieldKey>{};
+    for (final target in targets) {
+      if (!seen.add(target.key)) {
+        throw ArgumentError(
+          'Multiple async validators resolve to ${target.key}',
+        );
+      }
+    }
+    final eligible = <_ResolvedRule>[];
+    for (final target in targets) {
+      _ruleSnapshots[target.key] = target.draft;
+      _asyncErrors = _replaceKey(_asyncErrors, target.key, null);
+      _failures.remove(target.key);
+      _failed.remove(target.key);
+      if (_isSyncBlocked(target.key)) {
+        _cancelRunsForKey(target.key);
+        continue;
+      }
+      eligible.add(target);
+    }
+    _mergeErrorSources();
+    final generations = <FieldKey, int>{};
+    final cancellation = Completer<void>();
+    for (final target in eligible) {
+      _cancelRunsForKey(target.key);
+      final generation = (_validationGeneration[target.key] ?? 0) + 1;
+      _validationGeneration[target.key] = generation;
+      generations[target.key] = generation;
+      (_activeRunsByKey[target.key] ??= {}).add(cancellation);
+      _validating.add(target.key);
+    }
+    notifyListeners();
+    final outcomesFuture = Future.wait(
+      eligible.map((target) => _executeRule(target)),
+    );
+    final cancelled = await Future.any([
+      outcomesFuture.then((_) => false),
+      cancellation.future.then((_) => true),
+    ]);
+    if (cancelled || _disposed || runEpoch != _epoch) {
+      _unlinkRun(eligible, cancellation);
+      if (!_disposed && runEpoch == _epoch) {
+        unawaited(
+          outcomesFuture.then(
+            (lateOutcomes) =>
+                _settleCurrentOutcomes(eligible, generations, lateOutcomes),
+          ),
+        );
+      }
+      return _result(KeyedFormValidationStatus.superseded, const {});
+    }
+    final outcomes = await outcomesFuture;
+    _unlinkRun(eligible, cancellation);
+    var superseded = false;
+    final resultFailures = <FieldKey, KeyedFormValidationFailure>{};
+    final failureObservers = <_FailureObserver>[];
+    for (var i = 0; i < eligible.length; i++) {
+      final target = eligible[i];
+      if (_validationGeneration[target.key] != generations[target.key]) {
+        superseded = true;
+        continue;
+      }
+      _validating.remove(target.key);
+      final outcome = outcomes[i];
+      if (outcome.failure != null) {
+        _failures[target.key] = outcome.failure!;
+        _failed.add(target.key);
+        resultFailures[target.key] = outcome.failure!;
+        failureObservers.add((
+          callback: target.onFailure,
+          failure: outcome.failure!,
+        ));
+      } else {
+        _asyncErrors = _replaceKey(_asyncErrors, target.key, outcome.error);
+      }
+    }
+    _mergeErrorSources();
+    notifyListeners();
+    _notifyFailureObservers(failureObservers);
+    final merged = <FieldKey, String>{
+      for (final key in _errors.keys)
+        if (scopes.isEmpty ||
+            scopes.any((scope) => scope.contains(key) || key.contains(scope)))
+          key: _errors.byKey(key)!,
+    };
+    final status = superseded
+        ? KeyedFormValidationStatus.superseded
+        : merged.isNotEmpty
+        ? KeyedFormValidationStatus.invalid
+        : resultFailures.isNotEmpty
+        ? KeyedFormValidationStatus.unavailable
+        : KeyedFormValidationStatus.valid;
+    return _result(status, merged, failures: resultFailures);
+  }
 
-  void _revalidateScopeOf(FieldKey key) {
-    final scopeOf = this.scopeOf;
-    if (scopeOf == null) {
-      _errors = resolver(_value, null);
+  Future<({String? error, KeyedFormValidationFailure? failure})> _executeRule(
+    _ResolvedRule target,
+  ) async {
+    try {
+      final value = Future<String?>.sync(target.validate);
+      final message = target.timeout == null
+          ? await value
+          : await value.timeout(target.timeout!);
+      return (error: message, failure: null);
+    } catch (error, stackTrace) {
+      return (
+        error: null,
+        failure: KeyedFormValidationFailure(
+          error: error,
+          stackTrace: stackTrace,
+          failureMode: target.failureMode ?? asyncValidationFailureMode,
+        ),
+      );
+    }
+  }
+
+  void _settleCurrentOutcomes(
+    List<_ResolvedRule> targets,
+    Map<FieldKey, int> generations,
+    List<({String? error, KeyedFormValidationFailure? failure})> outcomes,
+  ) {
+    if (_disposed) return;
+    final failureObservers = <_FailureObserver>[];
+    for (var i = 0; i < targets.length; i++) {
+      final target = targets[i];
+      if (_validationGeneration[target.key] != generations[target.key]) {
+        continue;
+      }
+      _validating.remove(target.key);
+      final outcome = outcomes[i];
+      if (outcome.failure case final failure?) {
+        _failures[target.key] = failure;
+        _failed.add(target.key);
+        failureObservers.add((callback: target.onFailure, failure: failure));
+      } else {
+        _asyncErrors = _replaceKey(_asyncErrors, target.key, outcome.error);
+      }
+    }
+    _mergeErrorSources();
+    notifyListeners();
+    _notifyFailureObservers(failureObservers);
+  }
+
+  List<_ResolvedRule> _resolveRules(Root root) {
+    final visitor = _RuleCollector();
+    for (final rule in asyncValidators) {
+      rule.resolve(root, FieldKey.root, visitor);
+    }
+    return visitor.rules;
+  }
+
+  bool _isSyncBlocked(FieldKey key) => _syncErrors.keys.any(
+    (error) => error.contains(key) || key.contains(error),
+  );
+
+  KeyedFormValidationResult _result(
+    KeyedFormValidationStatus status,
+    Map<FieldKey, String> errors, {
+    Map<FieldKey, KeyedFormValidationFailure> failures = const {},
+  }) => KeyedFormValidationResult(
+    status: status,
+    errors: FieldErrors(Map.unmodifiable(errors)),
+    failures: Map.unmodifiable(failures),
+  );
+
+  List<FieldKey> _normalizeScopes(Iterable<FieldKey> scopes) {
+    final result = <FieldKey>[];
+    for (final scope in scopes) {
+      if (result.any((existing) => existing.contains(scope))) continue;
+      result.removeWhere(scope.contains);
+      result.add(scope);
+    }
+    return result;
+  }
+
+  bool _shouldValidateOnBlur(FieldKey key) {
+    if (mode == KeyedFormMode.all) return true;
+    if (_submitted) return reValidateMode == KeyedFormReValidateMode.onBlur;
+    return mode == KeyedFormMode.onBlur || mode == KeyedFormMode.onTouched;
+  }
+
+  void _automaticValidation(FieldKey key) {
+    final scope = scopeOf?.call(key);
+    if (scopeOf != null && scope == null) return;
+    final errors = resolver(_value, scope);
+    if (scope == null) {
+      _syncErrors = errors;
+    } else {
+      _syncErrors = _spliceInto(_syncErrors, scope, errors);
+    }
+    _serverErrors = scope == null
+        ? const FieldErrors.empty()
+        : _serverErrors.removeSubtree(scope);
+    _clearSyncBlockedBindings();
+    _revealed.add(key);
+
+    _mergeErrorSources();
+    final targets = _resolveRules(
+      _value,
+    ).where((rule) => key.contains(rule.key));
+    for (final target in targets) {
+      unawaited(_runSingleTarget(target));
+    }
+  }
+
+  void _clearSyncBlockedBindings() {
+    for (final key in _ruleSnapshots.keys.toList()) {
+      if (!_isSyncBlocked(key)) continue;
+      _cancelRunsForKey(key);
+      _asyncErrors = _replaceKey(_asyncErrors, key, null);
+      _failures.remove(key);
+      _failed.remove(key);
+    }
+    _mergeErrorSources();
+  }
+
+  Future<void> _runSingleTarget(_ResolvedRule target) async {
+    if (_isSyncBlocked(target.key)) {
+      _asyncErrors = _replaceKey(_asyncErrors, target.key, null);
+      _failures.remove(target.key);
+      _failed.remove(target.key);
+      _mergeErrorSources();
+      notifyListeners();
       return;
     }
-    final scope = scopeOf(key);
-    if (scope == null) return; // scoped controller, key outside any subtree
-    _errors = _spliceScope(scope, resolver(_value, scope));
+    await validateScopes([target.key]);
   }
 
-  /// Drops the existing errors under [scope] and appends [replacement],
-  /// keeping the surviving entries in their original order. Mirrors the
-  /// hand-rolled `replace<X>DayErrors` the app editors used to carry.
-  FieldErrors<String> _spliceScope(
+  FieldErrors<String> _spliceInto(
+    FieldErrors<String> source,
     FieldKey scope,
     FieldErrors<String> replacement,
   ) {
-    final kept = _errors.removeSubtree(scope);
-    final merged = <FieldKey, String>{
-      for (final key in kept.keys) key: kept.byKey(key)!,
+    final values = <FieldKey, String>{
+      for (final key in source.keys)
+        if (!scope.contains(key)) key: source.byKey(key)!,
     };
     for (final key in replacement.keys) {
-      assert(
-        scope.contains(key),
-        'resolver returned $key outside its scope $scope',
-      );
-      merged[key] = replacement.byKey(key)!;
+      assert(scope.contains(key));
+      values[key] = replacement.byKey(key)!;
     }
-    return FieldErrors(merged);
+    return FieldErrors(values);
+  }
+
+  FieldErrors<String> _replaceKey(
+    FieldErrors<String> source,
+    FieldKey key,
+    String? value,
+  ) {
+    final values = <FieldKey, String>{
+      for (final existing in source.keys)
+        if (existing != key) existing: source.byKey(existing)!,
+    };
+    if (value != null) values[key] = value;
+    return FieldErrors(values);
+  }
+
+  void _mergeErrorSources() {
+    final values = <FieldKey, String>{};
+    for (final source in [_syncErrors, _serverErrors, _asyncErrors]) {
+      for (final key in source.keys) {
+        values.putIfAbsent(key, () => source.byKey(key)!);
+      }
+    }
+    _errors = FieldErrors(values);
   }
 
   // --- seed / reset / server errors ------------------------------------
@@ -374,6 +796,7 @@ class KeyedFormController<Root> extends ChangeNotifier {
     if (isDirty && !force) return;
     _value = value;
     _original = value;
+    _revision++;
     _resetBookkeeping();
     notifyListeners();
   }
@@ -381,22 +804,27 @@ class KeyedFormController<Root> extends ChangeNotifier {
   /// Discards edits back to [original] and clears all bookkeeping.
   void reset() {
     _value = _original;
+    _revision++;
     _resetBookkeeping();
     notifyListeners();
   }
 
   void _resetBookkeeping() {
+    _invalidateRuns();
+    _syncErrors = const FieldErrors.empty();
+    _serverErrors = const FieldErrors.empty();
+    _asyncErrors = const FieldErrors.empty();
     _errors = const FieldErrors.empty();
+    _failures.clear();
+    _ruleSnapshots.clear();
     _touched.clear();
     _revealed.clear();
     _validating.clear();
     _failed.clear();
-    _validationGeneration.clear();
     _submitted = false;
     _submitting = false;
-    // _readOnly is deliberately left alone: it is configuration (like a
-    // field's frozen state), not draft bookkeeping, so seed()/reset() must
-    // not clear it.
+    _submissionRevision = null;
+    // Read-only configuration survives seed/reset.
   }
 
   /// Merges server-reported errors into the map and force-reveals them (they
@@ -404,15 +832,14 @@ class KeyedFormController<Root> extends ChangeNotifier {
   /// state). Also sets [submitted].
   void setServerErrors(Map<FieldKey, String> errors) {
     if (errors.isEmpty) return;
-    final merged = <FieldKey, String>{
-      for (final key in _errors.keys) key: _errors.byKey(key)!,
+    final values = <FieldKey, String>{
+      for (final key in _serverErrors.keys) key: _serverErrors.byKey(key)!,
+      ...errors,
     };
-    errors.forEach((key, message) {
-      merged[key] = message;
-      _revealed.add(key);
-    });
-    _errors = FieldErrors(merged);
+    _serverErrors = FieldErrors(values);
+    _revealed.addAll(errors.keys);
     _submitted = true;
+    _mergeErrorSources();
     notifyListeners();
   }
 
@@ -429,61 +856,6 @@ class KeyedFormController<Root> extends ChangeNotifier {
     if (_submitting == value) return;
     _submitting = value;
     notifyListeners();
-  }
-
-  /// Toggles whether [key] is mid-async-validation (drives a per-field
-  /// spinner via [FieldHandle.isValidating] / `KeyedFieldState.isValidating`).
-  /// The resolver itself stays synchronous — call this around your own async
-  /// check (a server round-trip); [validateFieldAsync] does it for you.
-  void setFieldValidating(FieldKey key, bool value) {
-    final changed = value ? _validating.add(key) : _validating.remove(key);
-    if (!changed) return;
-    notifyListeners();
-  }
-
-  /// Runs [check] as [key]'s async validation, toggling [isValidating] around
-  /// it. A non-null result is merged in as a server error on [key] (see
-  /// [setServerErrors]) — `null` leaves existing errors on [key] alone, since
-  /// the sync [resolver] stays authoritative for the field's own format/
-  /// required checks.
-  ///
-  /// A thrown error, or a run that exceeds [timeout], is a technical failure,
-  /// not a verdict about the value: [key] lands on [isFailedValidation]
-  /// instead of [errors], [onFailure] (if given) is called with the error and
-  /// stack trace, and the call still completes normally rather than
-  /// propagating. Not sticky — a later call on the same [key] clears it,
-  /// whether that call succeeds or fails in turn.
-  ///
-  /// Safe against overlapping calls on the same [key]: if a newer call starts
-  /// before an older one resolves, the older one's result — success or
-  /// failure — is discarded; only the latest call can settle it.
-  Future<void> validateFieldAsync(
-    FieldKey key,
-    FutureOr<String?> Function() check, {
-    Duration? timeout,
-    void Function(Object error, StackTrace stackTrace)? onFailure,
-  }) async {
-    final generation = (_validationGeneration[key] ?? 0) + 1;
-    _validationGeneration[key] = generation;
-    final hadFailure = _failed.remove(key);
-    final startedValidating = _validating.add(key);
-    if (hadFailure || startedValidating) notifyListeners();
-    try {
-      final result = timeout == null
-          ? await check()
-          : await Future<String?>.sync(check).timeout(timeout);
-      if (_validationGeneration[key] != generation) return; // superseded
-      if (result != null) setServerErrors({key: result});
-    } catch (error, stackTrace) {
-      if (_validationGeneration[key] != generation) return; // superseded
-      _failed.add(key);
-      onFailure?.call(error, stackTrace);
-      notifyListeners();
-    } finally {
-      if (_validationGeneration[key] == generation) {
-        setFieldValidating(key, false);
-      }
-    }
   }
 
   // --- read-only -----------------------------------------------------------
@@ -507,5 +879,13 @@ class KeyedFormController<Root> extends ChangeNotifier {
   void unmarkReadOnly(FieldKey key) {
     if (!_readOnly.remove(key)) return;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _invalidateRuns();
+    _validating.clear();
+    super.dispose();
   }
 }

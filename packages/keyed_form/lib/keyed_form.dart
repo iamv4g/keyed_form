@@ -15,6 +15,8 @@ export 'package:keyed_form_core/keyed_form_core.dart'
     hide KeyedSchema, keyedSchema;
 
 export 'src/field_handle.dart';
+export 'src/keyed_form_async_validator.dart';
+export 'src/keyed_form_validation_result.dart';
 export 'src/keyed_form_controller.dart';
 export 'src/keyed_form_list.dart';
 export 'src/keyed_form_mode.dart';
