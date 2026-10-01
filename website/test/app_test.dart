@@ -371,7 +371,19 @@ void main() {
       expect(
         content,
         contains(
-          '<title>keyed_form — big Flutter forms, one rebuild per keystroke</title>',
+          '<title>keyed_form — Big forms. Less code. One rebuild per keystroke</title>',
+        ),
+      );
+      expect(
+        content,
+        contains(
+          '<meta property="og:title" content="keyed_form — Big forms. Less code. One rebuild per keystroke"/>',
+        ),
+      );
+      expect(
+        content,
+        contains(
+          '<meta name="twitter:title" content="keyed_form — Big forms. Less code. One rebuild per keystroke"/>',
         ),
       );
       expect(content, contains('<meta name="twitter:card" content="summary"/>'));

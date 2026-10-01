@@ -9,7 +9,7 @@ import 'pages/playground_page.dart';
 final appRoutes = <RouteBase>[
   Route(
     path: '/',
-    title: 'keyed_form — big Flutter forms, one rebuild per keystroke',
+    title: 'keyed_form — Big forms. Less code. One rebuild per keystroke',
     builder: (context, state) => const LandingPage(),
   ),
   Route(
