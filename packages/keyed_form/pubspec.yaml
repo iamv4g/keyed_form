@@ -15,7 +15,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  keyed_form_core: ^0.1.0
+  keyed_form_core: ^0.2.0
   listen: ^1.0.1
   meta: ^1.11.0
 

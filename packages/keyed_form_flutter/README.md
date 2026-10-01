@@ -11,7 +11,7 @@ each field with `KeyedFormField`. Re-exports all of `keyed_form` (and thus
 ```yaml
 dependencies:
   keyed_form_flutter: ^0.2.0
-  keyed_form_schema: ^0.1.0
+  keyed_form_schema: ^0.2.0
 
 dev_dependencies:
   build_runner: ^2.15.0
@@ -144,6 +144,7 @@ field inside it — handles edits within a row.
 
 ## More
 
+- [Full documentation, guides, and examples](https://keyed-form.v4g.space).
 - [`skills/keyed_form/SKILL.md`](https://github.com/iamv4g/keyed_form/blob/main/skills/keyed_form/SKILL.md) — the
   full API reference: cross-field and async validation, read-only fields,
   derived fields, scroll-to-first-error in a lazy list, and more.

@@ -16,6 +16,9 @@ Flutter-team observable package), so the controller can live in a plain
 Dart test, a CLI, or — via [`keyed_form_flutter`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter) —
 a widget tree.
 
+For the full documentation, guides, and examples, visit
+[keyed-form.v4g.space](https://keyed-form.v4g.space).
+
 ## Usage
 
 ```dart

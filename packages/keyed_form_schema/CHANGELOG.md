@@ -1,3 +1,8 @@
+## 0.2.0
+
+- Align the schema package with the keyed_form 0.2.0 release.
+- Depend on `keyed_form_core ^0.2.0`.
+
 ## 0.1.0
 
 Initial release.

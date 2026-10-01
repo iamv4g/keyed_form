@@ -4,6 +4,9 @@ Code generator for [`keyed_form_schema`](https://github.com/iamv4g/keyed_form/tr
 
 Automatically translates declarative `ks.object({...})` schemas into **Immutable Data Models**, **field-name keyed references** (`Fields` navigators + `FieldRefs` wrappers), and **type-safe validation functions**.
 
+For the full documentation, guides, and examples, visit
+[keyed-form.v4g.space](https://keyed-form.v4g.space).
+
 ---
 
 ## Features
@@ -48,12 +51,11 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  keyed_form_schema: ^0.1.0
+  keyed_form_schema: ^0.2.0
 
 dev_dependencies:
   build_runner: ^2.15.0
-  keyed_form_gen: ^0.1.0
-```
+  keyed_form_gen: ^0.2.0
 
 ---
 

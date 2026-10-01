@@ -1,3 +1,7 @@
+## 0.2.0
+
+- Align the core package version with the keyed_form 0.2.0 release.
+
 ## 0.1.0
 
 Initial release.

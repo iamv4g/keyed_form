@@ -2,6 +2,9 @@
 
 Schema-driven declarative validation and type-safe form models for the `keyed_form` family. Pure Dart, zero Flutter dependency. Re-exports `keyed_form_core`.
 
+For the full documentation, guides, and examples, visit
+[keyed-form.v4g.space](https://keyed-form.v4g.space).
+
 ## Features
 
 - **Fluent Schema DSL (`ks.*`):** `ks.object({...})`, `ks.string()`, `ks.int()`, `ks.double()`, `ks.boolean()`, `ks.enums()`, `ks.list()`, `ks.map()`.

@@ -5,6 +5,9 @@ Shared vocabulary for the `keyed_form` family. It sits on
 [`keyed_form_schema`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_schema) / [`keyed_form`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form) —
 you normally reach it transitively, not by importing it directly.
 
+For the full documentation, guides, and examples, visit
+[keyed-form.v4g.space](https://keyed-form.v4g.space).
+
 ## What it gives the form layers
 
 | Name | Is | For |

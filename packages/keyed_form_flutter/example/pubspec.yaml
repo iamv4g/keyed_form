@@ -13,7 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   keyed_form_flutter: ^0.2.0
-  keyed_form_schema: ^0.1.0
+  keyed_form_schema: ^0.2.0
 
 dev_dependencies:
   flutter_test:
