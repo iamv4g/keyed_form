@@ -17,7 +17,7 @@ class ItineraryScreen extends StatefulWidget {
 }
 
 class _ItineraryScreenState extends State<ItineraryScreen> {
-  final form = KeyedFormController<ItinerarySchema>(
+  late final form = KeyedFormController<ItinerarySchema>(
     initialValue: ItinerarySchema.create(
       days: [
         DaySchema.create(
@@ -30,7 +30,34 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     ),
     mode: KeyedFormMode.onTouched,
     resolver: ItinerarySchema.validateData,
+    asyncValidators: [
+      .forEach(
+        collection: ItineraryFields.days,
+        rules: [
+          .forEach(
+            collection: DayFields.activities,
+            rules: [
+              .field(
+                field:
+                    VariantRef<ActivitySchema, SightseeingActivitySchema>.type()
+                        .then(SightseeingActivityFields.place),
+                validate: (_, place) => _checkPlace(place),
+                timeout: const Duration(seconds: 5),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
   );
+  bool _submitted = false;
+
+  Future<String?> _checkPlace(String place) async {
+    await Future.delayed(const Duration(milliseconds: 700));
+    final normalized = place.trim().toLowerCase();
+    if (normalized == 'error') throw StateError('Place service unavailable');
+    return normalized == 'closed' ? 'This place is unavailable' : null;
+  }
 
   @override
   void dispose() {
@@ -51,11 +78,10 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             padding: const EdgeInsets.all(16),
             children: [
               const DemoNote(
-                'Each day is a row containing its own by-id list of '
-                'activities, and each activity is a discriminated union '
-                '— switch its kind and the previous narrowed field '
-                '(.asSightseeing / .asMeal) simply stops resolving, no '
-                'error.',
+                'Place availability is checked on blur and again on submit. '
+                'Try “closed” for a value error and “error” for a service '
+                'failure. Switch to Meal or remove an activity while checking '
+                'to discard its stale result.',
               ),
               const SizedBox(height: 16),
               for (final day in days)
@@ -77,6 +103,31 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                 ),
                 icon: const Icon(Icons.add),
                 label: const Text('Add day'),
+              ),
+              const SizedBox(height: 16),
+              KeyedFormBuilder<ItinerarySchema>(
+                builder: (context, controller) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    FilledButton(
+                      onPressed: controller.submitting
+                          ? null
+                          : () async {
+                              await form.handleSubmit(context, (_) {
+                                setState(() => _submitted = true);
+                              });
+                            },
+                      child: Text(
+                        controller.submitting ? 'Checking…' : 'Submit',
+                      ),
+                    ),
+                    if (_submitted)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 8),
+                        child: Text('Submitted'),
+                      ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -129,6 +180,7 @@ class _DayCard extends StatelessWidget {
                   for (final activity in activities)
                     _ActivityRow(
                       key: ValueKey(activity.clientId),
+                      form: form,
                       fields: ItineraryFields.activity(
                         dayClientId: dayId,
                         activityClientId: activity.clientId,
@@ -170,11 +222,13 @@ class _DayCard extends StatelessWidget {
 class _ActivityRow extends StatelessWidget {
   const _ActivityRow({
     super.key,
+    required this.form,
     required this.fields,
     required this.onChangeKind,
     required this.onRemove,
   });
 
+  final KeyedFormController<ItinerarySchema> form;
   final ActivityFieldRefs fields;
   final ValueChanged<String> onChangeKind;
   final VoidCallback? onRemove;
@@ -206,9 +260,52 @@ class _ActivityRow extends StatelessWidget {
               children: [
                 Expanded(
                   child: switch (kind) {
-                    'sightseeing' => KeyedText<ItinerarySchema>(
+                    'sightseeing' => KeyedFormField.text<ItinerarySchema>(
                       field: fields.asSightseeing.place,
-                      label: 'Place',
+                      builder: (context, field, controller) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Focus(
+                            canRequestFocus: false,
+                            onFocusChange: (hasFocus) {
+                              if (!hasFocus) field.onBlur();
+                            },
+                            child: TextField(
+                              controller: controller,
+                              onTapOutside: (_) =>
+                                  FocusScope.of(context).unfocus(),
+                              decoration: InputDecoration(
+                                labelText: 'Place',
+                                errorText: field.errorText,
+                                helperText: field.isFailedValidation
+                                    ? 'Availability check failed.'
+                                    : null,
+                                suffixIcon: field.isValidating
+                                    ? const Padding(
+                                        padding: EdgeInsets.all(14),
+                                        child: SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                      )
+                                    : null,
+                              ),
+                            ),
+                          ),
+                          if (field.isFailedValidation)
+                            TextButton(
+                              onPressed: () async {
+                                await form
+                                    .field(fields.asSightseeing.place)
+                                    .validate();
+                              },
+                              child: const Text('Retry place check'),
+                            ),
+                        ],
+                      ),
                     ),
                     _ => KeyedText<ItinerarySchema>(
                       field: fields.asMeal.restaurant,

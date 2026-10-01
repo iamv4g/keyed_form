@@ -1,3 +1,16 @@
+## 0.2.0
+
+Breaking validation lifecycle update, matching `keyed_form` 0.2.0.
+
+- `KeyedFormField` and `KeyedFieldState` continue to expose validation progress
+  and technical-failure state, now driven by configured controller rules.
+- `handleSubmit` routes blocking technical failures to
+  `onValidationUnavailable`; value errors still use `onInvalid`, whose
+  default behavior reveals the first visible error.
+- A field's blur callback is ignored if its binding no longer resolves.
+- Text-field examples now report actual focus loss. `onTapOutside` only moves
+  focus; Enter/submission does not simulate blur.
+
 ## 0.1.0
 
 Initial release.

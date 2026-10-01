@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:keyed_form_flutter/keyed_form_flutter.dart';
@@ -89,34 +91,32 @@ void main() {
     expect(builds['b'], bBuilds, reason: 'sibling field does not');
   });
 
-  testWidgets('isValidating flipping rebuilds the field, not a sibling', (
+  testWidgets('configured async validation rebuilds only its field', (
     tester,
   ) async {
+    final gate = Completer<String?>();
     final form = KeyedFormController<Pair>(
       initialValue: const Pair(a: 'x', b: 'y'),
       mode: KeyedFormMode.onChange,
       resolver: _resolve,
+      asyncValidators: [.field(field: _a, validate: (_, _) => gate.future)],
     );
     final builds = <String, int>{};
     await tester.pumpWidget(_host(form, builds));
 
     final aBuilds = builds['a']!;
     final bBuilds = builds['b']!;
-
-    form.setFieldValidating(_a.key, true);
+    final pending = form.field(_a).validate();
     await tester.pump();
-    expect(builds['a'], greaterThan(aBuilds), reason: 'isValidating true');
-    expect(builds['b'], bBuilds, reason: 'sibling field does not');
+    expect(builds['a'], greaterThan(aBuilds));
+    expect(builds['b'], bBuilds);
 
-    final aBuildsAfterOn = builds['a']!;
-    form.setFieldValidating(_a.key, false);
+    final aBuildsWhileValidating = builds['a']!;
+    gate.complete(null);
+    await pending;
     await tester.pump();
-    expect(
-      builds['a'],
-      greaterThan(aBuildsAfterOn),
-      reason: 'isValidating false',
-    );
-    expect(builds['b'], bBuilds, reason: 'sibling field still unaffected');
+    expect(builds['a'], greaterThan(aBuildsWhileValidating));
+    expect(builds['b'], bBuilds);
   });
 
   testWidgets('blur wires KeyedFieldState.onBlur → controller.touch', (

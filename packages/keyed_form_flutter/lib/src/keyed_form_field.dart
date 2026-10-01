@@ -44,15 +44,13 @@ class KeyedFieldState<V> {
   final FieldKey fieldKey;
 
   /// Whether this field is currently mid-async-validation — render a spinner
-  /// alongside the control while this is `true`. Set it around your own
-  /// async check with `form.field(ref).validateAsync(...)` (or the
-  /// lower-level `form.setFieldValidating(key, ...)`).
+  /// alongside the control while this is `true`. Async rules are configured
+  /// through the controller's `asyncValidators`.
   final bool isValidating;
 
-  /// Whether this field's last `validateAsync` call ended in a technical
-  /// failure (it threw, or exceeded its timeout) rather than a verdict about
-  /// the value — render a retry affordance from this, distinct from
-  /// [errorText]. See `KeyedFormController.isFailedValidation`.
+  /// Whether this field's latest configured async rule ended in a technical
+  /// failure (threw or timed out) rather than a value verdict — render a retry
+  /// affordance from this, distinct from [errorText].
   final bool isFailedValidation;
 
   /// Whether this field is frozen against writes — pass `enabled: !isReadOnly`
@@ -203,7 +201,11 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
       KeyedFieldState<V>(
         value: _lastValue as V?,
         onChanged: (v) => controller.field(widget.field).set(v),
-        onBlur: () => controller.touch(widget.field.key),
+        onBlur: () {
+          if (widget.field.existsIn(controller.value)) {
+            controller.touch(widget.field.key);
+          }
+        },
         errorText: _lastError,
         fieldKey: widget.field.key,
         isValidating: _lastValidating,

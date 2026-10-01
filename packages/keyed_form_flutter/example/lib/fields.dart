@@ -25,16 +25,22 @@ class KeyedText<R> extends StatelessWidget {
   Widget build(BuildContext context) => KeyedFormField.text<R>(
     field: field,
     anchor: anchor,
-    builder: (context, f, controller) => TextField(
-      controller: controller,
-      enabled: !f.isReadOnly,
-      onTapOutside: (_) => f.onBlur(),
-      minLines: maxLines > 1 ? maxLines : null,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        errorText: f.errorText,
-        border: const OutlineInputBorder(),
+    builder: (context, f, controller) => Focus(
+      canRequestFocus: false,
+      onFocusChange: (hasFocus) {
+        if (!hasFocus) f.onBlur();
+      },
+      child: TextField(
+        controller: controller,
+        enabled: !f.isReadOnly,
+        onTapOutside: (_) => FocusScope.of(context).unfocus(),
+        minLines: maxLines > 1 ? maxLines : null,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label,
+          errorText: f.errorText,
+          border: const OutlineInputBorder(),
+        ),
       ),
     ),
   );

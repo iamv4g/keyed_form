@@ -15,14 +15,20 @@ class _LoginTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return KeyedFormField.text<LoginSchema>(
       field: field,
-      builder: (context, f, controller) => TextField(
-        controller: controller,
-        obscureText: obscureText,
-        onTapOutside: (_) => f.onBlur(),
-        decoration: InputDecoration(
-          labelText: label,
-          errorText: f.errorText,
-          border: const OutlineInputBorder(),
+      builder: (context, f, controller) => Focus(
+        canRequestFocus: false,
+        onFocusChange: (hasFocus) {
+          if (!hasFocus) f.onBlur();
+        },
+        child: TextField(
+          controller: controller,
+          obscureText: obscureText,
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+          decoration: InputDecoration(
+            labelText: label,
+            errorText: f.errorText,
+            border: const OutlineInputBorder(),
+          ),
         ),
       ),
     );

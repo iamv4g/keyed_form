@@ -2,7 +2,7 @@ name: keyed_form_flutter
 description: >-
   Flutter bindings for keyed_form: a scope, field and list widgets with selective
   rebuilds, caret-safe text editing, and scroll-to-first-error anchors.
-version: 0.1.0
+version: 0.2.0
 
 homepage: https://github.com/iamv4g/keyed_form
 repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter
@@ -16,7 +16,7 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
-  keyed_form: ^0.1.0
+  keyed_form: ^0.2.0
 
 dev_dependencies:
   flutter_test:
