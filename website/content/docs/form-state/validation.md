@@ -48,7 +48,9 @@ values, `seed`, and `reset` do not eagerly validate.
 `onBlur` and `onTouched` require the UI to report actual focus loss.
 `touch()` is that blur signal: it records interaction and runs blur validation
 when the configured mode calls for it; it is not an independent force-reveal.
-Flutter's `KeyedFieldState.onBlur` reports focus loss. Do not wire
+Flutter's `KeyedFormField` reports focus leaving its widget subtree by
+default. Set `autoDetectBlur: false` when a control owns a wider logical focus
+boundary, then call `KeyedFieldState.onBlur` at that boundary. Do not wire
 `onTapOutside` or Enter directly to blur.
 
 `reValidateMode` is independently configurable as `onChange`, `onBlur`, or

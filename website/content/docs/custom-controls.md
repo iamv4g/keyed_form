@@ -16,4 +16,8 @@ KeyedFormField<SettingsSchema, bool>(
 )
 ```
 
-For a dropdown, slider, or stepper, use the same pattern: provide a stable typed field, show `errorText` where appropriate, honor `isReadOnly`, and call `onBlur()` when the control loses focus if the validation mode depends on touch state.
+For a dropdown, slider, or stepper, use the same pattern and choose one blur
+owner. `KeyedFormField` detects focus leaving its widget subtree by default.
+Set `autoDetectBlur: false` when the control commits at a logical boundary
+outside that subtree, then call `onBlur()` at that boundary. Show `errorText`
+where appropriate and honor `isReadOnly`.

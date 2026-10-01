@@ -36,9 +36,11 @@ description: The main controller, field handle, list, and Flutter binding APIs.
 `KeyedForm<Root>` publishes the controller and field registry.
 `KeyedFormField<Root, Value>` binds a custom control through `KeyedFieldState`
 (`value`, `errorText`, `isReadOnly`, `isValidating`, `isFailedValidation`,
-`onChanged`, and `onBlur`). `KeyedFormField.text<Root>` manages text
-synchronization and caret stability. `KeyedFieldList<Root, Item>` builds
-keyed dynamic rows.
+`onChanged`, and `onBlur`). Focus leaving its widget subtree calls `onBlur` by
+default; both `KeyedFormField` and `KeyedFormField.text` accept
+`autoDetectBlur: false` for controls with a separate logical focus boundary.
+`KeyedFormField.text<Root>` manages text synchronization and caret stability.
+`KeyedFieldList<Root, Item>` builds keyed dynamic rows.
 
 Use the package API reference for full signatures:
 [keyed_form_flutter](https://pub.dev/documentation/keyed_form_flutter/latest/)

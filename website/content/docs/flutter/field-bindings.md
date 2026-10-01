@@ -17,15 +17,15 @@ KeyedFormField<SettingsSchema, bool>(
 )
 ```
 
-Wire `onBlur` to actual focus loss when the validation mode depends on touch
-state. For text fields, place a `Focus` around the field and call `onBlur()`
-when `onFocusChange` reports `false`; `onTapOutside` should only unfocus, not
-pretend that every outside tap is a blur. For a picker that commits when its
-dialog closes, call `onBlur()` after that interaction. `onChanged` writes the
-new value through the controller; frozen fields safely ignore writes, but
-disabling the control gives users the expected visual feedback. `isValidating`
-and `isFailedValidation` describe configured async rule progress and technical
-failure; they are not substitutes for `errorText`.
+`KeyedFormField` reports focus leaving its widget subtree automatically by
+default, including for text inputs; ordinary fields need no extra `Focus`
+wrapper. `onTapOutside` should only unfocus and does not cover keyboard focus
+traversal. For a picker whose logical focus extends into an overlay, set
+`autoDetectBlur: false` and call `onBlur()` when that interaction ends.
+`onChanged` writes the new value through the controller; frozen fields safely
+ignore writes, but disabling the control gives users the expected visual
+feedback. `isValidating` and `isFailedValidation` describe configured async
+rule progress and technical failure; they are not substitutes for `errorText`.
 
 The builder result is wrapped in a `KeyedFieldAnchor` automatically, registered under `fieldKey`. This allows submit handling to reveal a mounted invalid control without manual registry wiring. Set `anchor: false` only when this widget must never be a scroll-to-error target (for example, a decorative duplicate representation); it disables that automatic anchor. See [submit and scroll to error](docs/flutter/scroll-to-first-error).
 
