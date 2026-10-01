@@ -62,36 +62,24 @@ KeyedForm<SignupSchema>(
     children: [
       KeyedFormField.text<SignupSchema>(
         field: SignupFields.email,
-        builder: (context, state, controller) => Focus(
-          canRequestFocus: false,
-          onFocusChange: (hasFocus) {
-            if (!hasFocus) state.onBlur();
-          },
-          child: TextField(
-            controller: controller,
-            onTapOutside: (_) => FocusScope.of(context).unfocus(),
-            decoration: InputDecoration(
-              labelText: 'Email',
-              errorText: state.errorText,
-            ),
+        builder: (context, state, controller) => TextField(
+          controller: controller,
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+          decoration: InputDecoration(
+            labelText: 'Email',
+            errorText: state.errorText,
           ),
         ),
       ),
       KeyedFormField.text<SignupSchema>(
         field: SignupFields.password,
-        builder: (context, state, controller) => Focus(
-          canRequestFocus: false,
-          onFocusChange: (hasFocus) {
-            if (!hasFocus) state.onBlur();
-          },
-          child: TextField(
-            controller: controller,
-            obscureText: true,
-            onTapOutside: (_) => FocusScope.of(context).unfocus(),
-            decoration: InputDecoration(
-              labelText: 'Password',
-              errorText: state.errorText,
-            ),
+        builder: (context, state, controller) => TextField(
+          controller: controller,
+          obscureText: true,
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+          decoration: InputDecoration(
+            labelText: 'Password',
+            errorText: state.errorText,
           ),
         ),
       ),
@@ -121,9 +109,12 @@ form.dispose();
 
 The default mode is `onSubmit`: initial values and `seed`/`reset` do not
 validate automatically. `onTouched` validates at first actual blur and after
-later writes to that field. Report focus loss through `Focus.onFocusChange`;
-`onTapOutside` should only unfocus and Enter is not blur. Submit always
-validates a fresh draft and reveals the result.
+later writes to that field. `KeyedFormField` detects focus leaving its widget
+subtree by default; ordinary text fields need no manual `Focus` wrapper.
+`onTapOutside` should only unfocus and Enter is not blur. Set
+`autoDetectBlur: false` for controls whose logical focus extends outside their
+subtree, and call `state.onBlur()` when that logical interaction ends. Submit
+always validates a fresh draft and reveals the result.
 
 ## Two rules that prevent most bugs
 
@@ -294,10 +285,12 @@ by default; `onBlur` or `onSubmit` are the alternatives). `all` continues to
 validate both writes and blur. `touch()` reports blur: it records interaction
 and runs the blur trigger when configured.
 
-For text controls, call `state.onBlur()` from actual focus loss, for example
-with `Focus.onFocusChange`. `onTapOutside` should only unfocus; it does not
-cover keyboard focus traversal. Non-text controls can report blur when their
-interaction commits or closes.
+For text controls, `KeyedFormField` automatically reports focus leaving its
+widget subtree; `KeyedFormField.text` needs no manual `Focus` wrapper.
+`onTapOutside` should only unfocus. Set `autoDetectBlur: false` when a control
+owns a separate logical focus lifecycle (such as a picker overlay), then call
+`state.onBlur()` at that boundary. Non-text controls may use the default
+detector or report logical blur manually, but must have one blur owner.
 
 ### Scoped validation
 
@@ -433,16 +426,36 @@ Calls `onChange` with the selected slice of `source` whenever it actually change
 ### Binding one field
 
 ```dart
-KeyedFormField<Root, V>({required FieldRef<Root, V> field, required builder, bool anchor = true})
-KeyedFormField.text<Root>({required FieldRef<Root, String> field, bool anchor = true, required builder})
+KeyedFormField<Root, V>({
+  required FieldRef<Root, V> field,
+  required builder,
+  bool anchor = true,
+  bool autoDetectBlur = true,
+})
+KeyedFormField.text<Root>({
+  required FieldRef<Root, String> field,
+  bool anchor = true,
+  bool autoDetectBlur = true,
+  required builder,
+})
 ```
 
-`builder` receives a `KeyedFieldState<V>`: `value`, `onChanged`, `onBlur`, `errorText` (already mode-gated and translated), `fieldKey`, `isValidating`, `isFailedValidation`, `isReadOnly`. It rebuilds only when one of those six actually changes — a write to any other field is a no-op for this widget. `.text` additionally hands the builder a ready `TextEditingController` kept in caret/IME-safe sync with the field; never wire that control's own `onChanged` alongside it — user edits are told apart from external writes solely by watching that controller, and a second `onChanged` reintroduces the exact problems the binding exists to avoid.
+`builder` receives a `KeyedFieldState<V>`: `value`, `onChanged`, `onBlur`,
+`errorText` (already mode-gated and translated), `fieldKey`, `isValidating`,
+`isFailedValidation`, and `isReadOnly`. It rebuilds only when one of those
+values actually changes — a write to any other field is a no-op for this
+widget. Focus leaving the `KeyedFormField` subtree calls `onBlur` by default.
+Set `autoDetectBlur: false` for a logical control spanning an overlay or other
+outside subtree; its owner must call `onBlur` explicitly. `.text` additionally
+hands the builder a ready `TextEditingController` kept in caret/IME-safe sync
+with the field; never wire that control's own `onChanged` alongside it.
 
-Render `enabled: !state.isReadOnly` (or the equivalent) on the wrapped widget to grey out a frozen field — `onChanged` / `state.onChanged` stays safe to wire unconditionally, since a write to a frozen field is already a no-op at the controller.
+Render `enabled: !state.isReadOnly` (or the equivalent) on the wrapped widget
+to grey out a frozen field — `onChanged` stays safe to wire unconditionally.
 
-Pass `anchor: false` for a field that should never be the scroll target for the first error (a checkbox, a switch) — otherwise every `KeyedFormField` registers itself as one automatically.
-
+Pass `anchor: false` for a field that should never be the scroll target for the
+first error (a checkbox, a switch) — otherwise every `KeyedFormField`
+registers itself as one automatically.
 ### Binding a dynamic list of rows
 
 ```dart
@@ -513,4 +526,7 @@ One controller, one `dispose()` — call it wherever the `KeyedFormController` i
 15. Never wire a bound text control's own `onChanged` alongside the field binding — caret and composed-input state break.
 16. A default submit-scroll only finds anchors that are currently built — a lazily-built region needs its own `onInvalid`.
 17. Model and row classes need real `==` / `hashCode`, or dirty tracking and no-op writes stop working.
-18. `KeyedFormState.onBlur` reports actual focus loss; `onTapOutside` alone does not cover keyboard traversal or other focus changes.
+18. `KeyedFormField` detects focus leaving its widget subtree; use
+    `autoDetectBlur: false` and call `KeyedFieldState.onBlur` manually when a
+    control has a wider logical focus lifecycle. `onTapOutside` alone does not
+    cover keyboard traversal or other focus changes.
