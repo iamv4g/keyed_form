@@ -18,7 +18,7 @@ A handle exposes `key`, `value`, `error`, `dirty`, `isReadOnly`, `isValidating`,
 
 ## Writes and touch
 
-`set(value)` replaces the value with a statically checked type. `update(transform)` reads, transforms, and writes in one controller operation. Both no-op when the path no longer resolves or the draft is unchanged; readonly blocks ordinary writes. Writes revalidate according to the controller's scope policy. `touch()` marks the field interacted with and revalidates the containing scope.
+`set(value)` replaces the value with a statically checked type. `update(transform)` reads, transforms, and writes in one controller operation. Both no-op when the path no longer resolves or the draft is unchanged; readonly blocks ordinary writes. Writes run validation only when the configured mode or post-submit `reValidateMode` schedules them. `touch()` reports a blur, records interaction, and runs blur validation when the mode requires it.
 
 ```dart
 final email = form.field(InvoiceFields.customerEmail);
@@ -28,7 +28,7 @@ email.touch();
 assert(email.error != null);
 ```
 
-Modes determine visibility, not whether validation ran: see [Validation and visibility](docs/form-state/validation).
+Modes determine automatic validation triggers as well as error visibility; see [Validation and visibility](docs/form-state/validation).
 
 ## Read-only fields and subtrees
 

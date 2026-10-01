@@ -62,19 +62,37 @@ KeyedForm<SignupSchema>(
     children: [
       KeyedFormField.text<SignupSchema>(
         field: SignupFields.email,
-        builder: (context, state, controller) => TextField(
-          controller: controller,
-          onTapOutside: (_) => state.onBlur(),
-          decoration: InputDecoration(labelText: 'Email', errorText: state.errorText),
+        builder: (context, state, controller) => Focus(
+          canRequestFocus: false,
+          onFocusChange: (hasFocus) {
+            if (!hasFocus) state.onBlur();
+          },
+          child: TextField(
+            controller: controller,
+            onTapOutside: (_) => FocusScope.of(context).unfocus(),
+            decoration: InputDecoration(
+              labelText: 'Email',
+              errorText: state.errorText,
+            ),
+          ),
         ),
       ),
       KeyedFormField.text<SignupSchema>(
         field: SignupFields.password,
-        builder: (context, state, controller) => TextField(
-          controller: controller,
-          obscureText: true,
-          onTapOutside: (_) => state.onBlur(),
-          decoration: InputDecoration(labelText: 'Password', errorText: state.errorText),
+        builder: (context, state, controller) => Focus(
+          canRequestFocus: false,
+          onFocusChange: (hasFocus) {
+            if (!hasFocus) state.onBlur();
+          },
+          child: TextField(
+            controller: controller,
+            obscureText: true,
+            onTapOutside: (_) => FocusScope.of(context).unfocus(),
+            decoration: InputDecoration(
+              labelText: 'Password',
+              errorText: state.errorText,
+            ),
+          ),
         ),
       ),
       // A submit button needs a context from *inside* the tree KeyedForm
@@ -101,7 +119,11 @@ KeyedForm<SignupSchema>(
 form.dispose();
 ```
 
-Nothing is shown as invalid until a field is touched (in `onTouched` mode, that means blurred) — a submit attempt always makes every error visible, regardless of mode.
+The default mode is `onSubmit`: initial values and `seed`/`reset` do not
+validate automatically. `onTouched` validates at first actual blur and after
+later writes to that field. Report focus loss through `Focus.onFocusChange`;
+`onTapOutside` should only unfocus and Enter is not blur. Submit always
+validates a fresh draft and reveals the result.
 
 ## Two rules that prevent most bugs
 
@@ -235,33 +257,56 @@ Pass the discriminator key as a string literal, never a variable — anything el
 
 `ks.object({...})` is a plain runtime value on its own — `.validateMap(rawMap)` / `.validateMapAsync(...)` works with no `@keyedSchema`, no `part`, no build step, returning the same `FieldErrors<String>` keyed by `FieldKey`. Reach for this to validate a payload with no reason to generate a typed class for it (an incoming API response, a one-off check); add `@keyedSchema` and `part` to the same file later with no schema rewrite if a generated class and field references turn out to be wanted too.
 
-## Controller
+`KeyedFormController<Root>` takes:
 
 ```dart
 KeyedFormController<Root>({
   required Root initialValue,
-  required KeyedFormResolver<Root> resolver,   // FieldErrors<String> Function(Root draft, FieldKey? scope)
-  KeyedFormMode mode = KeyedFormMode.onTouched,
-  KeyedFormScopeOf? scopeOf,                    // FieldKey? Function(FieldKey writtenKey)
+  required KeyedFormResolver<Root> resolver,
+  KeyedFormMode mode = KeyedFormMode.onSubmit,
+  KeyedFormReValidateMode reValidateMode = KeyedFormReValidateMode.onChange,
+  List<KeyedFormAsyncValidator<Root>> asyncValidators = const [],
+  KeyedFormAsyncFailureMode asyncValidationFailureMode =
+      KeyedFormAsyncFailureMode.blockSubmit,
+  KeyedFormScopeOf? scopeOf,
 })
 ```
 
-owns one immutable `Root` value (the draft) plus its errors and interaction bookkeeping, and notifies its listeners on every change. `resolver` is a generated `SomeSchema.validateData` in the common case. A resolver that ignores `scope` and always validates the whole draft is safe to use whether or not `scopeOf` is set — it just does more work than asked when a `scope` is actually given.
+The controller owns one immutable draft, its baseline, validation error
+sources, interaction/reveal state, and async lifecycle. A generated
+`SomeSchema.validateData` is the common synchronous resolver.
 
-### Scoped vs. unscoped — the biggest behavioral fork
+### Validation triggers
 
-Without `scopeOf`, every write revalidates the **entire** draft — simplest to wire, fine for small-to-medium forms. With `scopeOf` (a generated `SomeSchema.scopeOf` in the common case), a write only revalidates the subtree `scopeOf` returns for it — `scopeOf` returning `null` for a given key means that write **silently skips revalidation entirely** (errors elsewhere are left stale until something in-scope is next written), and a resolver that returns an error key outside the given `scope` trips a debug assertion. Reach for `scopeOf` once whole-draft validation on every keystroke is measurably too slow (large forms, long dynamic lists). `validateScopes` (below) is only meaningful on a scoped controller.
+`KeyedFormMode` schedules validation, not just error visibility:
 
-### Error visibility — `KeyedFormMode`
-
-| Mode | Visible when |
+| Mode | Before the first submit |
 |---|---|
-| `all` | always |
-| `onSubmit` | after a submit attempt, or an explicitly revealed scope — never merely from interaction |
-| `onChange` | after the field itself has been written to, after submit, or after an explicit reveal |
-| `onBlur` / `onTouched` | after the field has been marked touched, after submit, or after an explicit reveal |
+| `onSubmit` | No automatic validation |
+| `onChange` | Validate after writes |
+| `onBlur` | Validate on blur |
+| `onTouched` | Validate on first blur, then after writes to that field |
+| `all` | Validate after writes and blur |
 
-`onChange`, `onBlur`, and `onTouched` are visibility-identical inside the controller — the only difference is which widget-level event calls `.touch()` on a field (every write, versus only on blur). A submit attempt, or an explicit `reveal` / `validateScopes` call, always makes the relevant errors visible no matter which mode is set; the mode only controls what happens before one of those.
+Initial values, `seed`, and `reset` do not eagerly validate. After a submit
+attempt settles, `reValidateMode` selects automatic revalidation (`onChange`
+by default; `onBlur` or `onSubmit` are the alternatives). `all` continues to
+validate both writes and blur. `touch()` reports blur: it records interaction
+and runs the blur trigger when configured.
+
+For text controls, call `state.onBlur()` from actual focus loss, for example
+with `Focus.onFocusChange`. `onTapOutside` should only unfocus; it does not
+cover keyboard focus traversal. Non-text controls can report blur when their
+interaction commits or closes.
+
+### Scoped validation
+
+Without `scopeOf`, an automatic write validates the whole draft. With
+`scopeOf`, the resolver validates the mapped subtree; returning `null` skips
+automatic validation for that event. Out-of-scope resolver keys trip a debug
+assertion. `validate()` and `submit()` always validate the full draft;
+`validateScopes()` explicitly validates the requested subtrees whether or not
+`scopeOf` is configured.
 
 ### Reading and writing one field
 
@@ -269,48 +314,97 @@ Without `scopeOf`, every write revalidates the **entire** draft — simplest to 
 FieldHandle<Root, V> field<V>(FieldRef<Root, V> ref)
 ```
 
-gives `.value` (`V?`, `null` if the path no longer resolves), `.error` (the visible, mode-gated error), `.dirty` (differs from the seeded baseline), `.isValidating`, `.isFailedValidation`, `.isReadOnly`, and:
+provides `.value` (`V?`, null if the path no longer resolves), visible `.error`,
+`.dirty`, `.isValidating`, `.isFailedValidation`, `.isReadOnly`, plus:
 
 ```dart
 void set(V value, {bool force = false});
 void update(V Function(V current) transform, {bool force = false});
 void touch();
-void markReadOnly();
-void unmarkReadOnly();
-Future<void> validateAsync(
-  FutureOr<String?> Function() check, {
-  Duration? timeout,
-  void Function(Object error, StackTrace stackTrace)? onFailure,
-});
+Future<KeyedFormValidationResult> validate();
 ```
 
-For a list field, `.list()` gives a row editor: `append` / `prepend` / `insert` / `insertAfter` / `removeAt` / `removeById` / `move` / `swap` / `updateAt` / `updateById` — every one of these also takes `{bool force = false}`.
+`FieldHandle.validate()` reruns configured async rules for the field; it does
+not accept an ad-hoc callback. For list fields, `.list()` gives the by-id row
+editor (`append`, `insert`, `removeById`, `move`, `updateById`, and others).
+`form.errors` is the full merged error map; field `.error` is
+visibility-gated.
 
-`form.errors` is the full, un-gated error map (`FieldErrors<String>`, itself callable — `form.errors(someRef)` reads by that ref's key); `form.field(ref).error` / `form.visibleErrorFor(ref)` gate it by the current mode.
+### Declarative async validation
+
+Async checks are typed rules attached to `asyncValidators`, not work started
+from a widget callback:
+
+```dart
+asyncValidators: [
+  .field(
+    field: SignupFields.email,
+    validate: (draft, email) => checkEmailAvailability(email),
+    timeout: const Duration(seconds: 5),
+    onFailure: (error, stack) => reportCheckFailure(error),
+  ),
+],
+```
+
+`validate()` / `validateScopes()` await applicable rules and return a
+`KeyedFormValidationResult` with `status`, `errors`, and `failures`:
+
+| Status | Meaning |
+|---|---|
+| `valid` | No value errors or technical failures (`isValid == true`) |
+| `invalid` | At least one value error |
+| `unavailable` | At least one technical failure; `isValid` is false even if submit is allowed |
+| `superseded` | A newer run or draft change made this result stale |
+
+`onValid` is called only for `valid`. With a value error, `onInvalid` wins;
+only when there are no value errors do blocking technical failures route to
+`onValidationUnavailable`.
+Independent checks start in parallel. Sync value errors gate only async rules
+at or below that field scope; an unrelated sibling error does not. Inside
+`.forEach(collection: ..., rules: [...])`, nested `.field` callbacks receive
+the typed local row draft, and the controller builds concrete keys from each
+row's stable `clientId`. Missing paths or inactive union variants skip the
+rule; a present nullable value is still passed as its declared nullable type.
+Duplicate concrete rules are configuration errors.
+
+A returned message is an async value error; `null` clears only that rule's
+previous async message. Per-key display precedence is sync, then server, then
+async. Thrown checks and timeouts are technical failures, stored separately
+from `errors` with their stack trace and effective `failureMode`.
+`onFailure` observes a still-current failure; observer exceptions propagate
+after validation state is settled.
+
+Technical failures block submit by default. Override a rule with
+`failureMode: KeyedFormAsyncFailureMode.allowSubmit` only when continuing
+without a service verdict is safe; the backend may still reject the value.
+An explicit result remains `unavailable` (`isValid == false`) if any
+technical failure occurred, even if submit is allowed to proceed.
+
+There is **no automatic debounce, cache, or retry**. `onChange` starts
+validation for each scheduled write. Prefer `onBlur`/`onTouched` for expensive
+remote checks or debounce at the service/request layer. Superseded results
+cannot update state or authorize submit, but the underlying network request is
+not canceled.
 
 ### Validating and submitting
 
-- `form.validate()` — whole draft, ignores `mode` and `scopeOf`, makes every error visible, returns whether it's clean.
-- `form.validateScopes(scopes)` — revalidates and force-reveals each given subtree, returns the ones still failing. Meaningful only with `scopeOf` set.
-- `form.reveal(scopes)` — forces the given subtrees' errors visible without revalidating them.
-- `await form.submit(onValid, {onInvalid})` — calls `validate()`; on success runs `onValid(value)` with `submitting` toggled around it; on failure runs `onInvalid(errorKeys)` if given. In Flutter, prefer `form.handleSubmit(context, onValid, {onInvalid})` (see below) — same contract, with a default `onInvalid` already wired.
-- `form.seed(value, {force})` re-baselines both the draft and the dirty baseline to `value` and clears interaction bookkeeping — a no-op while the draft is dirty unless `force: true`, so a background refresh can't clobber an in-progress edit. `form.reset()` discards the draft back to that baseline and clears the same bookkeeping.
-- `form.setServerErrors(Map<FieldKey, String>)` / `.setServerErrorPaths(Map<String, String>)` merge externally-sourced errors in and force-reveal them; the path variant takes the same dotted/bracketed wire format a field key's own path form uses, and throws on a malformed path.
-
-### Async validation
-
-```dart
-Future<void> validateFieldAsync(
-  FieldKey key,
-  FutureOr<String?> Function() check, {
-  Duration? timeout,
-  void Function(Object error, StackTrace stackTrace)? onFailure,
-})
-```
-
-(`form.field(ref).validateAsync(check, {timeout, onFailure})` is the typed entry point.) A non-null result from `check` is merged in as a visible error on that field; `null` leaves whatever the schema resolver already recorded alone — this call is additive for a check the resolver can't do on its own (a server round-trip), not a replacement for it.
-
-A call that throws, or exceeds `timeout`, does **not** write an error and does **not** propagate out of the returned future — it sets `isFailedValidation` on that field instead, calls `onFailure` if given, and completes normally. `isFailedValidation` is deliberately independent from `errors`: it means "the check itself could not run," not "the value is invalid," and it is not sticky — the next `validateFieldAsync` call on the same field clears it up front, whether that call goes on to succeed or fail. Overlapping calls on the same field are race-safe: if a newer call starts before an older one settles, the older one's result — success or failure — is discarded, never allowed to clobber the newer one's.
+- `await form.validate()` — full fresh validation; reveals its result but does
+  not mark the form submitted.
+- `await form.validateScopes(scopes)` — returns a structured result scoped to
+  the requested subtrees; check `result.isValid` or `result.errors` /
+  `result.failures`, not a list of failing keys.
+- `form.reveal(scopes)` — changes visibility without running validation.
+- `await form.submit(onValid, {onInvalid, onValidationUnavailable})` — starts
+  fresh validation, then calls exactly one outcome callback. Value errors
+  route to `onInvalid`; blocking technical failures route to
+  `onValidationUnavailable`; only an allowed, otherwise error-free result
+  calls `onValid`. `submitting` covers validation and callback work.
+- A write, reset, seed, or dispose during submit fences the captured draft
+  from saving. Concurrent submit attempts do not double-run.
+- `form.seed(value, {force})` re-baselines draft and dirty baseline; it is a
+  no-op while dirty unless forced. `form.reset()` restores the baseline.
+- `setServerErrors` / `setServerErrorPaths` merge and reveal backend value
+  errors; malformed wire paths throw.
 
 ### Read-only fields
 
@@ -405,13 +499,13 @@ One controller, one `dispose()` — call it wherever the `KeyedFormController` i
 1. Never call `form.setField` / `updateField` / `list` / `mutateList` directly — always `form.field(ref)`.
 2. `scopeOf` returning `null` for a written key silently skips revalidation for that write.
 3. A resolver under a scoped controller must only return error keys inside the `scope` it was given.
-4. `onChange` / `onBlur` / `onTouched` gate visibility identically — they differ only in which event calls `.touch()`.
+4. Before submit, `onChange`, `onBlur`, and `onTouched` are validation triggers, not equivalent visibility settings; `reValidateMode` governs later automatic validation.
 5. A required `int` / `double` / `number` / `enums` field needs `.defaultTo(...)` to generate as non-nullable — `string` / `boolean` don't.
 6. `.refine()`'s default error message is the bare `'Invalid'` — every other rule has a real default.
 7. Any async `.refine()` anywhere in the schema means every `validate` call in that chain must be the async variant.
 8. Build rows with `.create(...)`, never the plain constructor, unless a stable `clientId` is already in hand.
 9. Only the root schema's generated class has `validate()` / `validateData()` / `scopeOf` — nested or list-item classes don't.
-10. `isFailedValidation` is independent of `errors` and not sticky — it clears at the start of the next `validateFieldAsync` call on that field.
+10. Async validation is declarative and explicit; `FieldHandle.validate()` reruns configured rules. There is no automatic debounce, cancellation, or retry.
 11. `unmarkReadOnly(leaf)` does not lift a freeze placed on an ancestor of `leaf`.
 12. Read-only survives `seed()` / `reset()`; touched, revealed, validating, and failed do not.
 13. `addRelation` does not fire on registration, skips silently while its source is unresolved, and is never auto-disposed.
@@ -419,3 +513,4 @@ One controller, one `dispose()` — call it wherever the `KeyedFormController` i
 15. Never wire a bound text control's own `onChanged` alongside the field binding — caret and composed-input state break.
 16. A default submit-scroll only finds anchors that are currently built — a lazily-built region needs its own `onInvalid`.
 17. Model and row classes need real `==` / `hashCode`, or dirty tracking and no-op writes stop working.
+18. `KeyedFormState.onBlur` reports actual focus loss; `onTapOutside` alone does not cover keyboard traversal or other focus changes.

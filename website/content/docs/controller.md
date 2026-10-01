@@ -22,10 +22,17 @@ form.reset(); // restore the baseline
 
 Call `seed(value)` when loading an existing record. It sets the current value and the comparison baseline together. `isDirty` tracks whether the draft differs from that baseline; `differs(ref)` checks one field.
 
-## Submit and dispose
-
-`submit(onValid, onInvalid: ...)` validates before invoking the async callback. In Flutter, `handleSubmit(context, onValid)` also reveals and focuses the first invalid field. Dispose the controller with its owning state.
+`submit(onValid, ...)` performs fresh sync and async validation before calling
+`onValid`. Value errors go to `onInvalid`; blocking technical failures go to
+`onValidationUnavailable`. `validate()` returns a structured result and does
+not mark the form submitted. See [Validation](docs/validation) for trigger
+timing and [Async validation](docs/async-validation) for submit policy.
+In Flutter, `handleSubmit(context, onValid)` also reveals the relevant mounted
+fields. Dispose the controller with its owning state.
 
 ## Read state reactively
 
-Use `context.watchField` for one value and `context.selectForm` for a derived slice. `KeyedFormSelector` scopes the rebuild to a subtree. `watchForm` and `KeyedFormBuilder` observe the whole draft, so prefer narrower reads when possible.
+Use `context.watchField` for one value and `context.selectForm` for a derived
+slice. `KeyedFormSelector` scopes the rebuild to a subtree. `watchForm` and
+`KeyedFormBuilder` observe the whole draft, so prefer narrower reads when
+possible.

@@ -14,7 +14,7 @@ dependencies:
   jaspr_content: ^0.5.4
   jaspr_lucide: ^0.55.0
   jaspr_router: ^0.9.0
-  keyed_form: ^0.1.0
+  keyed_form: ^0.2.0
   keyed_form_schema: ^0.1.0
   syntax_highlight_lite: ^0.0.1
   universal_web: ^1.1.1+1

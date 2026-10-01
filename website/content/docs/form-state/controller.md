@@ -24,16 +24,31 @@ Readonly configuration is not draft bookkeeping: fields marked read-only remain 
 
 ## Validate and submit
 
-`validate()` invokes the resolver for the whole draft, sets `submitted`, makes errors visible, and returns whether the errors are empty. `submit` returns `Future<bool>`: it validates synchronously before invoking the callback, awaits a `FutureOr<void>` success callback while `submitting` is true, then returns `true`; invalid data returns `false` and does not invoke it. An optional `onInvalid` callback receives visible error keys. Callback exceptions propagate, while `submitting` is reset in `finally`.
+`validate()` runs full sync and configured async validation, force-reveals its
+result, and returns `KeyedFormValidationResult`. It does not mark the form
+submitted. `submit` always validates a fresh snapshot and returns
+`Future<bool>`: value errors go to `onInvalid`, blocking technical failures
+go to `onValidationUnavailable`, and only a valid result runs `onValid`.
+`submitting` remains true through validation and the callback. If the draft
+changes, the form resets/seeds, or the controller is disposed before the
+attempt settles, `onValid` is not called for that stale snapshot.
 
 ```dart
 final saved = await form.submit(
   (draft) => api.save(draft.toMap()),
   onInvalid: (keys) => logInvalidFields(keys),
+  onValidationUnavailable: (result) =>
+      showCheckUnavailable(result.failures.keys),
 );
 ```
 
-The controller's resolver itself is never awaited. Server-backed checks use [Async validation](docs/form-state/async-validation); Flutter's descendant-context helper is covered under [Flutter submit](docs/flutter/scroll-to-first-error).
+`onInvalid` receives value-error keys. Technical failures are not errors;
+`onValidationUnavailable` receives the structured result. A rule configured
+with `KeyedFormAsyncFailureMode.allowSubmit` does not block an otherwise
+error-free draft, but its remote check had no verdict. Callback exceptions
+propagate; `submitting` is reset in `finally`. See [Validation and
+visibility](docs/form-state/validation) for trigger timing and [Async
+validation](docs/form-state/async-validation) for the complete submit policy.
 
 ## Disposal and snapshots
 

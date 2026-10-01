@@ -3,9 +3,20 @@ title: Submit and scroll to error
 description: Validate on submit and reveal mounted invalid fields, with a two-phase pattern for lazy sections.
 ---
 
-`form.handleSubmit(context, onValid)` runs the controller's submit flow. On valid data it calls `onValid` and manages `submitting`; on invalid data it invokes `onInvalid` if supplied, otherwise the form's registry reveals the first visible error by scrolling to and focusing its mounted field anchor. The `BuildContext` must be below the matching `KeyedForm` (use a descendant builder context, as shown in [form scope](docs/flutter/form-context)).
+`form.handleSubmit(context, onValid)` runs a fresh validation before saving.
+Value errors call `onInvalid` when supplied; otherwise the registry reveals
+the first visible value error. Blocking technical failures call
+`onValidationUnavailable`; without a custom callback the registry reveals the
+failed-check fields. Providing either callback replaces the default reveal
+behavior for that outcome. The `BuildContext` must be below the matching
+`KeyedForm` (use a descendant builder context, as shown in
+[form scope](docs/flutter/form-context)).
 
-`KeyedFormField` registers an anchor automatically unless created with `anchor: false`. Custom controls can provide an invalid callback when they need app-specific behavior. `KeyedFieldRegistry.revealFirst` can reveal only mounted anchors: a row that has not yet been built by `ListView.builder` cannot be focused or scrolled to precisely.
+`KeyedFormField` registers an anchor automatically unless created with
+`anchor: false`. Custom callbacks are useful when an app needs to scroll a
+lazy section before asking the registry to reveal a mounted child.
+`KeyedFieldRegistry.revealFirst` can only reveal mounted anchors: an unbuilt
+`ListView.builder` row cannot be focused precisely.
 
 ## Two-phase reveal for lazy sections
 

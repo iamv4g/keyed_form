@@ -20,6 +20,15 @@ Rules such as `.required()`, `.email()`, `.min(...)`, and `.max(...)` can be cha
 
 Use `.refine(...)` when validity depends on more than one field, such as matching password and confirmation values. Keep the predicate synchronous and attach the result to the field that should display the error.
 
-## Choose when errors appear
+`KeyedFormMode` controls validation triggers before submit: `onSubmit` runs
+no automatic checks, `onChange` validates writes, `onBlur` validates on real
+focus loss, and `onTouched` validates on first blur and later writes to that
+field. `all` validates writes and blur. After submit, `reValidateMode`
+(default `onChange`) controls subsequent triggers; `all` keeps both.
 
-`KeyedFormMode` controls visibility while users edit. Submit through the controller to validate the full draft and reveal invalid fields. For asynchronous checks, see [async validation](docs/async-validation).
+Initial values, seeding, and reset do not eagerly validate. `touch()` reports
+a blur and runs blur validation when the mode requires it; it is not an
+independent reveal. Manual `validate()` returns a structured result and does
+not mark the form submitted. See [validation and visibility](docs/form-state/validation)
+for scoped validation and the full trigger table, and
+[async validation](docs/form-state/async-validation) for remote rules.

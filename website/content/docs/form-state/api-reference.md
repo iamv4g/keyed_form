@@ -12,31 +12,34 @@ This page is an index to the pure-Dart `keyed_form` API. For usage and edge beha
 | `KeyedFormController<Root>` | Owns draft, baseline, errors, visibility, and lifecycle; see [Controller and lifecycle](docs/form-state/controller). |
 | `value`, `original`, `isDirty`, `differs(ref)`, `dirtyRows(ref)` | Draft and comparison with baseline. |
 | `seed(value, {force})`, `reset()` | Replace baseline or restore it; seed skips a dirty draft unless forced. |
-| `validate()`, `submit(onValid, {onInvalid})` | Synchronous whole-draft validation; submit returns `Future<bool>` and awaits the valid callback. |
+| `validate()`, `validateScopes(scopes)` | Return `Future<KeyedFormValidationResult>` with status, value errors, and technical failures. |
+| `submit(onValid, {onInvalid, onValidationUnavailable})` | Fresh sync/async validation, then route to the matching callback; returns `Future<bool>`. |
 | `resolver`, `KeyedFormResolver<Root>` | `(draft, FieldKey? scope) -> FieldErrors<String>`; synchronous. |
-| `scopeOf`, `KeyedFormScopeOf` | Map a written key to the validation subtree. |
-| `validateScopes(scopes)`, `reveal(scopes)` | Revalidate/reveal selected scopes; the former returns failing scopes. |
-| `errors`, `visibleError(key)`, `visibleErrorFor(ref)`, `visibleErrorKeys`, `visibleErrorUnder(root)` | Raw errors or mode-gated visible errors. See [Validation and visibility](docs/form-state/validation). |
-| `KeyedFormMode` | `onChange`, `onBlur`, `onTouched`, `onSubmit`, or `all`; selected at construction. |
-| `snapshot` / `KeyedFormSnapshot<Root>` | Coarse immutable state; omits visibility, mode, readonly, and async state. |
+| `scopeOf`, `KeyedFormScopeOf` | Map an automatic write to a validation subtree; `null` skips that write. |
+| `reveal(scopes)` | Change visibility without running validation. |
+| `errors`, `visibleError(key)`, `visibleErrorFor(ref)`, `visibleErrorKeys`, `visibleErrorUnder(root)` | Raw errors or mode-gated visible errors. |
+| `KeyedFormMode`, `KeyedFormReValidateMode` | Configure user-event triggers before and after submit. |
+| `snapshot` / `KeyedFormSnapshot<Root>` | Coarse immutable state; omits visibility, readonly, and async state. |
 
 ## Fields, lists, and asynchronous checks
 
 | API | Purpose |
 |---|---|
-| `form.field(ref)` / `FieldHandle<Root, Value>` | Typed value, key, visible error, dirty/readonly state, set/update/touch; see [Field handles](docs/form-state/field-handles). |
-| `FieldRef<Root, Value>` / `StrictFieldRef<Root, Value>` | Core field identity; refs may be unresolved when a nested path is absent or a variant differs. |
-| `FieldHandle.validateAsync(check, {timeout, onFailure})` | App-owned async field check; see [Async validation](docs/form-state/async-validation). |
-| `KeyedFormList<Root, Item>` | List editor with append/prepend/insert/remove/move/swap/update methods; see [List operations](docs/form-state/lists). |
+| `form.field(ref)` / `FieldHandle<Root, Value>` | Typed value, key, visible error, dirty/readonly and validation state; set/update/touch. |
+| `FieldRef<Root, Value>` / `StrictFieldRef<Root, Value>` | Typed field identity; nested references may be unresolved. |
+| `KeyedFormAsyncValidator.field(...)`, `.forEach(...)` | Declare typed async rules, including rules scoped to keyed rows. |
+| `FieldHandle.validate()` | Explicitly rerun configured async rules for this field. |
+| `KeyedFormAsyncFailureMode`, `KeyedFormValidationResult` | Distinguish technical failures from value errors and configure submit policy. |
+| `KeyedFormList<Root, Item>` | List editor with append/prepend/insert/remove/move/swap/update methods. |
 | `markReadOnly(key)`, `unmarkReadOnly(key)` / `force` | Freeze a field/subtree; explicit `force` bypasses only the write guard. |
-| `setServerErrors(errors)`, `setServerErrorPaths(paths)` | Merge and reveal backend field errors; invalid wire path throws `FormatException`. See [Server errors](docs/form-state/server-errors). |
+| `setServerErrors(errors)`, `setServerErrorPaths(paths)` | Merge backend field errors. |
 
 ## Relations and framework bindings
 
 | API | Purpose |
 |---|---|
 | `addRelation(source, select, onChange)` | Observe a source and react to changed selected values; returns an unsubscribe callback. See [Relations](docs/form-state/relations). |
-| `handleSubmit(context, onValid)` | Flutter-aware submission and mounted-field reveal; see [Flutter submit](docs/flutter/scroll-to-first-error). |
+| `handleSubmit(context, onValid, {onInvalid, onValidationUnavailable, ...})` | Flutter-aware submission; reveals blocking fields by default. See [Flutter submit](docs/flutter/scroll-to-first-error). |
 | `KeyedForm`, `KeyedFormField`, `KeyedFieldList` | Flutter bindings; see [Flutter API](docs/flutter/api-reference). |
 
 For schema declaration and generated refs, start at [Schema](docs/schema).
