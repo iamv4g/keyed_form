@@ -170,7 +170,7 @@ void main() {
       expect(find.textContaining(RegExp(r'^v\d')), findsNComponents(2));
     });
 
-    testComponents('DocsHeader renders all section destinations and active section label', (tester) async {
+    testComponents('DocsHeader renders the visible section destinations', (tester) async {
       tester.pumpComponent(
         DocsSearchIndex(
           entries: readDocsSearchIndex(),
@@ -179,9 +179,10 @@ void main() {
       );
 
       expect(find.text('Search'), findsOneComponent);
-      for (final label in ['Guides', 'Schema', 'Form State', 'Flutter', 'Docs']) {
+      for (final label in ['Guides', 'Schema', 'Form State', 'Flutter']) {
         expect(find.text(label), findsOneComponent);
       }
+      expect(find.text('Docs'), findsNothing);
       expect(find.text('Playground'), findsNothing);
       expect(find.text('pub.dev ↗'), findsNothing);
     });
@@ -261,10 +262,10 @@ void main() {
     }
   });
 
-  test('search index contains all reorganized pages and their track labels', () {
+  test('search index contains reorganized pages and track labels', () {
     final entries = readDocsSearchIndex();
     expect(entries.where((e) => e['section']!.isEmpty).length, 38);
-    expect(entries.every((entry) => entry['docSection'] != 'docs'), isTrue);
+    expect(entries.any((entry) => entry['docSectionTitle'] == 'Docs'), isFalse);
     expect(entries.any((entry) => entry['url']!.endsWith('/docs/validation')), isFalse);
 
     final strings = entries.firstWhere((entry) => entry['url']!.endsWith('/docs/schema/builders#strings'));
@@ -283,9 +284,16 @@ void main() {
         .where((path) => path.endsWith('.md'))
         .toSet();
     final paths = docsPages.map((page) => page.contentPath).toList();
-    expect(paths, hasLength(61));
+    expect(paths, hasLength(38));
     expect(paths.toSet(), hasLength(paths.length));
     expect(paths.toSet(), files);
+    expect(docsSections.map((section) => section.label), [
+      'Guides',
+      'Schema',
+      'Form State',
+      'Flutter',
+    ]);
+    expect(docsPages.any((page) => page.path == '/docs'), isFalse);
     for (final section in docsSections) {
       expect(docsPagesFor(section).where((page) => page.slug == 'index'), hasLength(1));
     }
@@ -300,8 +308,7 @@ void main() {
         'docs/flutter/index.html',
         'docs/schema/code-generation/index.html',
         'docs/schema/code-generation/index.html.md',
-        'docs/index.html',
-        'docs/quickstart/index.html',
+        'docs/guides/quickstart/index.html',
         'playground/index.html',
       ]) {
         expect(File('build/jaspr/$route').existsSync(), isTrue, reason: route);
@@ -332,18 +339,6 @@ void main() {
       final flutterLast = File('build/jaspr/docs/flutter/api-reference/index.html').readAsStringSync();
       expect(flutterLast, isNot(contains('rel="next"')));
 
-      final comparison = File('build/jaspr/docs/validation/index.html').readAsStringSync();
-      final comparisonNavStart = comparison.indexOf('<nav class="md-sidebar-scroll"');
-      final comparisonSidebar = comparison.substring(
-        comparisonNavStart,
-        comparison.indexOf('</nav>', comparisonNavStart) + 6,
-      );
-      expect(comparison, contains('Comparison copy: this is the previous documentation'));
-      expect(comparison, contains('href="${_siteRoute('/docs/guides')}"'));
-      expect(comparisonSidebar, contains('data-docs-section="docs"'));
-      expect(comparisonSidebar, contains(_siteRoute('/docs/async-validation')));
-      expect(comparisonSidebar, isNot(contains(_siteRoute('/docs/schema/'))));
-
       final playground = File('build/jaspr/playground/index.html').readAsStringSync();
       final tabsStart = playground.indexOf('<nav class="docs-tabs"');
       final tabs = playground.substring(tabsStart, playground.indexOf('</nav>', tabsStart) + 6);
@@ -351,11 +346,10 @@ void main() {
       expect(tabs, isNot(contains('Playground')));
     });
 
-    test('new and comparison Markdown copies remain separate', () {
+    test('generated Markdown copies are emitted for current docs', () {
       final generated = File('build/jaspr/docs/schema/builders/index.html.md').readAsStringSync();
       expect(generated, startsWith('# Builders and rules\n'));
-      expect(File('build/jaspr/docs/validation/index.html.md').existsSync(), isTrue);
-      expect(File('build/jaspr/docs/index.html.md').existsSync(), isTrue);
+      expect(File('build/jaspr/docs/form-state/validation/index.html.md').existsSync(), isTrue);
     });
 
     test('build/jaspr contains valid production static assets', () {

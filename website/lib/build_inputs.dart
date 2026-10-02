@@ -37,7 +37,7 @@ const exampleLibDir = '../packages/keyed_form_flutter/example/lib';
 /// in sidebar order. Markdown is reduced to plain text; custom tags drop out.
 List<SearchEntry> readDocsSearchIndex() {
   final entries = <SearchEntry>[];
-  for (final page in docsPages.where((page) => page.section.searchable)) {
+  for (final page in docsPages) {
     final file = File('content/${page.contentPath}');
     var body = file.readAsStringSync();
     var description = '';

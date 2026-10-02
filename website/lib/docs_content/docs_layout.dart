@@ -65,11 +65,6 @@ class KfDocsLayout implements PageLayout {
               ]),
               if (description != null) p(classes: 'docs-description', [.text(description)]),
             ]),
-            if (entry.section == DocsSection.docs)
-              p(classes: 'md-note', [
-                .text('Comparison copy: this is the previous documentation and may contain outdated guidance. '),
-                a(href: '$siteBasePath/docs/guides', [.text('Read the reorganized guides')]),
-              ]),
             child,
             nav(
               classes: 'md-pager',
@@ -141,7 +136,6 @@ const _keepScroll = '''
   } catch (_) {}
 })();
 ''';
-
 
 /// The chapters list: a sticky column on wide screens, a drawer from the
 /// left (opened from the header's tab row) on narrow ones. Site links sit on

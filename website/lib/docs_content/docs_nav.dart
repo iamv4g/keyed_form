@@ -3,15 +3,13 @@ enum DocsSection {
   guides('guides', 'Guides', 'guides'),
   schema('schema', 'Schema', 'schema'),
   formState('form-state', 'Form State', 'form-state'),
-  flutter('flutter', 'Flutter', 'flutter'),
-  docs('docs', 'Docs', '');
+  flutter('flutter', 'Flutter', 'flutter');
 
   const DocsSection(this.id, this.label, this.directory);
   final String id;
   final String label;
   final String directory;
-  String get path => directory.isEmpty ? '/docs' : '/docs/$directory';
-  bool get searchable => this != DocsSection.docs;
+  String get path => '/docs/$directory';
 }
 
 const docsSections = DocsSection.values;
@@ -31,8 +29,7 @@ class DocsEntry {
   final String slug;
 
   String get path => slug == 'index' ? section.path : '${section.path}/$slug';
-  String get contentPath =>
-      'docs/${section.directory.isEmpty ? '' : '${section.directory}/'}$slug.md';
+  String get contentPath => 'docs/${section.directory}/$slug.md';
 }
 
 /// Sidebar order and Prev/Next all come from this list.
@@ -75,29 +72,6 @@ const docsPages = <DocsEntry>[
   DocsEntry(DocsSection.flutter, 'Lists and submission', 'Submit and scroll to error', 'scroll-to-first-error', 'arrow-down-to-line'),
   DocsEntry(DocsSection.flutter, 'Recipes', 'Rendering union fields', 'unions', 'file-code'),
   DocsEntry(DocsSection.flutter, 'Reference', 'Flutter API', 'api-reference', 'file-code'),
-  DocsEntry(DocsSection.docs, 'Getting started', 'Introduction', 'index', 'book-open'),
-  DocsEntry(DocsSection.docs, 'Getting started', 'Installation', 'installation', 'download'),
-  DocsEntry(DocsSection.docs, 'Getting started', 'Quickstart', 'quickstart', 'rocket'),
-  DocsEntry(DocsSection.docs, 'Getting started', 'How it works', 'how-it-works', 'workflow'),
-  DocsEntry(DocsSection.docs, 'Core concepts', 'Packages', 'packages', 'package'),
-  DocsEntry(DocsSection.docs, 'Core concepts', 'Controller', 'controller', 'sliders-horizontal'),
-  DocsEntry(DocsSection.docs, 'Core concepts', 'Field handles', 'field-handles', 'text-cursor-input'),
-  DocsEntry(DocsSection.docs, 'Core concepts', 'Validation', 'validation', 'shield-check'),
-  DocsEntry(DocsSection.docs, 'Core concepts', 'Async validation', 'async-validation', 'hourglass'),
-  DocsEntry(DocsSection.docs, 'Core concepts', 'Relations', 'relations', 'link'),
-  DocsEntry(DocsSection.docs, 'Lists & scrolling', 'Dynamic lists', 'dynamic-lists', 'grip-vertical'),
-  DocsEntry(DocsSection.docs, 'Lists & scrolling', 'Long lists', 'long-lists', 'list'),
-  DocsEntry(DocsSection.docs, 'Lists & scrolling', 'Scroll to first error', 'scroll-to-first-error', 'arrow-down-to-line'),
-  DocsEntry(DocsSection.docs, 'Recipes', 'Multi-step forms', 'wizard', 'list-checks'),
-  DocsEntry(DocsSection.docs, 'Recipes', 'Server errors', 'server-errors', 'server-crash'),
-  DocsEntry(DocsSection.docs, 'Recipes', 'Cascading dropdowns', 'cascading-dropdowns', 'list-tree'),
-  DocsEntry(DocsSection.docs, 'Recipes', 'Custom controls', 'custom-controls', 'toggle-right'),
-  DocsEntry(DocsSection.docs, 'Recipes', 'Discriminated unions', 'unions', 'split'),
-  DocsEntry(DocsSection.docs, 'Testing', 'Testing', 'testing', 'flask-conical'),
-  DocsEntry(DocsSection.docs, 'Reference', 'API reference', 'api-reference', 'file-code'),
-  DocsEntry(DocsSection.docs, 'Reference', 'Migration', 'migration', 'arrow-right-left'),
-  DocsEntry(DocsSection.docs, 'Reference', 'FAQ', 'faq', 'circle-question-mark'),
-  DocsEntry(DocsSection.docs, 'Reference', 'Benchmarks', 'benchmarks', 'gauge'),
 ];
 
 List<DocsEntry> docsPagesFor(DocsSection section) =>
