@@ -11,7 +11,7 @@ Six packages, bottom to top:
 
 ```
 keyed_lens              (pure Dart) — the FieldKey / lens primitives everything below builds on
- └── keyed_form_core     — shared vocabulary: FieldRef / StrictFieldRef / VariantRef, FieldErrors, @keyedSchema
+ └── keyed_form_core     — shared vocabulary: FieldRef / StrictFieldRef / VariantFieldRef, FieldErrors, @keyedSchema
        ├── keyed_form_schema   — the `ks.*` schema / validation DSL
        │     └── keyed_form_gen   — dev-time codegen: schema → data class + field references + validators
        └── keyed_form      — the pure-Dart form controller (KeyedFormController)
