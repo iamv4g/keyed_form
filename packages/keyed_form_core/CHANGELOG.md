@@ -2,6 +2,8 @@
 
 - Add pub.dev topics for package discoverability.
 - Depend on `keyed_lens ^0.2.0`.
+- Rename the union reference to `VariantFieldRef`; regenerate generated union
+  schemas when upgrading.
 
 ## 0.1.0
 

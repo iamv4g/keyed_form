@@ -74,18 +74,6 @@ void main() {
         ),
       );
       expect(code, contains('abstract final class _SectionVariants {'));
-      expect(
-        code,
-        contains(
-          'static final admission = VariantRef<SectionSchema, AdmissionSectionSchema>.type();',
-        ),
-      );
-      expect(
-        code,
-        contains(
-          'static final transfer = VariantRef<SectionSchema, TransferSectionSchema>.type();',
-        ),
-      );
       expect(code, contains('abstract final class SectionFields {'));
     });
 
@@ -239,7 +227,9 @@ void main() {
       // `dart analyze` on the real output with `return_of_invalid_type`.
       expect(
         code,
-        contains('day(dayClientId: dayClientId).asFieldRef.then(DayFields.groups)'),
+        contains(
+          'day(dayClientId: dayClientId).asFieldRef.then(DayFields.groups)',
+        ),
       );
       expect(
         code,

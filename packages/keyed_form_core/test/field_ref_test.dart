@@ -113,13 +113,13 @@ void main() {
     expect(present.set(p, 'hi').memo, isNull); // no-op while null
   });
 
-  test('.narrow() narrows a sum type via VariantRef', () {
+  test('.narrow() narrows a sum type via VariantFieldRef', () {
     final pay = StrictFieldRef<(Pay,), Pay>.of(
       key: FieldKey.name('pay'),
       get: (r) => r.$1,
       set: (r, v) => (v,),
     );
-    final VariantRef<Pay, Cash> cash = VariantRef<Pay, Cash>.type();
+    final VariantFieldRef<Pay, Cash> cash = VariantFieldRef<Pay, Cash>.type();
     final FieldRef<(Pay,), String> note = pay
         .narrow(cash)
         .then(
@@ -129,8 +129,13 @@ void main() {
             set: (c, v) => c.copyWith(note: v),
           ),
         );
-    expect(note.getOrNull((const Cash('paid'),)), 'paid');
-    expect(note.getOrNull((const Card('1234'),)), isNull);
+    const cashRoot = (Cash('paid'),);
+    const cardRoot = (Card('1234'),);
+    expect(note.key, FieldKey.name('pay') + FieldKey.name('note'));
+    expect(note.getOrNull(cashRoot), 'paid');
+    expect(note.getOrNull(note.set(cashRoot, 'new note')), 'new note');
+    expect(note.getOrNull(cardRoot), isNull);
+    expect(identical(note.set(cardRoot, 'new note'), cardRoot), isTrue);
   });
 
   test('.at() descends into a list row by id', () {

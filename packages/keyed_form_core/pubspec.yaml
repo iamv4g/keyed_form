@@ -1,7 +1,7 @@
 name: keyed_form_core
 description: >-
   Shared vocabulary for the keyed_form family: FieldRef / StrictFieldRef /
-  VariantRef field references over keyed_lens optics, DelegatingFieldRef,
+  VariantFieldRef field references over keyed_lens optics, DelegatingFieldRef,
   FieldErrors, and the @keyedSchema annotation.
 version: 0.2.0
 

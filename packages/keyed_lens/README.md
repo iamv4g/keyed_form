@@ -103,7 +103,7 @@ consumer for it yet; it earns its own story when server patches or deep links
 arrive, as a new named codec would rather than a change to this frozen one.
 
 The `keyed_form` layers wrap these types under a "field reference" vocabulary
-(`FieldRef` / `StrictFieldRef` / `VariantRef` in `keyed_form_core`) so form
+(`FieldRef` / `StrictFieldRef` / `VariantFieldRef` in `keyed_form_core`) so form
 code never has to say "lens".
 
 ## Scope

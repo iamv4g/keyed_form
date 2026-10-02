@@ -50,11 +50,11 @@ extension type StrictFieldRef<R, V>(Lens<R, V> _inner)
 
 /// A [FieldRef] valid only while [S] is a specific variant [V] of a sum type —
 /// compose with [FieldRefNarrow.narrow].
-extension type VariantRef<S, V extends S>(Prism<S, V> _inner)
+extension type VariantFieldRef<S, V extends S>(Prism<S, V> _inner)
     implements Prism<S, V>, FieldRef<S, V> {
-  /// Creates a [VariantRef] leveraging Dart's type system (`source is V`).
-  factory VariantRef.type({FieldKey? key}) =>
-      VariantRef(Prism<S, V>.type(key: key));
+  /// Creates a [VariantFieldRef] leveraging Dart's type system (`source is V`).
+  factory VariantFieldRef.type({FieldKey? key}) =>
+      VariantFieldRef(Prism<S, V>.type(key: key));
 
   // Same conflict as `StrictFieldRef.then` above (`Prism` inherits
   // `AffineLens.then`, `FieldRef` redeclares it) — required to compile.
@@ -104,9 +104,10 @@ extension FieldRefWhenPresent<R, V extends Object> on FieldRef<R, V?> {
 }
 
 /// Narrows a [FieldRef] on a sum type to one of its variants through a
-/// [VariantRef] — null / no-op when the value is a different variant.
+/// [VariantFieldRef] — null / no-op when the value is a different variant.
 extension FieldRefNarrow<R, V> on FieldRef<R, V> {
-  FieldRef<R, W> narrow<W extends V>(VariantRef<V, W> variant) => then(variant);
+  FieldRef<R, W> narrow<W extends V>(VariantFieldRef<V, W> variant) =>
+      then(variant);
 }
 
 /// Descends into a list row by client id: `rows.at(id, (r) => r.clientId == id)`.

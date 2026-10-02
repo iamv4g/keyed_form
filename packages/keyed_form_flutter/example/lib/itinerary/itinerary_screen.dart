@@ -39,7 +39,10 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             rules: [
               .field(
                 field:
-                    VariantRef<ActivitySchema, SightseeingActivitySchema>.type()
+                    VariantFieldRef<
+                          ActivitySchema,
+                          SightseeingActivitySchema
+                        >.type()
                         .then(SightseeingActivityFields.place),
                 validate: (_, place) => _checkPlace(place),
                 timeout: const Duration(seconds: 5),
