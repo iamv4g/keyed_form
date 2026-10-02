@@ -5,6 +5,19 @@ description: Keep text editing controllers synchronized with form state without 
 
 `KeyedFormField.text<Root>` combines a typed form field with a managed `TextEditingController`. The builder receives the field state and controller; use the controller on the text widget and render `errorText` as usual. The binding lifecycle follows the field widget and cleans up its controller when disposed. See the working [login text field source](https://github.com/tastech-sakura/keyed_form/blob/main/packages/keyed_form_flutter/example/lib/login/login_text_field.dart).
 
+```dart
+KeyedFormField.text<LoginSchema>(
+  field: LoginFields.email,
+  builder: (context, field, controller) => TextField(
+    controller: controller,
+    decoration: InputDecoration(errorText: field.errorText),
+  ),
+)
+```
+
+This field binding connects text edits to `LoginFields.email` and supplies the
+managed controller; do not also wire the `TextField`'s `onChanged`.
+
 For a standalone control, `KeyedTextBinding` accepts a `value`, `onChanged`, and builder that receives its controller:
 
 ```dart

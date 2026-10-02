@@ -29,4 +29,7 @@ rule progress and technical failure; they are not substitutes for `errorText`.
 
 The builder result is wrapped in a `KeyedFieldAnchor` automatically, registered under `fieldKey`. This allows submit handling to reveal a mounted invalid control without manual registry wiring. Set `anchor: false` only when this widget must never be a scroll-to-error target (for example, a decorative duplicate representation); it disables that automatic anchor. See [submit and scroll to error](docs/flutter/scroll-to-first-error).
 
-For a text input, prefer [text binding](docs/flutter/text-binding), which owns the editing controller and handles external updates without duplicate change reporting.
+For text inputs, prefer `KeyedFormField.text<Root>(field: ..., builder: ...)`
+from [text binding](docs/flutter/text-binding). It manages the editing
+controller; use `KeyedTextBinding` directly only when binding a standalone
+text control outside a form field.
