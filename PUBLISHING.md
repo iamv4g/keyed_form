@@ -14,12 +14,12 @@ table and pub.dev ever disagree.
 
 | Package             | Live version    | Published on |
 |----------------------|-----------------|--------------|
-| `keyed_lens`         | 0.1.0 | 2026-09-13 |
-| `keyed_form_core`    | 0.1.0 | 2026-09-13 |
-| `keyed_form_schema`  | 0.1.0 | 2026-09-13 |
-| `keyed_form_gen`     | 0.1.0 | 2026-09-13 |
-| `keyed_form`         | 0.1.0 | 2026-09-13 |
-| `keyed_form_flutter` | 0.1.0 | 2026-09-13 |
+| `keyed_lens`         | 0.2.0 | 2026-10-02 |
+| `keyed_form_core`    | 0.2.0 | 2026-10-02 |
+| `keyed_form_schema`  | 0.2.0 | 2026-10-02 |
+| `keyed_form_gen`     | 0.2.0 | 2026-10-02 |
+| `keyed_form`         | 0.2.0 | 2026-10-02 |
+| `keyed_form_flutter` | 0.2.0 | 2026-10-02 |
 
 ## Order
 
