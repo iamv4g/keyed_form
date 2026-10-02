@@ -7,7 +7,7 @@ Use a discriminated union when a form section has mutually exclusive shapes, suc
 
 ## Render the active variant
 
-Inside a row widget, `fields` is that row's generated `ActivityFieldRefs`. Read its current discriminator with a selector, then render the matching generated variant reference. A `VariantRef` resolves only while the row contains that variant; after a switch, the old branch's fields stop resolving instead of reading stale data.
+Inside a row widget, `fields` is that row's generated `ActivityFieldRefs`. Read its current discriminator with a selector, then render the matching generated variant reference. A `VariantFieldRef` resolves only while the row contains that variant; after a switch, the old branch's fields stop resolving instead of reading stale data.
 
 ```dart
 KeyedFormSelector<ItinerarySchema, String?>(
@@ -41,4 +41,4 @@ activityList.updateById(
 
 The selector reads the row's current discriminator because switching variants keeps the same `clientId`; the outer list's row snapshot may therefore stay unchanged. `updateById` replaces the row with the selected generated shape while preserving its identity. The schema uses `ks.discriminatedUnion('kind', ...)` and the generator creates variant accessors such as `fields.asSightseeing` and `fields.asMeal`.
 
-Keep shared fields outside the union and validate each branch in its own schema. See [how it works](docs/how-it-works) for the role of `VariantRef`.
+Keep shared fields outside the union and validate each branch in its own schema. See [how it works](docs/how-it-works) for the role of `VariantFieldRef`.

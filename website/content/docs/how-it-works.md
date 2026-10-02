@@ -20,7 +20,7 @@ email.error;
 
 - `StrictFieldRef<Root, Value>` addresses a root field that always exists.
 - `FieldRef<Root, Value>` can stop resolving if a row or nullable object disappears.
-- `VariantRef<Sum, Variant>` resolves only while a union contains that variant.
+- `VariantFieldRef<Sum, Variant>` resolves only while a union contains that variant.
 
 The generator chooses the appropriate reference type. A deleted list row therefore produces an unresolved field instead of a stale write.
 

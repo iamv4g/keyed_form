@@ -42,7 +42,7 @@ asyncValidators: [
         list: DayFields.activities,
         rules: [
           .field(
-            field: VariantRef<ActivitySchema, SightseeingActivitySchema>.type()
+            field: VariantFieldRef<ActivitySchema, SightseeingActivitySchema>.type()
                 .then(SightseeingActivityFields.place),
             validate: (_, place) => api.checkPlace(place),
           ),
