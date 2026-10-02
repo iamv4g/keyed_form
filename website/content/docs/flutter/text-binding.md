@@ -3,7 +3,7 @@ title: Text fields and bindings
 description: Keep text editing controllers synchronized with form state without disrupting caret or IME input.
 ---
 
-`KeyedFormField.text<Root>` combines a typed form field with a managed `TextEditingController`. The builder receives the field state and controller; use the controller on the text widget and render `errorText` as usual. The binding lifecycle follows the field widget and cleans up its controller when disposed. See the working [login text field source](https://github.com/tastech-sakura/keyed_form/blob/main/packages/keyed_form_flutter/example/lib/login/login_text_field.dart).
+`KeyedFormField.text<Root>` combines a typed form field with a managed `TextEditingController`. The builder receives the field state and controller; use the controller on the text widget and render `errorText` as usual. The binding lifecycle follows the field widget and cleans up its controller when disposed. See the working [login text field source](https://github.com/iamv4g/keyed_form/blob/main/packages/keyed_form_flutter/example/lib/login/login_text_field.dart).
 
 ```dart
 KeyedFormField.text<LoginSchema>(
