@@ -18,7 +18,7 @@ class _LoginTextField extends StatelessWidget {
       builder: (context, f, controller) => TextField(
         controller: controller,
         obscureText: obscureText,
-        onTapOutside: (_) => f.onBlur(),
+        onTapOutside: (_) => FocusScope.of(context).unfocus(),
         decoration: InputDecoration(
           labelText: label,
           errorText: f.errorText,

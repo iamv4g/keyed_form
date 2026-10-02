@@ -37,4 +37,9 @@ For user-facing messages, a rule-specific error takes priority over the validato
 
 Use `validateMap` / `validateValues` for synchronous predicates and `validateMapAsync` / `validateValuesAsync` if a reachable predicate can be asynchronous. Calling synchronous validation when an async predicate is reached throws `KSAsyncValidationError`; it is not treated as a normal invalid value.
 
-Schema-level async predicates are distinct from controller field checks. A controller's resolver is synchronous, so do not assign generated `validateDataAsync` to `resolver` or expect the controller to await it. For remote availability or other network checks, use the controller's `FieldHandle.validateAsync` workflow documented in [Form State async validation](docs/form-state/async-validation).
+Schema-level async predicates are distinct from controller validation. The
+controller resolver is synchronous, so do not assign generated
+`validateDataAsync` to `resolver` or expect the controller to await it. For
+remote availability checks, declare a typed
+`KeyedFormAsyncValidator.field` (or nested `.forEach`) rule; see
+[Form State async validation](docs/form-state/async-validation).

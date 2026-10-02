@@ -10,6 +10,11 @@ class Pair {
 
 final _aKey = FieldKey.name('a');
 final _bKey = FieldKey.name('b');
+final _aRef = StrictFieldRef<Pair, String>.of(
+  key: _aKey,
+  get: (pair) => pair.a,
+  set: (pair, value) => Pair(a: value, b: pair.b),
+);
 
 FieldErrors<String> _resolve(Pair p, FieldKey? scope) => FieldErrors({
   if (p.a.isEmpty) _aKey: 'a required',
@@ -157,5 +162,39 @@ void main() {
     expect(ok, isFalse);
     expect(seenKeys?.map((k) => k.toPath()), ['b']);
     expect(bFocus.hasFocus, isFalse, reason: 'default reveal did not run');
+  });
+  testWidgets('handleSubmit forwards technical failures separately', (
+    tester,
+  ) async {
+    final bFocus = FocusNode();
+    addTearDown(bFocus.dispose);
+    final form = KeyedFormController<Pair>(
+      initialValue: const Pair(a: 'x', b: 'y'),
+      resolver: _resolve,
+      asyncValidators: [
+        .field(field: _aRef, validate: (_, _) => throw StateError('offline')),
+      ],
+    );
+    KeyedFormValidationResult? unavailable;
+    var saved = false;
+    late BuildContext submitContext;
+    await tester.pumpWidget(
+      _form(
+        form: form,
+        bFocus: bFocus,
+        captureContext: (context) => submitContext = context,
+      ),
+    );
+
+    final didSubmit = await form.handleSubmit(
+      submitContext,
+      (_) => saved = true,
+      onValidationUnavailable: (result) => unavailable = result,
+    );
+
+    expect(didSubmit, isFalse);
+    expect(saved, isFalse);
+    expect(unavailable?.status, KeyedFormValidationStatus.unavailable);
+    expect(unavailable?.failures.keys, contains(_aKey));
   });
 }

@@ -3,11 +3,17 @@ description: >-
   A form-state controller for immutable aggregates, built on keyed_form_core:
   holds the working draft, FieldKey-addressed validation errors and
   touched/dirty/submit state.
-version: 0.1.0
+version: 0.2.0
 
 homepage: https://github.com/iamv4g/keyed_form
 repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form
 issue_tracker: https://github.com/iamv4g/keyed_form/issues
+topics:
+  - dart
+  - form
+  - validation
+  - state-management
+  - async
 
 environment:
   sdk: ^3.10.0
@@ -15,7 +21,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  keyed_form_core: ^0.1.0
+  keyed_form_core: ^0.2.0
   listen: ^1.0.1
   meta: ^1.11.0
 

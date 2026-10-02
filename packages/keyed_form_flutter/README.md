@@ -10,12 +10,12 @@ each field with `KeyedFormField`. Re-exports all of `keyed_form` (and thus
 
 ```yaml
 dependencies:
-  keyed_form_flutter: ^0.1.0
-  keyed_form_schema: ^0.1.0
+  keyed_form_flutter: ^0.2.0
+  keyed_form_schema: ^0.2.0
 
 dev_dependencies:
   build_runner: ^2.15.0
-  keyed_form_gen: ^0.1.0
+  keyed_form_gen: ^0.2.0
 ```
 
 ## Quick start
@@ -68,8 +68,11 @@ KeyedForm<SignupSchema>(
         field: SignupFields.email,
         builder: (context, state, controller) => TextField(
           controller: controller,
-          onTapOutside: (_) => state.onBlur(),
-          decoration: InputDecoration(labelText: 'Email', errorText: state.errorText),
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+          decoration: InputDecoration(
+            labelText: 'Email',
+            errorText: state.errorText,
+          ),
         ),
       ),
       KeyedFormField.text<SignupSchema>(
@@ -77,8 +80,11 @@ KeyedForm<SignupSchema>(
         builder: (context, state, controller) => TextField(
           controller: controller,
           obscureText: true,
-          onTapOutside: (_) => state.onBlur(),
-          decoration: InputDecoration(labelText: 'Password', errorText: state.errorText),
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+          decoration: InputDecoration(
+            labelText: 'Password',
+            errorText: state.errorText,
+          ),
         ),
       ),
       // handleSubmit needs a context from *inside* the tree KeyedForm builds
@@ -100,9 +106,13 @@ KeyedForm<SignupSchema>(
 form.dispose();
 ```
 
-Nothing is shown as invalid until a field is touched (in `onTouched` mode,
-that means blurred) — a submit attempt always makes every error visible,
-regardless of mode.
+In `onTouched` mode, blur starts validation and later edits to a blurred field
+revalidate it. Submit always validates the current draft. `KeyedFormField`
+automatically reports focus leaving its widget subtree; ordinary text fields
+need no `Focus` wrapper. `onTapOutside` only unfocuses the text input. For a
+control whose logical focus extends into an overlay, set
+`autoDetectBlur: false` and call `state.onBlur()` when that logical interaction
+ends. Enter does not count as blur.
 
 ### Context and `handleSubmit`
 
@@ -134,6 +144,7 @@ field inside it — handles edits within a row.
 
 ## More
 
+- [Full documentation, guides, and examples](https://keyed-form.v4g.space).
 - [`skills/keyed_form/SKILL.md`](https://github.com/iamv4g/keyed_form/blob/main/skills/keyed_form/SKILL.md) — the
   full API reference: cross-field and async validation, read-only fields,
   derived fields, scroll-to-first-error in a lazy list, and more.
@@ -152,27 +163,20 @@ field inside it — handles edits within a row.
 | `KeyedFormSelector<Root, T>` | The `context.selectForm` above wrapped in a widget, to scope the rebuild to a subtree, with a non-rebuilt `child` |
 | `KeyedFormBuilder<Root>` | Rebuilds on *every* controller change — the escape hatch for a widget that genuinely needs the whole state (a live inspector) |
 | `KeyedTextBinding` | A `TextEditingController` two-way bound to an external string value, keeping the caret and IME composing region stable as the value round-trips through the form controller. Design-system agnostic |
-| `form.handleSubmit(context, onValid, {onInvalid})` | Validates, and on success runs `onValid` with the draft while toggling `submitting` — see below |
-| `KeyedFieldRegistry` / `KeyedFieldAnchor` | Maps `FieldKey`s to live field positions so a form can scroll to (and focus) a field it only knows by identity; `handleSubmit` uses this for you — reach for it directly only for a custom `onInvalid` |
+| `form.handleSubmit(context, onValid, {onInvalid, onValidationUnavailable})` | Validates, awaits async rules and runs `onValid` only when allowed; see below |
+| `KeyedFieldRegistry` / `KeyedFieldAnchor` | Maps `FieldKey`s to live field positions so a form can reveal and focus a mounted field |
 
 **`KeyedFormField`** rebuilds only when that field's value, visible error,
-`isValidating`, `isFailedValidation`, or `isReadOnly` changes.
+`isValidating`, `isFailedValidation`, or `isReadOnly` changes. Rerun a
+configured rule explicitly with `form.field(ref).validate()`.
 `KeyedFormField.text` bundles a `KeyedTextBinding` for a `String` field.
-Wraps its builder output in a `KeyedFieldAnchor` automatically
-(`anchor: false` to opt out) so it participates in scroll-to-first-error
-without extra wiring. `KeyedFieldState.isValidating` mirrors
-`form.field(ref).isValidating` — render a spinner from it while a field's
-own async check (`form.field(ref).validateAsync(...)`) is running;
-`isFailedValidation` mirrors a check that threw or timed out (distinct from
-`errorText`); `isReadOnly` mirrors a frozen field — pair it with
-`enabled: !state.isReadOnly` on the wrapped widget (`onChanged` stays safe
-to wire unconditionally, since the controller already no-ops a frozen
-write).
+The builder output is anchored automatically (`anchor: false` opts out).
 
-**`handleSubmit`** — on failure its default `onInvalid` reveals the first
-visible error via the ambient `KeyedFieldRegistry`. Pass `onInvalid` to
-override for custom invalid-handling (e.g. scrolling a lazily-built section
-list first).
+**`handleSubmit`** — value errors use `onInvalid`, whose default reveals the
+first visible error through the ambient registry. Blocking technical failures
+use `onValidationUnavailable`; the default also reveals their fields. An
+explicit callback replaces the default reveal for its outcome. See
+[submit and scroll to error](https://github.com/iamv4g/keyed_form/tree/main/website/content/docs/flutter/scroll-to-first-error.md).
 
 ## Scope
 

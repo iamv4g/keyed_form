@@ -1,7 +1,7 @@
 // The shared "field reference" vocabulary the whole keyed_form family speaks.
 //
 // `keyed_form_core` sits on `keyed_lens` but never says "lens": a field is a
-// `FieldRef` / `StrictFieldRef` / `VariantRef`, and per-field data (errors,
+// `FieldRef` / `StrictFieldRef` / `VariantFieldRef`, and per-field data (errors,
 // dirty flags, …) lives in a `FieldErrors` sidecar looked up *by that same
 // ref*. This is exactly the shape `keyed_form_gen` emits — written by hand
 // here so you can see it.

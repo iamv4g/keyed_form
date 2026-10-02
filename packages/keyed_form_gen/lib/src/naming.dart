@@ -32,7 +32,7 @@ String getFieldsClassName(String name, String suffix) {
   return '${name}Fields';
 }
 
-/// The library-private holder class for a union's per-variant [VariantRef]s
+/// The library-private holder class for a union's per-variant [VariantFieldRef]s
 /// (e.g. `_SectionVariants`). Only the generated `.asX` narrower getters
 /// reference it.
 String getVariantsClassName(String name, String suffix) {

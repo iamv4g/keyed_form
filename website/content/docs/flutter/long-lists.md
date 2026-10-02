@@ -30,6 +30,6 @@ KeyedFieldList<TourSchema, StopSchema>(
 )
 ```
 
-A `KeyedFieldList` rebuilds when rows are added, removed, or reordered; it does not rebuild just because a field inside a row changed. The provided `KeyedFormList` supports collection operations while generated field references address nested data by row identity. See the [packing-list walkthrough](docs/guides/dynamic-lists) and the [packing example source](https://github.com/tastech-sakura/keyed_form/tree/main/packages/keyed_form_flutter/example/lib/packing_list).
+A `KeyedFieldList` rebuilds when rows are added, removed, or reordered; it does not rebuild just because a field inside a row changed. The provided `KeyedFormList` supports collection operations while generated field references address nested data by row identity. See the [packing-list walkthrough](docs/guides/dynamic-lists) and the [packing example source](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter/example/lib/packing_list).
 
 A mounted field can be revealed precisely on submit. An unbuilt lazy row has no anchor yet, so long-list error navigation needs the application's coarse section scroll before registry reveal; see [submit and scroll to error](docs/flutter/scroll-to-first-error).

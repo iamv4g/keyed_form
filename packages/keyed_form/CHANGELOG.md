@@ -1,3 +1,21 @@
+## 0.2.0
+
+Breaking validation lifecycle update.
+
+- Declarative typed asynchronous rules via `KeyedFormAsyncValidator.field` and
+  `.forEach`; `validate()` and `validateScopes()` now return structured
+  `KeyedFormValidationResult` values and always await configured rules.
+- `submit()` always validates a fresh draft snapshot. Value errors route to
+  `onInvalid`; blocking technical failures route to
+  `onValidationUnavailable` and never call `onValid`.
+- Async technical failures are separate from value errors. The default policy
+  blocks submission; individual rules can opt into `allowSubmit`.
+- Validation modes now trigger validation as well as control visibility.
+  `onSubmit` is the default; `reValidateMode` defaults to `onChange`.
+- Removed manual `FieldHandle.validateAsync`, `setFieldValidating`, and
+  `validateFieldAsync` APIs. Configure rules on the controller instead.
+- Add pub.dev topics for package discoverability.
+
 ## 0.1.0
 
 Initial release.

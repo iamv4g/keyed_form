@@ -19,7 +19,7 @@ typedef KeyedFormResolver<Root> =
     FieldErrors<String> Function(Root draft, FieldKey? scope);
 
 /// Maps a just-written field's [FieldKey] to the subtree the controller should
-/// re-validate, or `null` to fall back to a whole-draft validation.
+/// re-validate, or `null` to skip automatic validation for that write.
 ///
 /// Per-day editors pass `(key) => key.prefix(2)` so a write anywhere inside
 /// `days.[id]. …` re-validates just that day.

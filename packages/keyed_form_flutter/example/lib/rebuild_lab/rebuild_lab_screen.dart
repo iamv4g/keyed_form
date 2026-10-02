@@ -135,7 +135,7 @@ class _RebuildLabScreenState extends State<RebuildLabScreen> {
                         _fieldRebuilds[i]++;
                         return TextField(
                           controller: controller,
-                          onTapOutside: (_) => f.onBlur(),
+                          onTapOutside: (_) => FocusScope.of(context).unfocus(),
                           decoration: InputDecoration(
                             isDense: true,
                             labelText:

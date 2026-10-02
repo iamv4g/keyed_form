@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:keyed_form_core/keyed_form_core.dart';
 
 import 'keyed_form_controller.dart';
+import 'keyed_form_validation_result.dart';
 import 'keyed_form_list.dart';
 
 /// A per-field facade over [KeyedFormController], addressed by a [FieldRef] and
@@ -43,9 +44,9 @@ class FieldHandle<Root, V> {
   /// Whether this field is currently mid-async-validation.
   bool get isValidating => _form.isValidating(_ref.key);
 
-  /// Whether this field's last [validateAsync] ended in a technical failure
-  /// (threw, or exceeded its timeout) rather than a verdict about the value —
-  /// see [KeyedFormController.isFailedValidation].
+  /// Whether this field's latest configured async rule ended in a technical
+  /// failure (threw or timed out), rather than a value verdict — see
+  /// [KeyedFormController.isFailedValidation].
   bool get isFailedValidation => _form.isFailedValidation(_ref.key);
 
   /// Whether this field is frozen against [set] / [update] — see
@@ -72,18 +73,9 @@ class FieldHandle<Root, V> {
   /// Unfreezes the field. See [KeyedFormController.unmarkReadOnly].
   void unmarkReadOnly() => _form.unmarkReadOnly(_ref.key);
 
-  /// Runs [check] as this field's async validation — see
-  /// [KeyedFormController.validateFieldAsync].
-  Future<void> validateAsync(
-    FutureOr<String?> Function() check, {
-    Duration? timeout,
-    void Function(Object error, StackTrace stackTrace)? onFailure,
-  }) => _form.validateFieldAsync(
-    _ref.key,
-    check,
-    timeout: timeout,
-    onFailure: onFailure,
-  );
+  /// Runs this field's configured asynchronous rules, independent of mode.
+  Future<KeyedFormValidationResult> validate() =>
+      _form.validateScopes([_ref.key]);
 }
 
 /// `form.field(ref)` — the entry point to [FieldHandle].

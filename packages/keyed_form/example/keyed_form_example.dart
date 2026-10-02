@@ -120,7 +120,7 @@ FieldErrors<String> validateTour(TourForm draft, FieldKey? scope) {
   return FieldErrors(errors);
 }
 
-void main() {
+Future<void> main() async {
   final form = KeyedFormController<TourForm>(
     initialValue: const TourForm(
       title: 'Kyoto in autumn',
@@ -134,25 +134,25 @@ void main() {
   //    field's value, so `title.set(1000)` would not compile.
   final title = form.field(TourFields.title);
 
-  // Write a bad value. The error is in the map immediately, but not yet
-  // *visible* under onTouched — the field hasn't been touched.
+  // Writing does not run validation until this field is blurred.
   title.set('Ky');
-  print(form.errors(TourFields.title)); // Title needs at least 3 characters
+  print(form.errors(TourFields.title)); // null before blur
   print(title.error); // null
 
   title.touch();
   print(title.error); // Title needs at least 3 characters
 
   title.set('Kyoto in early autumn');
-  print(title.error); // null — fixed
+  print(title.error); // null — fixed after the first blur
 
   // 2. Field-array editing, by id (the `useFieldArray` analogue).
   final stops = form.field(TourFields.stops).list();
   stops.append(const Stop(clientId: 'b', city: '', nights: 20));
   print(form.value.stops.length); // 2
 
-  // 3. Whole-draft validate — sets `submitted`, so every error shows.
-  print('valid: ${form.validate()}'); // valid: false
+  // 3. Explicit validation reveals the result but does not mark submit attempted.
+  var result = await form.validate();
+  print('valid: ${result.isValid}'); // valid: false
   for (final key in form.visibleErrorKeys) {
     print('  ${key.toPath()}: ${form.errors.byKey(key)}');
   }
@@ -161,7 +161,8 @@ void main() {
 
   // 4. Fix the offending row and revalidate.
   stops.updateById('b', (s) => s.copyWith(city: 'Nara', nights: 2));
-  print('valid: ${form.validate()}'); // valid: true
+  result = await form.validate();
+  print('valid: ${result.isValid}'); // valid: true
 
   // 5. Dirty tracking, against the value the form was seeded with.
   print(

@@ -16,6 +16,6 @@ The Flutter package re-exports the shared `keyed_form` API, so most applications
 | `KeyedFormSelector<Root, T>`, `KeyedFormBuilder<Root>` | Scope a selected dependency to a subtree, or observe every controller change. | [Selective rebuilds](docs/flutter/reactivity) |
 | `KeyedFieldList<Root, Item>` | Render keyed rows and obtain `KeyedFormList` collection operations. | [Lists and virtualization](docs/flutter/long-lists) |
 | `KeyedFieldRegistry.revealFirst(keys, ...)` | Reveal/focus the first mounted matching field anchor. | [Submit and scroll to error](docs/flutter/scroll-to-first-error) |
-| `KeyedFormController.handleSubmit(context, onValid, onInvalid:, duration:, alignment:)` | Submit with descendant context; default invalid handling reveals first visible error. | [Submit and scroll to error](docs/flutter/scroll-to-first-error) |
+| `KeyedFormController.handleSubmit(context, onValid, {onInvalid, onValidationUnavailable, duration:, alignment:})` | Fresh validation; value errors and blocking technical failures have separate callbacks, each with default reveal behavior. | [Submit and scroll to error](docs/flutter/scroll-to-first-error) |
 
 For shared controller lifecycle, validation, and relation APIs, see [Form State API](docs/form-state/api-reference). For generated field references and schema builders, see [Schema](docs/schema).

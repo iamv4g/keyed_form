@@ -24,7 +24,7 @@ class _PackingRow extends StatelessWidget {
             field: fields.label,
             builder: (context, f, controller) => TextField(
               controller: controller,
-              onTapOutside: (_) => f.onBlur(),
+              onTapOutside: (_) => FocusScope.of(context).unfocus(),
               decoration: InputDecoration(
                 labelText: 'Item',
                 errorText: f.errorText,

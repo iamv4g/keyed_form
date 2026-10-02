@@ -1,18 +1,18 @@
 import 'package:flutter/widgets.dart';
 import 'package:keyed_form/keyed_form.dart';
 
-import 'keyed_text_binding.dart';
 import 'keyed_field_registry.dart';
 import 'keyed_form.dart';
+import 'keyed_text_binding.dart';
 
 /// Everything a field widget needs, computed from the ambient [KeyedFormController]
 /// for one [FieldRef] — the analogue of react-hook-form's `useController`
 /// result.
 ///
-/// [KeyedFormField] wraps the builder output in a [KeyedFieldAnchor] itself
-/// (unless `anchor: false`), so a field widget no longer has to forward a
-/// registry or field key to opt into scroll-to-error. Wire [onBlur] to the
-/// wrapped control's focus-lost for touch-on-blur.
+/// [KeyedFormField] wraps the builder output in a non-focusable [Focus]
+/// boundary and, unless `anchor: false`, a [KeyedFieldAnchor]. Focus loss marks
+/// the field touched automatically; set `autoDetectBlur: false` for controls
+/// that report their own logical blur through [KeyedFieldState.onBlur].
 @immutable
 class KeyedFieldState<V> {
   const KeyedFieldState({
@@ -32,8 +32,12 @@ class KeyedFieldState<V> {
   /// Writes a new value into the form (revalidates, notifies).
   final ValueChanged<V> onChanged;
 
-  /// Marks the field touched — wire to the wrapped control's focus-lost, or
-  /// call it directly for a control that commits on close (a picker dialog).
+  /// Marks the field touched. Called automatically when focus leaves the
+  /// field's focus subtree unless [KeyedFormField.autoDetectBlur] is disabled.
+  ///
+  /// Call it directly for controls with a separate logical focus lifecycle,
+  /// such as a picker that remains open in an overlay. The callback is inert
+  /// after this field is disposed or its binding no longer resolves.
   final VoidCallback onBlur;
 
   /// The visible, translated error, or `null` — render this directly.
@@ -44,15 +48,13 @@ class KeyedFieldState<V> {
   final FieldKey fieldKey;
 
   /// Whether this field is currently mid-async-validation — render a spinner
-  /// alongside the control while this is `true`. Set it around your own
-  /// async check with `form.field(ref).validateAsync(...)` (or the
-  /// lower-level `form.setFieldValidating(key, ...)`).
+  /// alongside the control while this is `true`. Async rules are configured
+  /// through the controller's `asyncValidators`.
   final bool isValidating;
 
-  /// Whether this field's last `validateAsync` call ended in a technical
-  /// failure (it threw, or exceeded its timeout) rather than a verdict about
-  /// the value — render a retry affordance from this, distinct from
-  /// [errorText]. See `KeyedFormController.isFailedValidation`.
+  /// Whether this field's latest configured async rule ended in a technical
+  /// failure (threw or timed out) rather than a value verdict — render a retry
+  /// affordance from this, distinct from [errorText].
   final bool isFailedValidation;
 
   /// Whether this field is frozen against writes — pass `enabled: !isReadOnly`
@@ -66,6 +68,11 @@ class KeyedFieldState<V> {
 /// rebuilds **only** when that field's value or visible error changes — a
 /// write to a sibling field does not rebuild this one.
 ///
+/// Focus leaving the builder output's widget subtree calls
+/// [KeyedFieldState.onBlur] by default. Set [autoDetectBlur] to `false` when a
+/// control's logical focus extends outside that subtree, and call `onBlur`
+/// explicitly at the logical boundary.
+///
 /// The builder output is wrapped in a [KeyedFieldAnchor] (registered under the
 /// field's key against the scope's [KeyedFieldRegistry]) so revealing the first
 /// validation error can scroll to it. Pass `anchor: false` for a field that is
@@ -77,7 +84,6 @@ class KeyedFieldState<V> {
 ///   builder: (context, f) => TextInput(
 ///     value: f.value ?? '',
 ///     onChanged: f.onChanged,
-///     onTouched: f.onBlur,
 ///     errorText: f.errorText,
 ///     label: Text('Description'),
 ///   ),
@@ -88,6 +94,7 @@ class KeyedFormField<Root, V> extends StatefulWidget {
     required this.field,
     required this.builder,
     this.anchor = true,
+    this.autoDetectBlur = true,
     super.key,
   });
 
@@ -98,12 +105,17 @@ class KeyedFormField<Root, V> extends StatefulWidget {
   /// to it. `false` opts out — for a field that can never hold the first error.
   final bool anchor;
 
+  /// Whether to call [KeyedFieldState.onBlur] when focus leaves this field's
+  /// widget subtree. Disable for controls that report logical blur manually.
+  final bool autoDetectBlur;
+
   /// A [KeyedFormField] for a `String` field that bundles a [KeyedTextBinding],
   /// so the builder gets a ready `TextEditingController`.
   static Widget text<Root>({
     Key? key,
     required FieldRef<Root, String> field,
     bool anchor = true,
+    bool autoDetectBlur = true,
     required Widget Function(
       BuildContext context,
       KeyedFieldState<String> state,
@@ -114,6 +126,7 @@ class KeyedFormField<Root, V> extends StatefulWidget {
     key: key,
     field: field,
     anchor: anchor,
+    autoDetectBlur: autoDetectBlur,
     builder: (context, state) => KeyedTextBinding(
       value: state.value ?? '',
       onChanged: state.onChanged,
@@ -134,6 +147,8 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
   Object? _lastValue;
   String? _lastError;
   bool _hasField = true;
+  late final VoidCallback _onBlur = _handleBlur;
+  bool _hasSubtreeFocus = false;
   bool _lastValidating = false;
   bool _lastFailed = false;
   bool _lastReadOnly = false;
@@ -176,10 +191,26 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
     }
   }
 
+  void _handleBlur() {
+    if (!mounted) return;
+    final controller = _controller;
+    if (controller == null || !widget.field.existsIn(controller.value)) return;
+    controller.touch(widget.field.key);
+  }
+
+  void _handleFocusChange(bool hasFocus) {
+    final wasFocused = _hasSubtreeFocus;
+    _hasSubtreeFocus = hasFocus;
+    if (wasFocused && !hasFocus && widget.autoDetectBlur && _hasField) {
+      _onBlur();
+    }
+  }
+
   void _readSnapshot() {
     final controller = _controller;
     if (controller == null) return;
     _hasField = widget.field.existsIn(controller.value);
+    if (!_hasField) _hasSubtreeFocus = false;
     _lastValue = widget.field.getOrNull(controller.value);
     final raw = controller.visibleError(widget.field.key);
     _lastError = raw == null ? null : _translate(context, raw);
@@ -203,7 +234,7 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
       KeyedFieldState<V>(
         value: _lastValue as V?,
         onChanged: (v) => controller.field(widget.field).set(v),
-        onBlur: () => controller.touch(widget.field.key),
+        onBlur: _onBlur,
         errorText: _lastError,
         fieldKey: widget.field.key,
         isValidating: _lastValidating,
@@ -211,11 +242,18 @@ class _KeyedFormFieldState<Root, V> extends State<KeyedFormField<Root, V>> {
         isReadOnly: _lastReadOnly,
       ),
     );
-    if (!widget.anchor) return child;
+    final focusBoundary = Focus(
+      canRequestFocus: false,
+      skipTraversal: true,
+      includeSemantics: false,
+      onFocusChange: _handleFocusChange,
+      child: child,
+    );
+    if (!widget.anchor) return focusBoundary;
     return KeyedFieldAnchor(
       registry: _registry!,
       fieldKey: widget.field.key,
-      child: child,
+      child: focusBoundary,
     );
   }
 }

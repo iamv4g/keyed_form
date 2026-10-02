@@ -22,8 +22,9 @@ final currentStepKeys = <FieldKey>[
   CheckoutFields.address.key,
 ];
 
-void nextStep() {
-  if (form.validateScopes(currentStepKeys).isEmpty) {
+Future<void> nextStep() async {
+  final result = await form.validateScopes(currentStepKeys);
+  if (result.isValid) {
     setState(() => currentStep++);
   }
 }
@@ -33,6 +34,14 @@ Future<void> finish(BuildContext context) async {
 }
 ```
 
-`CheckoutSchema.scopeOf` is only an example when generated scopes correspond to your wizard's units. If they do not, define a mapping from each written `FieldKey` to its step's scope and ensure the resolver validates that subtree. `validateScopes` force-reveals requested scopes and returns the scopes that still fail; the explicit result check works even in `onSubmit` visibility mode. Do not use an error that happens to be visible after touching fields as the gate for advancing.
+`CheckoutSchema.scopeOf` is only an example when generated scopes correspond
+to your wizard's units. If they do not, define a mapper from each written
+`FieldKey` to its step scope and ensure the resolver validates that subtree.
+`validateScopes` force-reveals requested scopes and returns a structured
+`KeyedFormValidationResult`; gate on `result.isValid`, not on visibility.
 
-The final action uses `submit`, which performs full-draft validation before invoking the callback; a valid current step does not imply that later steps are valid. Keep the controller alive for the whole wizard and dispose it with its owner. See [Validation and visibility](docs/form-state/validation) and [Flutter submit behavior](docs/flutter/scroll-to-first-error).
+The final action uses `submit`, which performs fresh full-draft validation
+before invoking the callback; a valid current step does not imply later steps
+are valid. Keep the controller alive for the whole wizard and dispose it with
+its owner. See [Validation and visibility](docs/form-state/validation) and
+[Flutter submit behavior](docs/flutter/scroll-to-first-error).

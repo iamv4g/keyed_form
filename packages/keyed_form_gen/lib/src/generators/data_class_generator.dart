@@ -173,7 +173,7 @@ class DataClassGenerator {
         final variantClass = entry.value;
         buffer.writeln(
           '  static final $variantKey = '
-          'VariantRef<$name, ${variantClass.name}>.type();',
+          'VariantFieldRef<$name, ${variantClass.name}>.type();',
         );
       }
     }

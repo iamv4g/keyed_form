@@ -8,7 +8,7 @@ flutter run -d chrome         # or macos / windows / linux / a device
 | Screen | File | Shows |
 |---|---|---|
 | Sign in | [`lib/login/login_form.dart`](lib/login/login_form.dart) | text fields in `onTouched` mode, a shared field widget, `handleSubmit` |
-| Email check | [`lib/email_check/email_check_screen.dart`](lib/email_check/email_check_screen.dart) | async validation (`validateAsync`, `isValidating` / `isFailedValidation`) |
+| Email check | [`lib/email_check/email_check_screen.dart`](lib/email_check/email_check_screen.dart) | declarative async rules, focus-loss validation, separate technical-failure retry |
 | Invoice | [`lib/invoice/invoice_screen.dart`](lib/invoice/invoice_screen.dart) | `markReadOnly` / `force: true`, a derived field (`addRelation`) |
 | Packing list | [`lib/packing_list/packing_list.dart`](lib/packing_list/packing_list.dart) | `KeyedFieldList` bound directly to a list field, reordered by drag and drop |
 | Itinerary | [`lib/itinerary/itinerary_screen.dart`](lib/itinerary/itinerary_screen.dart) | a schema nested two levels deep, with a discriminated union at the leaf |

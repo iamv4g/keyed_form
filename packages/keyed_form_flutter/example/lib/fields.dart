@@ -28,7 +28,7 @@ class KeyedText<R> extends StatelessWidget {
     builder: (context, f, controller) => TextField(
       controller: controller,
       enabled: !f.isReadOnly,
-      onTapOutside: (_) => f.onBlur(),
+      onTapOutside: (_) => FocusScope.of(context).unfocus(),
       minLines: maxLines > 1 ? maxLines : null,
       maxLines: maxLines,
       decoration: InputDecoration(
@@ -56,6 +56,7 @@ class KeyedDropdown<R, T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => KeyedFormField<R, T>(
+    autoDetectBlur: false,
     field: field,
     builder: (context, f) => InputDecorator(
       decoration: InputDecoration(
@@ -97,6 +98,7 @@ class KeyedSwitch<R> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => KeyedFormField<R, bool>(
+    autoDetectBlur: false,
     field: field,
     anchor: false,
     builder: (context, f) => SwitchListTile(
@@ -132,6 +134,7 @@ class KeyedStepper<R> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => KeyedFormField<R, int>(
+    autoDetectBlur: false,
     field: field,
     builder: (context, f) {
       final value = f.value ?? min;

@@ -3,42 +3,74 @@ title: Validation and visibility
 description: Configure a synchronous resolver, scoped revalidation, modes, and error reveal behavior.
 ---
 
-A controller resolver has the synchronous shape `(Root draft, FieldKey? scope) -> FieldErrors<String>`. A `null` scope means validate the whole draft; a non-null scope means return only errors at or below that key. When scoped, the controller replaces errors under that scope and preserves other scopes' errors. A resolver returning keys outside the requested scope violates the contract (asserted in debug builds).
-
-Generated schemas provide `validateData` and `scopeOf`. Configure them together:
+A resolver has the synchronous shape `(Root draft, FieldKey? scope) ->
+FieldErrors<String>`. `null` scope means validate the full draft; a non-null
+scope replaces errors under that key and preserves unrelated scopes.
+Generated schemas provide `validateData` and `scopeOf`:
 
 ```dart
 final form = KeyedFormController<InvoiceSchema>(
   initialValue: InvoiceSchema.create(),
   mode: KeyedFormMode.onTouched,
-  resolver: (draft, scope) => InvoiceSchema.validateData(draft, scope: scope),
+  resolver: InvoiceSchema.validateData,
   scopeOf: InvoiceSchema.scopeOf,
 );
 ```
 
-If `scopeOf` is omitted, a write revalidates the full draft. With it, the controller asks for the subtree containing the written key. `scopeOf` returning `null` for a write means skip scoped revalidation for that write. See [Schema refinements](docs/schema/refinements) for rule declaration and [Code generation](docs/schema/code-generation) for generated resolver APIs.
+If `scopeOf` is omitted, an automatic write validates the full draft. If the
+mapper returns `null`, that automatic write is skipped. For generated
+positional models, use the scope mapper exposed by the generated API (for
+example `InvoiceSchema.scopeOf`), not a handwritten tuple-position guess.
 
-## Error visibility modes
+## Validation and reveal are separate
 
-`KeyedFormMode` is chosen in the constructor and is final:
+`validate()` validates the full draft, awaits configured async rules, and
+returns a `KeyedFormValidationResult` with `status`, `errors`, and
+`failures`. It reveals the result but does not set `submitted`.
+`validateScopes(scopes)` validates those subtrees and returns the same
+structured result; inspect `result.errors` or `result.isValid`, not a list of
+failing scope keys. `reveal(scopes)` only changes visibility and does not run
+validation.
 
-| Mode | Visibility behavior |
-|---|---|
-| `onChange` | A write touches its field, so errors show as soon as the changed field has an error. |
-| `onBlur` | Errors show after touch; Flutter bindings mark touch on blur. |
-| `onTouched` | Same controller visibility rule as `onBlur`; Flutter keeps a blurred field's errors current while typing. |
-| `onSubmit` | Errors show after a submit attempt, unless explicitly revealed earlier. |
-| `all` | Every existing error is visible immediately. |
+## Trigger modes
 
-`errors` is the full raw error map independent of display mode. `visibleError(key)`, `visibleErrorFor(ref)`, `visibleErrorKeys`, and `visibleErrorUnder(root)` apply visibility policy. `validate()` performs whole-draft validation and sets `submitted`, so all errors become visible. `reveal(scopes)` reveals existing errors without re-running the resolver.
+The constructor mode determines which user events run validation. Initial
+values, `seed`, and `reset` do not eagerly validate.
 
-## Validate selected scopes
+| Mode | Before first submit | After submit |
+|---|---|---|
+| `onSubmit` | No automatic validation | `reValidateMode` (`onChange` by default) |
+| `onChange` | Validate after writes | `reValidateMode` (`onChange` by default) |
+| `onBlur` | Validate on blur | `reValidateMode` (`onChange` by default) |
+| `onTouched` | Validate on first blur, then after writes to touched fields | `reValidateMode` (`onChange` by default) |
+| `all` | Validate after writes and blur | Continue both triggers |
 
-`validateScopes(scopes)` revalidates each specified subtree, force-reveals each it inspects, and returns the scopes that still contain errors. This return value is useful for step-by-step forms even in `onSubmit` mode: gate advancing on an empty failing-scope list, rather than testing whether errors happen to be visible. At final submission, validate the entire draft so cross-step rules are included.
+`onBlur` and `onTouched` require the UI to report actual focus loss.
+`touch()` is that blur signal: it records interaction and runs blur validation
+when the configured mode calls for it; it is not an independent force-reveal.
+Flutter's `KeyedFormField` reports focus leaving its widget subtree by
+default. Set `autoDetectBlur: false` when a control owns a wider logical focus
+boundary, then call `KeyedFieldState.onBlur` at that boundary. Do not wire
+`onTapOutside` or Enter directly to blur.
+
+`reValidateMode` is independently configurable as `onChange`, `onBlur`, or
+`onSubmit`. `onSubmit` means no automatic revalidation after submit; `all`
+continues both event triggers.
+
+## Selected scopes
+
+`validateScopes(scopes)` is useful for wizard steps or dirty-row checks:
 
 ```dart
-final failingSteps = form.validateScopes([InvoiceFields.billingAddress.key]);
-if (failingSteps.isEmpty) advance();
+final result = await form.validateScopes([
+  InvoiceFields.billingAddress.key,
+]);
+if (result.isValid) advance();
 ```
 
-The resolver stays synchronous; do not pass `validateDataAsync` as the controller resolver. For a server/network check on one field use [Async validation](docs/form-state/async-validation), which is a distinct lifecycle.
+Use full `validate()` on final submission so cross-step rules are included.
+Scoped resolver output can contain ancestor errors; the result filters to
+errors related to the requested scopes.
+
+Async rules and the submit decision are described in
+[Async validation](docs/form-state/async-validation).

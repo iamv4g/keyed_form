@@ -3,11 +3,16 @@ description: >-
   Composable total and affine lenses for immutable aggregates, each carrying a
   stable, serializable FieldKey identity that addresses a field for reads,
   writes, diffs and patches.
-version: 0.1.0
-
+version: 0.2.0
 homepage: https://github.com/iamv4g/keyed_form
 repository: https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_lens
 issue_tracker: https://github.com/iamv4g/keyed_form/issues
+topics:
+  - dart
+  - optics
+  - lens
+  - immutable
+  - functional-programming
 
 environment:
   sdk: ^3.10.0

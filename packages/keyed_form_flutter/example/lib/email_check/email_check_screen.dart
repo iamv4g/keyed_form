@@ -13,11 +13,19 @@ class EmailCheckScreen extends StatefulWidget {
 }
 
 class _EmailCheckScreenState extends State<EmailCheckScreen> {
-  final form = KeyedFormController<EmailCheckSchema>(
+  late final form = KeyedFormController<EmailCheckSchema>(
     initialValue: EmailCheckSchema.create(),
     mode: KeyedFormMode.onTouched,
     resolver: EmailCheckSchema.validateData,
+    asyncValidators: [
+      .field(
+        field: EmailCheckFields.email,
+        validate: (_, email) => _checkEmailTaken(email),
+        timeout: const Duration(seconds: 5),
+      ),
+    ],
   );
+  bool _submitted = false;
 
   @override
   void dispose() {
@@ -56,43 +64,59 @@ class _EmailCheckScreenState extends State<EmailCheckScreen> {
             const SizedBox(height: 24),
             KeyedFormField.text<EmailCheckSchema>(
               field: EmailCheckFields.email,
-              builder: (context, f, controller) {
-                void checkEmail() {
-                  f.onBlur();
-                  form
-                      .field(EmailCheckFields.email)
-                      .validateAsync(
-                        () => _checkEmailTaken(f.value ?? ''),
-                        timeout: const Duration(seconds: 5),
-                      );
-                }
-
-                return TextField(
-                  controller: controller,
-                  onTapOutside: (_) => checkEmail(),
-                  onSubmitted: (_) => checkEmail(),
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    errorText: f.errorText,
-                    helperText: f.isFailedValidation
-                        ? "Couldn't verify this email — try again."
-                        : null,
-                    border: const OutlineInputBorder(),
-                    suffixIcon: f.isValidating
-                        ? const Padding(
-                            padding: EdgeInsets.all(14),
-                            child: SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          )
-                        : f.isFailedValidation
-                        ? const Icon(Icons.warning_amber_rounded)
-                        : null,
+              builder: (context, f, controller) => TextField(
+                controller: controller,
+                onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  errorText: f.errorText,
+                  helperText: f.isFailedValidation
+                      ? "Couldn't verify this email — try again."
+                      : null,
+                  border: const OutlineInputBorder(),
+                  suffixIcon: f.isValidating
+                      ? const Padding(
+                          padding: EdgeInsets.all(14),
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : f.isFailedValidation
+                      ? IconButton(
+                          tooltip: 'Retry email check',
+                          onPressed: () async {
+                            await form.field(EmailCheckFields.email).validate();
+                          },
+                          icon: const Icon(Icons.refresh),
+                        )
+                      : null,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            KeyedFormBuilder<EmailCheckSchema>(
+              builder: (context, controller) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  FilledButton(
+                    onPressed: controller.submitting
+                        ? null
+                        : () async {
+                            await form.handleSubmit(context, (_) {
+                              setState(() => _submitted = true);
+                            });
+                          },
+                    child: Text(controller.submitting ? 'Checking…' : 'Submit'),
                   ),
-                );
-              },
+                  if (_submitted)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 8),
+                      child: Text('Submitted'),
+                    ),
+                ],
+              ),
             ),
           ],
         ),

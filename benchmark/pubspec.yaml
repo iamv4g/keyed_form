@@ -16,9 +16,9 @@ dependencies:
   # This is a test-support package: the widget harnesses expose `Finder`s.
   flutter_test:
     sdk: flutter
-  keyed_form: ^0.1.0
-  keyed_form_flutter: ^0.1.0
-  keyed_form_schema: ^0.1.0
+  keyed_form: ^0.2.0
+  keyed_form_flutter: ^0.2.0
+  keyed_form_schema: ^0.2.0
   reactive_forms: ^18.2.2
   # 10.3.x is the last line on plain package:flutter/material; 11.x moved to
   # package:material_ui, which most projects have not adopted yet.

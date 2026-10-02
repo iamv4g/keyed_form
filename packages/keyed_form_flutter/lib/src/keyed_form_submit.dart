@@ -11,11 +11,10 @@ extension KeyedFormHandleSubmit<Root> on KeyedFormController<Root> {
   /// Same contract as [submit]: validates, and on success runs [onValid]
   /// while toggling [KeyedFormController.submitting] around it.
   ///
-  /// On failure, [onInvalid] runs if given; otherwise the first visible
-  /// error is revealed (scrolled to and focused) via the ambient
-  /// `KeyedFieldRegistry` — no registry to construct or pass, [KeyedForm]
-  /// owns one internally.
-  ///
+  /// Value errors use [onInvalid] when given, otherwise the first visible
+  /// error is revealed via the ambient `KeyedFieldRegistry`. Blocking
+  /// technical failures use [onValidationUnavailable]; without that callback,
+  /// fields whose checks failed are revealed instead.
   /// [context] must be a descendant of the [KeyedForm]`<Root>` this
   /// controller belongs to — the `context` a builder callback hands you
   /// (`KeyedFormSelector`, `KeyedFormBuilder`, a field's own builder), not
@@ -26,6 +25,8 @@ extension KeyedFormHandleSubmit<Root> on KeyedFormController<Root> {
     BuildContext context,
     FutureOr<void> Function(Root value) onValid, {
     FutureOr<void> Function(Iterable<FieldKey> errorKeys)? onInvalid,
+    FutureOr<void> Function(KeyedFormValidationResult result)?
+    onValidationUnavailable,
     Duration duration = const Duration(milliseconds: 300),
     double alignment = 0.1,
   }) {
@@ -36,6 +37,19 @@ extension KeyedFormHandleSubmit<Root> on KeyedFormController<Root> {
           onInvalid ??
           (keys) => registry.revealFirst(
             keys,
+            duration: duration,
+            alignment: alignment,
+          ),
+      onValidationUnavailable:
+          onValidationUnavailable ??
+          (result) => registry.revealFirst(
+            result.failures.entries
+                .where(
+                  (entry) =>
+                      entry.value.failureMode ==
+                      KeyedFormAsyncFailureMode.blockSubmit,
+                )
+                .map((entry) => entry.key),
             duration: duration,
             alignment: alignment,
           ),

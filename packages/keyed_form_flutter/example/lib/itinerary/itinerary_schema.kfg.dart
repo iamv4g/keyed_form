@@ -304,8 +304,9 @@ sealed class ActivitySchema implements KeyedRow {
 
 abstract final class _ActivityVariants {
   static final sightseeing =
-      VariantRef<ActivitySchema, SightseeingActivitySchema>.type();
-  static final meal = VariantRef<ActivitySchema, MealActivitySchema>.type();
+      VariantFieldRef<ActivitySchema, SightseeingActivitySchema>.type();
+  static final meal =
+      VariantFieldRef<ActivitySchema, MealActivitySchema>.type();
 }
 
 abstract final class ActivityFields {}

@@ -18,6 +18,8 @@
   use `keyed_lens` vocabulary, so a row accessor's doc now just says its
   read/write is a no-op when the row doesn't exist.
 
+- Add pub.dev topics for package discoverability.
+
 ## 0.1.0
 
 Initial release.
