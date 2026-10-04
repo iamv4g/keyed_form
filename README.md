@@ -52,7 +52,7 @@ The same "Kyoto tour" runs through every package, bottom to top:
 
 ## Agent Skill
 
-[`skills/keyed_form/`](skills/keyed_form/SKILL.md) is a Claude Agent Skill that teaches an AI agent the full API, so it wires schemas, fields, validation, dynamic lists and submit handling idiomatically. Copy it into a project's `.claude/skills/` (or `~/.claude/skills/`) to enable it.
+[`skills/keyed-form/`](skills/keyed-form/SKILL.md) is a Claude Agent Skill that teaches an AI agent the full API, so it wires schemas, fields, validation, dynamic lists and submit handling idiomatically. Copy it into a project's `.claude/skills/` (or `~/.claude/skills/`) to enable it.
 
 ## License
 
