@@ -9,6 +9,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import 'ast_arguments.dart';
 import 'naming.dart';
 
 /// Strips chained method calls like `.refine(...)` off [expr], returning the
@@ -81,7 +82,7 @@ String? resolveDartType(Expression expr) {
       }
       final args = base.argumentList.arguments;
       if (args.isNotEmpty) {
-        final first = args.first;
+        final first = argumentExpressionOf(args.first);
         if (first is PrefixedIdentifier && first.identifier.name == 'values') {
           return first.prefix.name;
         } else if (first is PropertyAccess &&
@@ -94,7 +95,8 @@ String? resolveDartType(Expression expr) {
     if (name == 'list') {
       final args = base.argumentList.arguments;
       if (args.isNotEmpty) {
-        final innerType = resolveDartType(args.first) ?? 'Object';
+        final innerType =
+            resolveDartType(argumentExpressionOf(args.first)) ?? 'Object';
         return 'List<$innerType>';
       }
       return 'List<Object>';
@@ -106,17 +108,18 @@ String? resolveDartType(Expression expr) {
       }
       final args = base.argumentList.arguments;
       if (args.length >= 2) {
-        final k = resolveDartType(args[0]) ?? 'Object';
-        final v = resolveDartType(args[1]) ?? 'Object';
+        final k = resolveDartType(argumentExpressionOf(args[0])) ?? 'Object';
+        final v = resolveDartType(argumentExpressionOf(args[1])) ?? 'Object';
         return 'Map<$k, $v>';
       }
       return 'Map<Object, Object>';
     }
     if (name == 'object' || name == 'discriminatedUnion') {
       for (final arg in base.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'className') {
-          if (arg.expression is SimpleStringLiteral) {
-            return (arg.expression as SimpleStringLiteral).value;
+        if (argumentNameOf(arg) == 'className') {
+          final expression = argumentExpressionOf(arg);
+          if (expression is SimpleStringLiteral) {
+            return expression.value;
           }
         }
       }

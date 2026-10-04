@@ -12,6 +12,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:dart_style/dart_style.dart';
+import 'package:keyed_form_gen/src/ast_arguments.dart';
 import 'package:keyed_form_gen/src/generators/data_class_generator.dart';
 import 'package:keyed_form_gen/src/generators/preamble.dart';
 import 'package:keyed_form_gen/src/models/schema_model.dart';
@@ -31,11 +32,12 @@ String _suffixFor(CompilationUnit unit) {
   for (final directive in unit.directives) {
     for (final md in directive.metadata) {
       if (md.name.name != 'KeyedSchema') continue;
-      final args = md.arguments?.arguments ?? const <Expression>[];
+      final args = md.arguments?.arguments;
+      if (args == null) continue;
       for (final arg in args) {
-        if (arg is NamedExpression && arg.name.label.name == 'suffix') {
-          final v = arg.expression;
-          if (v is SimpleStringLiteral) return v.value;
+        if (argumentNameOf(arg) == 'suffix') {
+          final value = argumentExpressionOf(arg);
+          if (value is SimpleStringLiteral) return value.value;
         }
       }
     }

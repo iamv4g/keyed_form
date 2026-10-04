@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'ast_arguments.dart';
 
 import 'expression_type_resolver.dart';
 import 'models/schema_model.dart';
@@ -164,12 +165,13 @@ class SchemaParser {
     SetOrMapLiteral? mapLiteral;
 
     for (final arg in args) {
-      if (arg is SetOrMapLiteral) {
-        mapLiteral = arg;
-      } else if (arg is NamedExpression && arg.name.label.name == 'className') {
-        if (arg.expression is SimpleStringLiteral) {
-          explicitClassName = (arg.expression as SimpleStringLiteral).value;
+      final expression = argumentExpressionOf(arg);
+      if (argumentNameOf(arg) == 'className') {
+        if (expression is SimpleStringLiteral) {
+          explicitClassName = expression.value;
         }
+      } else if (expression is SetOrMapLiteral) {
+        mapLiteral = expression;
       }
     }
 
@@ -252,22 +254,22 @@ class SchemaParser {
         if (mArgs.isNotEmpty) {
           String? message;
           String? path;
-          for (final a in mArgs) {
-            if (a is NamedExpression) {
-              final label = a.name.label.name;
-              if (label == 'error') {
-                final expr = a.expression;
-                if (expr is MethodInvocation &&
-                    expr.methodName.name == 'text') {
-                  final firstArg = expr.argumentList.arguments.firstOrNull;
-                  if (firstArg is SimpleStringLiteral) {
-                    message = firstArg.value;
+          for (final argument in mArgs) {
+            final label = argumentNameOf(argument);
+            final expression = argumentExpressionOf(argument);
+            if (label == 'error') {
+              if (expression is MethodInvocation &&
+                  expression.methodName.name == 'text') {
+                final firstArg = expression.argumentList.arguments.firstOrNull;
+                if (firstArg != null) {
+                  final messageExpression = argumentExpressionOf(firstArg);
+                  if (messageExpression is SimpleStringLiteral) {
+                    message = messageExpression.value;
                   }
                 }
-              } else if (label == 'path' &&
-                  a.expression is SimpleStringLiteral) {
-                path = (a.expression as SimpleStringLiteral).value;
               }
+            } else if (label == 'path' && expression is SimpleStringLiteral) {
+              path = expression.value;
             }
           }
           if (message != null && path != null) {
@@ -319,7 +321,7 @@ class SchemaParser {
       } else if (cName == 'defaultTo') {
         final args = call.argumentList.arguments;
         if (args.isNotEmpty) {
-          defaultValue = args.first.toSource();
+          defaultValue = argumentExpressionOf(args.first).toSource();
         }
       }
     }
@@ -391,7 +393,7 @@ class SchemaParser {
         } else {
           final args = baseExpr.argumentList.arguments;
           if (args.isNotEmpty) {
-            final first = args.first;
+            final first = argumentExpressionOf(args.first);
             if (first is PrefixedIdentifier &&
                 first.identifier.name == 'values') {
               enumType = first.prefix.name;
@@ -424,8 +426,10 @@ class SchemaParser {
         } else {
           final args = baseExpr.argumentList.arguments;
           if (args.length >= 2) {
-            keyType = resolveDartType(args[0]) ?? 'Object';
-            valType = resolveDartType(args[1]) ?? 'Object';
+            keyType =
+                resolveDartType(argumentExpressionOf(args[0])) ?? 'Object';
+            valType =
+                resolveDartType(argumentExpressionOf(args[1])) ?? 'Object';
           }
         }
       }
@@ -444,8 +448,7 @@ class SchemaParser {
       if (baseExpr is! MethodInvocation) return null;
       final listArgs = baseExpr.argumentList.arguments;
       if (listArgs.isEmpty) return null;
-      final itemArg = listArgs.first;
-
+      final itemArg = argumentExpressionOf(listArgs.first);
       String singular = capitalize(fieldName);
       if (singular.endsWith('ies')) {
         singular = '${singular.substring(0, singular.length - 3)}y';
@@ -589,8 +592,8 @@ class SchemaParser {
     final args = baseExpr.argumentList.arguments;
     if (args.length < 2) return null;
 
-    final discArg = args[0];
-    final variantsArg = args[1];
+    final discArg = argumentExpressionOf(args[0]);
+    final variantsArg = argumentExpressionOf(args[1]);
 
     String discriminator = 'category';
     if (discArg is SimpleStringLiteral) {
@@ -598,10 +601,11 @@ class SchemaParser {
     }
 
     String? explicitClassName;
-    for (final a in args) {
-      if (a is NamedExpression && a.name.label.name == 'className') {
-        if (a.expression is SimpleStringLiteral) {
-          explicitClassName = (a.expression as SimpleStringLiteral).value;
+    for (final argument in args) {
+      if (argumentNameOf(argument) == 'className') {
+        final expression = argumentExpressionOf(argument);
+        if (expression is SimpleStringLiteral) {
+          explicitClassName = expression.value;
         }
       }
     }

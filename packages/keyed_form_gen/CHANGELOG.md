@@ -1,7 +1,10 @@
+## 0.2.2
+
+- Allow analyzer 14.
+
 ## 0.2.1
 
-- Widen the analyzer dependency to include analyzer 13, allowing dependency
-  resolution alongside packages that require analyzer 13.
+- Allow analyzer 13.
 
 ## 0.2.0
 
