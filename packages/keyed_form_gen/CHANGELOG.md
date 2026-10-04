@@ -1,3 +1,8 @@
+## 0.2.1
+
+- Widen the analyzer dependency to include analyzer 13, allowing dependency
+  resolution alongside packages that require analyzer 13.
+
 ## 0.2.0
 
 - `refine(path: ...)` is now checked against the schema's declared fields at

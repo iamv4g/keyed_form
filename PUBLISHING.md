@@ -17,7 +17,7 @@ table and pub.dev ever disagree.
 | `keyed_lens`         | 0.2.0 | 2026-10-02 |
 | `keyed_form_core`    | 0.2.0 | 2026-10-02 |
 | `keyed_form_schema`  | 0.2.0 | 2026-10-02 |
-| `keyed_form_gen`     | 0.2.0 | 2026-10-02 |
+| `keyed_form_gen`     | 0.2.1 | 2026-10-04 |
 | `keyed_form`         | 0.2.0 | 2026-10-02 |
 | `keyed_form_flutter` | 0.2.0 | 2026-10-02 |
 
