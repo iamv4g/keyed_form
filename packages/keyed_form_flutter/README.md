@@ -145,7 +145,7 @@ field inside it — handles edits within a row.
 ## More
 
 - [Full documentation, guides, and examples](https://keyed-form.v4g.space).
-- [`skills/keyed_form/SKILL.md`](https://github.com/iamv4g/keyed_form/blob/main/skills/keyed_form/SKILL.md) — the
+- [`skills/keyed-form/SKILL.md`](https://github.com/iamv4g/keyed_form/blob/main/skills/keyed-form/SKILL.md) — the
   full API reference: cross-field and async validation, read-only fields,
   derived fields, scroll-to-first-error in a lazy list, and more.
 - [`example/`](https://github.com/iamv4g/keyed_form/tree/main/packages/keyed_form_flutter/example) — a runnable app, one screen per

@@ -34,7 +34,7 @@ class Footer extends StatelessComponent {
           ]),
           _column('Resources', [
             _link('Playground', '$siteBasePath/playground'),
-            _link('Agent skill (SKILL.md)', '$_repo/blob/main/skills/keyed_form/SKILL.md', external: true),
+            _link('Agent skill (SKILL.md)', '$_repo/blob/main/skills/keyed-form/SKILL.md', external: true),
             _link('Full examples', '$_repo/tree/main/packages/keyed_form_flutter/example', external: true),
           ]),
         ]),

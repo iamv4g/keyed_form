@@ -6,15 +6,15 @@ import 'copy_button.dart';
 class AgentSkillSection extends StatelessComponent {
   const AgentSkillSection({super.key});
 
-  static const _skillUrl = 'https://raw.githubusercontent.com/iamv4g/keyed_form/main/skills/keyed_form/SKILL.md';
+  static const _skillUrl = 'https://raw.githubusercontent.com/iamv4g/keyed_form/main/skills/keyed-form/SKILL.md';
 
   static const _install =
-      'mkdir -p .agents/skills/keyed_form && \\\n'
+      'mkdir -p .agents/skills/keyed-form && \\\n'
       '  curl -fsSL $_skillUrl \\\n'
-      '  -o .agents/skills/keyed_form/SKILL.md';
+      '  -o .agents/skills/keyed-form/SKILL.md';
 
   static const _claudeLink =
-      'mkdir -p .claude/skills && ln -s ../../.agents/skills/keyed_form .claude/skills/keyed_form';
+      'mkdir -p .claude/skills && ln -s ../../.agents/skills/keyed-form .claude/skills/keyed-form';
 
   @override
   Component build(BuildContext context) {
@@ -32,7 +32,7 @@ class AgentSkillSection extends StatelessComponent {
           ]),
           a(
             classes: 'section-link mono',
-            href: 'https://github.com/iamv4g/keyed_form/blob/main/skills/keyed_form/SKILL.md',
+            href: 'https://github.com/iamv4g/keyed_form/blob/main/skills/keyed-form/SKILL.md',
             target: Target.blank,
             [.text('Read SKILL.md →')],
           ),
