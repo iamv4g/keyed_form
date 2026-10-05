@@ -17,18 +17,10 @@ class HeroSection extends StatelessComponent {
         div(classes: 'hero-chips mono', [
           for (final chip in const ['MIT', 'Pure Dart core', 'Flutter']) span(classes: 'chip', [.text(chip)]),
         ]),
-        h1(classes: 'display', [
-          .text('Big forms. Less code.'),
-          span(classes: 'highlight', [.text('One rebuild per keystroke.')]),
-        ]),
+        h1(classes: 'display', [.text('Big forms, made easy.')]),
         p(classes: 'hero-tagline', [
-          .text('Declare one schema; '),
           strong([.text('keyed_form')]),
-          .text(
-            ' generates the typed field refs, so each widget listens to its own slice of state — at 250 fields, '
-            'across list reorders, with no string keys. Form logic stays plain Dart you can test without a widget '
-            'tree.',
-          ),
+          .text(' handles nested fields, dependent rules and rebuilds, so big forms stay fast.'),
         ]),
         div(classes: 'cmd-bar mono', [
           span([.text(r'$ ')]),

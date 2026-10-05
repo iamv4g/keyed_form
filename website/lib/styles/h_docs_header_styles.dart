@@ -113,8 +113,8 @@ List<StyleRule> get docsHeaderStyles => [
     radius: BorderRadius.circular(6.px),
   ),
 
-  // Ghost buttons: GitHub, theme, sidebar toggle.
-  css('.header-icon-button, .docs-header .theme-toggle, .sidebar-trigger').styles(
+  // Ghost buttons: GitHub, sidebar toggle (the theme toggle shares this look via a_shared_styles).
+  css('.header-icon-button, .sidebar-trigger').styles(
     display: Display.inlineFlex,
     alignItems: AlignItems.center,
     justifyContent: JustifyContent.center,
@@ -127,7 +127,7 @@ List<StyleRule> get docsHeaderStyles => [
     cursor: Cursor.pointer,
     raw: {'width': 'auto'},
   ),
-  css('.header-icon-button:hover, .docs-header .theme-toggle:hover, .sidebar-trigger:hover').styles(
+  css('.header-icon-button:hover, .sidebar-trigger:hover').styles(
     backgroundColor: AppColors.surfaceElevated,
     color: AppColors.ink,
   ),
