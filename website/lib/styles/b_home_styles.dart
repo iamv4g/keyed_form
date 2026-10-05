@@ -126,12 +126,6 @@ List<StyleRule> get homeStyles => [
     letterSpacing: (-0.03).em,
     fontSize: 3.rem,
   ),
-  css('.hero h1 .highlight').styles(
-    display: Display.block,
-    color: AppColors.cyan,
-    position: Position.relative(),
-  ),
-
   css('.hero-tagline').styles(
     margin: .only(top: 20.px),
     fontSize: 1.15.rem,
