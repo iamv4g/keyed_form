@@ -85,13 +85,23 @@ List<StyleRule> get homeStyles => [
     backgroundColor: AppColors.border,
   ),
 
-  css('.nav-icon').styles(
+  // Same ghost look as the docs header buttons. The `.nav-links` prefix beats
+  // the `.nav-links a` colour rules.
+  css('.nav-links .nav-icon, .nav-links .theme-toggle').styles(
+    margin: .symmetric(horizontal: (-6).px),
+  ),
+  css('.nav-links .nav-icon').styles(
     display: Display.inlineFlex,
     alignItems: AlignItems.center,
     justifyContent: JustifyContent.center,
-    width: 34.px,
-    height: 34.px,
-    margin: .symmetric(horizontal: (-6).px),
+    height: 36.px,
+    padding: .symmetric(horizontal: 10.px),
+    color: AppColors.ink,
+    radius: BorderRadius.circular(10.px),
+  ),
+  css('.nav-links .nav-icon:hover').styles(
+    backgroundColor: AppColors.surfaceElevated,
+    color: AppColors.ink,
   ),
 
   // Hero Section
