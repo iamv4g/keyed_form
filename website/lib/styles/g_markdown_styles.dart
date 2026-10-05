@@ -11,10 +11,12 @@ List<StyleRule> get markdownStyles => [
     display: Display.flex,
     alignItems: AlignItems.start,
   ),
+  // Stretch to the article's height: the sticky panel inside can only travel
+  // within this column, so a shrink-wrapped column scrolls away with the page.
   css('.md-sidebar').styles(
     width: Unit.expression('var(--sidebar-width)'),
     fontSize: 0.875.rem,
-    raw: {'flex': 'none'},
+    raw: {'flex': 'none', 'align-self': 'stretch'},
   ),
   css('.md-sidebar-panel').styles(
     display: Display.flex,
