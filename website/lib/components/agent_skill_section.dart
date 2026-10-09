@@ -6,12 +6,13 @@ import 'copy_button.dart';
 class AgentSkillSection extends StatelessComponent {
   const AgentSkillSection({super.key});
 
-  static const _skillUrl = 'https://raw.githubusercontent.com/iamv4g/keyed_form/main/skills/keyed-form/SKILL.md';
+  static const _skillBase = 'https://raw.githubusercontent.com/iamv4g/keyed_form/main/skills/keyed-form';
 
   static const _install =
-      'mkdir -p .agents/skills/keyed-form && \\\n'
-      '  curl -fsSL $_skillUrl \\\n'
-      '  -o .agents/skills/keyed-form/SKILL.md';
+      'mkdir -p .agents/skills/keyed-form/references && \\\n'
+      '  for f in SKILL.md references/schema.md references/controller.md references/widgets.md; do \\\n'
+      '    curl -fsSL $_skillBase/\$f -o .agents/skills/keyed-form/\$f; \\\n'
+      '  done';
 
   static const _claudeLink =
       'mkdir -p .claude/skills && ln -s ../../.agents/skills/keyed-form .claude/skills/keyed-form';
