@@ -90,7 +90,7 @@ void main() {
       tester.pumpComponent(const AgentSkillSection());
 
       expect(find.text('// AGENT SKILL'), findsOneComponent);
-      expect(find.textContaining('-o .agents/skills/keyed-form/SKILL.md'), findsOneComponent);
+      expect(find.textContaining('-o .agents/skills/keyed-form/\$f'), findsOneComponent);
       expect(
         find.text('mkdir -p .claude/skills && ln -s ../../.agents/skills/keyed-form .claude/skills/keyed-form'),
         findsOneComponent,
